@@ -2,7 +2,7 @@
 """
 Build a single self-contained HTML file from the working CSV.
 
-Reads:   data/resources.csv, index.html, src/styles.css, src/app.js
+Reads:   data/resources.csv, index.html, styles.css, app.js
 Writes:  dist/resources-app.html
 
 The output embeds the data as JavaScript and inlines all CSS/JS, so it has no
@@ -25,8 +25,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CSV_IN = os.path.join(ROOT, "data", "resources.csv")
 HTML_IN = os.path.join(ROOT, "index.html")
-CSS_IN = os.path.join(ROOT, "src", "styles.css")
-JS_IN = os.path.join(ROOT, "src", "app.js")
+CSS_IN = os.path.join(ROOT, "styles.css")
+JS_IN = os.path.join(ROOT, "app.js")
 OUT = os.path.join(ROOT, "dist", "resources-app.html")
 
 FIELDS = {
@@ -179,15 +179,15 @@ def main():
     html = html.replace("<!--NOSCRIPT-LIST-->", noscript_list(records))
 
     # Inline the stylesheet.
-    if '<link rel="stylesheet" href="src/styles.css">' not in html:
+    if '<link rel="stylesheet" href="styles.css">' not in html:
         raise SystemExit("Could not find the stylesheet <link> tag in index.html")
     html = html.replace(
-        '<link rel="stylesheet" href="src/styles.css">',
+        '<link rel="stylesheet" href="styles.css">',
         "<style>\n" + js_string_safe(css) + "\n</style>",
     )
 
     # Embed the data, then inline the app script.
-    if '<script src="src/app.js"></script>' not in html:
+    if '<script src="app.js"></script>' not in html:
         raise SystemExit("Could not find the app <script> tag in index.html")
 
     built = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -206,7 +206,7 @@ def main():
         + str(len(records))
         + ' resources · built "+window.__BUILT__;});</script>'
     )
-    html = html.replace('<script src="src/app.js"></script>', payload)
+    html = html.replace('<script src="app.js"></script>', payload)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as fh:
