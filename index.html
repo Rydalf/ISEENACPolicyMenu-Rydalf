@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resource Menu · Environmental Epidemiology</title>
+<meta name="description" content="A searchable menu of policy, advocacy, and civic-engagement resources for environmental epidemiologists.">
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Environmental Epidemiology Resource Menu</h1>
+    <p>Guides, databases, legal resources, and advocacy tools for translating environmental health science into policy and action.</p>
+  </header>
+
+  <div class="controls" id="controls">
+    <div class="searchrow">
+      <div class="searchbox" id="searchbox">
+        <span id="search-icon"></span>
+        <label class="visually-hidden" for="search">Search resources</label>
+        <input id="search" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search resources, creators, descriptions…">
+        <span class="slash-hint">
+          <button class="clear-search" id="clear-search" type="button" aria-label="Clear search">×</button>
+          <kbd>/</kbd>
+        </span>
+      </div>
+      <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters">
+        Filters<span class="badge" id="filter-badge"></span>
+      </button>
+      <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
+      <button class="btn" id="random" type="button">Random resource</button>
+    </div>
+
+    <div class="filters" id="filters">
+      <div class="fgroup">
+        <span class="flabel" id="lbl-type">Type</span>
+        <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
+      </div>
+      <div class="fgroup">
+        <span class="flabel" id="lbl-sub">Subtype</span>
+        <div class="pills" id="sub-pills" role="group" aria-labelledby="lbl-sub"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span class="count" id="count" aria-live="polite">Loading…</span>
+    <span class="crumbs" id="crumbs"></span>
+  </div>
+
+  <main id="grid" class="skeleton-grid" aria-busy="true">
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+  </main>
+
+  <noscript>
+    <style>
+      .controls, .statusbar, #grid { display: none !important; }
+    </style>
+    <div class="nojs-note">
+      <strong>JavaScript is required</strong> to search and filter this menu.
+      If you're viewing this as a downloaded file rather than a web page, open it
+      in a browser instead (on iPhone or iPad: tap <em>Share → Open in Safari</em>).
+    </div>
+    <!--NOSCRIPT-LIST-->
+  </noscript>
+
+  <footer class="foot">
+    <span>Click a card to open the resource · hover for full details · press <kbd>/</kbd> to search</span>
+    <span id="stamp"></span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="src/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resource Menu · Environmental Epidemiology</title>
+<meta name="description" content="A searchable menu of policy, advocacy, and civic-engagement resources for environmental epidemiologists.">
+<style>
+/* Resource Menu — environmental epidemiology policy & advocacy resources */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --border: #e2e6ec;
+  --border-strong: #cfd6e0;
+  --text: #131720;
+  --text-2: #5a6472;
+  --text-3: #8a93a2;
+  --accent: #1f6feb;
+  --accent-soft: #e8f0fe;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 14px 34px rgba(16, 24, 40, 0.14);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --ring: 0 0 0 3px rgba(31, 111, 235, 0.28);
+  --type-s: 62%;
+  --type-l: 42%;
+  --type-tint-l: 96%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1116;
+    --surface: #171b22;
+    --surface-2: #1e242d;
+    --border: #272e39;
+    --border-strong: #38414f;
+    --text: #e8ecf2;
+    --text-2: #a3adbb;
+    --text-3: #78828f;
+    --accent: #62a0ff;
+    --accent-soft: #17263f;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.6);
+    --ring: 0 0 0 3px rgba(98, 160, 255, 0.35);
+    --type-s: 55%;
+    --type-l: 66%;
+    --type-tint-l: 20%;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 20px 96px;
+}
+
+/* ---------- Header ---------- */
+
+.masthead { margin-bottom: 22px; }
+
+.masthead h1 {
+  margin: 0 0 6px;
+  font-size: clamp(23px, 3.4vw, 31px);
+  letter-spacing: -0.02em;
+  font-weight: 680;
+}
+
+.masthead p {
+  margin: 0;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+
+/* ---------- Controls ---------- */
+
+.controls {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.6) blur(10px);
+  -webkit-backdrop-filter: saturate(1.6) blur(10px);
+  border-bottom: 1px solid transparent;
+  padding: 14px 0 12px;
+  margin-bottom: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.controls.is-stuck {
+  border-bottom-color: var(--border);
+  box-shadow: 0 6px 18px -12px rgba(16, 24, 40, 0.5);
+}
+
+.searchrow {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.searchbox {
+  position: relative;
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.searchbox svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+#search {
+  width: 100%;
+  padding: 12px 84px 12px 40px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 11px;
+  outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+#search::placeholder { color: var(--text-3); }
+#search:focus { border-color: var(--accent); box-shadow: var(--ring); }
+
+.slash-hint {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+kbd {
+  font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--text-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 4px 6px;
+}
+
+.clear-search {
+  border: 0;
+  background: var(--surface-2);
+  color: var(--text-2);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.clear-search:hover { background: var(--border-strong); color: var(--text); }
+.searchbox.has-value .clear-search { display: flex; }
+
+.btn {
+  font: inherit;
+  font-weight: 560;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 11px;
+  padding: 11px 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: transform 0.12s ease, box-shadow 0.16s ease,
+    background 0.16s ease, border-color 0.16s ease;
+}
+
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); box-shadow: var(--shadow-sm); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.btn:disabled {
+  opacity: 0.42;
+  cursor: default;
+  color: var(--text-3);
+}
+
+/* Filters disclosure — only used on narrow screens */
+#filter-toggle { display: none; }
+
+.badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  min-width: 18px;
+  padding: 1px 5px;
+  text-align: center;
+}
+
+.badge:empty { display: none; }
+
+/* Clear-filters lights up once something is actually filtering */
+#clear-filters:not(:disabled) {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+#clear-filters:not(:disabled):hover {
+  border-color: #e5484d;
+  color: #e5484d;
+  background: color-mix(in srgb, #e5484d 8%, var(--surface));
+}
+
+/* ---------- Filter groups ---------- */
+
+.filters { margin-top: 14px; display: grid; gap: 11px; }
+
+.fgroup {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.fgroup > .flabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding-top: 7px;
+}
+
+.pills { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.pill {
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.2;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, transform 0.12s ease, opacity 0.15s ease;
+}
+
+.pill .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--type-h, 220) var(--type-s) var(--type-l));
+  flex: none;
+}
+
+.pill .n {
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: var(--text-3);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 1px 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pill:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+.pill:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.pill[aria-pressed="true"] {
+  color: #fff;
+  background: hsl(var(--type-h, 220) var(--type-s) var(--type-l));
+  border-color: hsl(var(--type-h, 220) var(--type-s) var(--type-l));
+  font-weight: 560;
+}
+
+.pill[aria-pressed="true"] .n {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.pill[aria-pressed="true"] .dot { background: rgba(255, 255, 255, 0.85); }
+
+.pill.is-empty { opacity: 0.34; }
+.pill.is-empty:hover { transform: none; }
+
+/* ---------- Status bar / breadcrumbs ---------- */
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 18px;
+  min-height: 30px;
+}
+
+.count { font-size: 13.5px; color: var(--text-2); }
+.count strong { color: var(--text); font-variant-numeric: tabular-nums; }
+
+.crumbs { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+
+.crumb {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 4px 6px 4px 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  animation: pop 0.18s ease both;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.crumb .k { color: var(--text-2); }
+.crumb .x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(127, 127, 127, 0.18);
+  font-size: 12px;
+  line-height: 1;
+}
+.crumb:hover { background: var(--surface); border-color: var(--border-strong); }
+.crumb:hover .x { background: #e5484d; color: #fff; }
+.crumb:focus-visible { outline: none; box-shadow: var(--ring); }
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Grid + cards ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 17px 17px 15px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  overflow: hidden;
+  animation: fadeUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Type colour stripe */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: hsl(var(--type-h) var(--type-s) var(--type-l));
+  opacity: 0.9;
+  transition: width 0.2s ease;
+}
+
+.card:hover,
+.card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: hsl(var(--type-h) var(--type-s) var(--type-l) / 0.55);
+  z-index: 2;
+}
+
+.card:hover::before { width: 6px; }
+.card:focus-visible { outline: none; box-shadow: var(--ring), var(--shadow-lg); }
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card h3 {
+  margin: 0 0 9px;
+  font-size: 15.5px;
+  font-weight: 640;
+  letter-spacing: -0.01em;
+  line-height: 1.34;
+  padding-left: 6px;
+}
+
+.card h3 a {
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.25s ease;
+}
+
+.card:hover h3 a { background-size: 100% 1px; }
+
+.tagrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding-left: 6px;
+}
+
+.tag {
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 560;
+  line-height: 1.2;
+  border-radius: 999px;
+  padding: 3.5px 9px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag.type {
+  color: hsl(var(--type-h) var(--type-s) calc(var(--type-l) - 6%));
+  background: hsl(var(--type-h) var(--type-s) var(--type-tint-l));
+  border-color: hsl(var(--type-h) var(--type-s) var(--type-l) / 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tag.type { color: hsl(var(--type-h) var(--type-s) calc(var(--type-l) + 12%)); }
+}
+
+.tag.sub {
+  color: var(--text-2);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.tag:hover { transform: translateY(-1px); filter: brightness(1.04); box-shadow: var(--shadow-sm); }
+.tag:focus-visible { outline: none; box-shadow: var(--ring); }
+.tag[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px currentColor; }
+
+.desc {
+  margin: 0;
+  padding-left: 6px;
+  color: var(--text-2);
+  font-size: 13.5px;
+  line-height: 1.58;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card:hover .desc,
+.card:focus-within .desc {
+  -webkit-line-clamp: 30;
+  line-clamp: 30;
+}
+
+/* Secondary metadata — hidden until hover to keep the base card clean */
+.meta {
+  padding-left: 6px;
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.22s ease, margin-top 0.26s ease;
+  margin-top: 0;
+}
+
+.meta > div { overflow: hidden; min-height: 0; }
+
+.card:hover .meta,
+.card:focus-within .meta {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 11px;
+}
+
+.meta-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.meta-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.meta-item svg { flex: none; opacity: 0.75; }
+.meta-item .v { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Copy-link button — appears on hover */
+.copy {
+  flex: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transform: scale(0.86);
+  transition: opacity 0.18s ease, transform 0.18s ease, color 0.15s ease,
+    border-color 0.15s ease, background 0.15s ease;
+}
+
+.card:hover .copy,
+.card:focus-within .copy,
+.copy:focus-visible { opacity: 1; transform: none; }
+
+.copy:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.copy:focus-visible { outline: none; box-shadow: var(--ring); }
+.copy.copied { color: #0a7d55; border-color: #a9e3cb; background: #e3f7ee; }
+
+/* Touch devices have no hover, so nothing may hide behind it: show the copy
+   button, the full description, and the metadata outright. */
+@media (hover: none) {
+  .copy { opacity: 1; transform: none; }
+  .desc { -webkit-line-clamp: unset; line-clamp: unset; display: block; overflow: visible; }
+  .meta { grid-template-rows: 1fr; opacity: 1; margin-top: 11px; }
+  .card:active { transform: scale(0.985); box-shadow: var(--shadow-md); }
+}
+
+/* Search-match highlight */
+mark {
+  background: #fff2a8;
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+  font-weight: 620;
+}
+
+@media (prefers-color-scheme: dark) {
+  mark { background: #6a5a12; color: #ffeeb0; }
+}
+
+/* Tag-hover cross-highlighting */
+.grid.dimming .card { opacity: 0.32; filter: saturate(0.5); }
+.grid.dimming .card.tag-match {
+  opacity: 1;
+  filter: none;
+  border-color: hsl(var(--type-h) var(--type-s) var(--type-l) / 0.7);
+  box-shadow: var(--shadow-md);
+}
+
+/* Random-pick flash */
+.card.flash {
+  animation: fadeUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both, flash 1.5s ease 0.1s;
+}
+
+@keyframes flash {
+  0%, 100% { box-shadow: var(--shadow-sm); }
+  18% { box-shadow: 0 0 0 4px hsl(var(--type-h) var(--type-s) var(--type-l) / 0.4), var(--shadow-lg); }
+  70% { box-shadow: 0 0 0 4px hsl(var(--type-h) var(--type-s) var(--type-l) / 0.25), var(--shadow-md); }
+}
+
+/* ---------- Empty + loading states ---------- */
+
+.state {
+  text-align: center;
+  padding: 66px 20px;
+  animation: fadeUp 0.3s ease both;
+}
+
+.state .icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state h2 { margin: 0 0 7px; font-size: 17px; font-weight: 640; }
+.state p { margin: 0 auto 18px; color: var(--text-2); max-width: 46ch; }
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+  gap: 16px;
+}
+
+.skel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 17px;
+  height: 172px;
+}
+
+.skel span {
+  display: block;
+  height: 11px;
+  border-radius: 6px;
+  margin-bottom: 11px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 37%, var(--surface-2) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+.skel span:nth-child(1) { width: 62%; height: 15px; }
+.skel span:nth-child(2) { width: 34%; }
+.skel span:nth-child(3) { width: 100%; }
+.skel span:nth-child(4) { width: 92%; }
+.skel span:nth-child(5) { width: 71%; }
+
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+.error-box {
+  border: 1px solid #f0c0c0;
+  background: #fdf1f1;
+  color: #8a2020;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  font-size: 14px;
+}
+
+.error-box code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .error-box { border-color: #5e2626; background: #2a1414; color: #ff9d9d; }
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 14px);
+  background: #131720;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 540;
+  padding: 10px 17px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 100;
+}
+
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-color-scheme: dark) {
+  .toast { background: #e8ecf2; color: #131720; }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 720px) {
+  .wrap { padding: 22px 14px 72px; }
+  .fgroup { grid-template-columns: 1fr; gap: 6px; }
+  .fgroup > .flabel { padding-top: 0; }
+  .grid, .skeleton-grid { grid-template-columns: 1fr; }
+  .slash-hint kbd { display: none; }
+  .controls { padding-top: 10px; }
+
+  /* 16px minimum stops iOS Safari zooming the page on focus */
+  #search { font-size: 16px; padding: 12px 44px 12px 40px; }
+
+  .searchbox { flex: 1 1 100%; }
+
+  /* Buttons share a second row evenly instead of overflowing */
+  #filter-toggle, #clear-filters, #random {
+    display: inline-flex;
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 11px 10px;
+    font-size: 13.5px;
+  }
+
+  /* 35 pills would swallow the screen, so collapse them behind a toggle */
+  .filters { display: none; }
+  .controls.filters-open .filters {
+    display: grid;
+    max-height: 45vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 2px;
+  }
+
+  /* Comfortable tap targets (~40px) */
+  .pill { padding: 9px 14px; font-size: 13.5px; }
+  .tag { padding: 6.5px 12px; font-size: 12px; }
+  .crumb { padding: 7px 8px 7px 13px; font-size: 13px; }
+  .crumb .x { width: 20px; height: 20px; }
+  .copy { width: 38px; height: 38px; }
+  .clear-search { width: 26px; height: 26px; }
+
+  .card { padding: 16px 15px 14px; }
+  .masthead h1 { font-size: 22px; }
+
+  /* Wrap the creator rather than truncating it — there's room in one column */
+  .meta-item .v { white-space: normal; }
+}
+
+/* ---------- No-JavaScript fallback ---------- */
+
+.nojs-note {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 15px 17px;
+  margin-bottom: 20px;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.nojs-note strong { color: var(--text); }
+
+.nojs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 13px;
+}
+
+.nojs-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.nojs-item a {
+  font-weight: 640;
+  font-size: 15px;
+  color: var(--text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.nojs-item a:hover { color: var(--accent); text-decoration: underline; }
+
+.nojs-kind {
+  display: block;
+  margin: 5px 0 7px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.nojs-item p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+/* Long titles must never push the layout sideways */
+.card h3, .desc { overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+footer.foot {
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  color: var(--text-3);
+  font-size: 12.5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Environmental Epidemiology Resource Menu</h1>
+    <p>Guides, databases, legal resources, and advocacy tools for translating environmental health science into policy and action.</p>
+  </header>
+
+  <div class="controls" id="controls">
+    <div class="searchrow">
+      <div class="searchbox" id="searchbox">
+        <span id="search-icon"></span>
+        <label class="visually-hidden" for="search">Search resources</label>
+        <input id="search" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search resources, creators, descriptions…">
+        <span class="slash-hint">
+          <button class="clear-search" id="clear-search" type="button" aria-label="Clear search">×</button>
+          <kbd>/</kbd>
+        </span>
+      </div>
+      <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters">
+        Filters<span class="badge" id="filter-badge"></span>
+      </button>
+      <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
+      <button class="btn" id="random" type="button">Random resource</button>
+    </div>
+
+    <div class="filters" id="filters">
+      <div class="fgroup">
+        <span class="flabel" id="lbl-type">Type</span>
+        <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
+      </div>
+      <div class="fgroup">
+        <span class="flabel" id="lbl-sub">Subtype</span>
+        <div class="pills" id="sub-pills" role="group" aria-labelledby="lbl-sub"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span class="count" id="count" aria-live="polite">Loading…</span>
+    <span class="crumbs" id="crumbs"></span>
+  </div>
+
+  <main id="grid" class="skeleton-grid" aria-busy="true">
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="skel"><span></span><span></span><span></span><span></span><span></span></div>
+  </main>
+
+  <noscript>
+    <style>
+      .controls, .statusbar, #grid { display: none !important; }
+    </style>
+    <div class="nojs-note">
+      <strong>JavaScript is required</strong> to search and filter this menu.
+      If you're viewing this as a downloaded file rather than a web page, open it
+      in a browser instead (on iPhone or iPad: tap <em>Share → Open in Safari</em>).
+    </div>
+    <ol class="nojs-list">
+<li class="nojs-item"><a href="https://thrivingearthexchange.org/" target="_blank" rel="noopener noreferrer">Thriving Earth Exchange</a><span class="nojs-kind">Advocacy · Skill share · Advancing Earth and Space Sciences (AGU)</span><p>Volunteer as a scientist to share you skills and expertise to support the technical aspects of projects.</p></li>
+<li class="nojs-item"><a href="https://www.agu.org/science-policy/programs/global-science-policy" target="_blank" rel="noopener noreferrer">Global Science Policy at AGU</a><span class="nojs-kind">Advocacy · Skill share · Advancing Earth and Space Sciences (AGU)</span><p>AGU provides scientists at all levels, including students, with opportunities to become effective advocates for science policy and use their expertise to address global challenges.</p></li>
+<li class="nojs-item"><a href="https://www.powerthepolls.org/" target="_blank" rel="noopener noreferrer">Help Staff your Local Polling Place</a><span class="nojs-kind">Civic Engagement · Power the polls</span><p>Poll workers are hired by local election officials to help check in voters, distribute ballots, tally votes, and assist voters in the polling place.</p></li>
+<li class="nojs-item"><a href="https://envirodatagov.org/volunteer/" target="_blank" rel="noopener noreferrer">Environmental Data &amp; Governance Initiative</a><span class="nojs-kind">Data governance/ preservation · Envionmental Data &amp; Governance Initiative</span><p>EDGI documents, contextualizes, and analyzes current changes to environmental data and governance practices through multidisciplinary and cross-professional collaborative work.</p></li>
+<li class="nojs-item"><a href="https://www.datarescueproject.org/resources/" target="_blank" rel="noopener noreferrer">Data Rescue Project</a><span class="nojs-kind">Data governance/ preservation · Data Resource Project</span><p>&quot;The Data Rescue Project is a grassroots volunteer community dedicated to access to public data for the public good. We enable rapid response efforts for at-risk public data grounded in recognized data stewardship principles. We partner with allied communities of data creators, carers, and their organizations to advocate for sustainable data access.</p></li>
+<li class="nojs-item"><a href="https://libraries.mit.edu/data-management/store/backups/checklist-usa/" target="_blank" rel="noopener noreferrer">Checklist for USA Federal Data Backups</a><span class="nojs-kind">Data governance/ preservation · MIT Libraries</span><p>Back up governmental webpages and non-interactive datasets that are hosted on them in the Internet Archive’s Wayback Machine</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/policy-and-advocacy/public-health-policy-briefs/policy-Database" target="_blank" rel="noopener noreferrer">Policy Brief Database</a><span class="nojs-kind">Database · Policy briefs · American Public Health Association (APHA)</span><p>The American Public Health Association (APHA) Policy Brief Database (formerly policy statements) is an online searchable archive containing public health positions and recommendations from 1948 to the present. It provides evidence-based guidance to shape legislation, regulatory actions, and educational outreach on critical health topics</p></li>
+<li class="nojs-item"><a href="https://www.atsdr.cdc.gov/place-health/php/eji/index.html" target="_blank" rel="noopener noreferrer">Environmental Justice Index</a><span class="nojs-kind">Database · Health effects · Center of Disease Control (CDC)</span><p>The first nationwide, community-level tool created by the Centers for Disease Control and Prevention (CDC) and the Agency for Toxic Substances and Disease Registry (ATSDR). It measures the total health effects of environmental pollution combined with social and economic challenges for every census tract in the United States.</p></li>
+<li class="nojs-item"><a href="https://silencingscience.org/" target="_blank" rel="noopener noreferrer">Silencing Science Tracker</a><span class="nojs-kind">Database · Federal policy · Climate Science Legal Defense Fund</span><p>The Silencing Science Tracker is a joint initiative of the Sabin Center for Climate Change Law and the Climate Science Legal Defense Fund. It is intended to record reports of federal, state, and local government attempts to “silence science” since the November 2016 election.</p></li>
+<li class="nojs-item"><a href="https://esal.us/local-stem-database/" target="_blank" rel="noopener noreferrer">ESAL Local STEM Database</a><span class="nojs-kind">Database · Local policy · Engineers and Scientists Acting Locally (ESAL)</span><p>Crowd-sourced database to find opportunities to engage locally. This resource contains searchable listings of community-based initiatives, agencies, and programs that benefit from having users, supporters, volunteers, and participants with a STEM background as well as content resources for learning more about issues at the intersection of STEM and local communities.</p></li>
+<li class="nojs-item"><a href="https://phern.communitycommons.org/advocacy/taking-action-advocacy-for-public-health/advancing-public-health-policies/advancing-policies-for-environmental-health-and-climate-resilience/" target="_blank" rel="noopener noreferrer">Data to Power Your Advocacy</a><span class="nojs-kind">Database · Local policy · Public Health &amp; Equity Resource Navigator</span><p>(PHERN) is an online hub. It helps changemakers find data, tools, and stories to support public health and equity advocacy. The American Public Health Association, the Alliance for the Public's Health, and the Institute for People, Place, and Possibility run the platform.</p></li>
+<li class="nojs-item"><a href="https://phern.communitycommons.org/" target="_blank" rel="noopener noreferrer">Public Health &amp; Equity Resource Navigator</a><span class="nojs-kind">Database · Local policy · Public Health &amp; Equity Resource Navigator</span><p>featuring over 3,000 curated tools, articles, and learning paths. It helps public health workers and changemakers find equitable strategies for community health, partnership building, and sustainable public health systems.</p></li>
+<li class="nojs-item"><a href="https://scienceimpacts.org/" target="_blank" rel="noopener noreferrer">Mapping the Impacts of Science Funding Cuts</a><span class="nojs-kind">Database · Local policy · Science &amp; Community Impacts Mapping Project (SciMap)</span><p>A data tool and initiative that tracks and visualizes the local and national consequences of federal funding cuts to science and medical research. It highlights how reductions in federal investments affect communities, universities, and health programs.</p></li>
+<li class="nojs-item"><a href="https://app.powerbi.com/view?ucsdf=attacksonscience.org&amp;r=eyJrIjoiYjdiM2M1ZWUtYjljYS00ODQyLTliYzAtMWFhNjk4OGYxZjdkIiwidCI6ImJjZTQxNzViLTZjOTYtNGI0ZC1hZjc1LTBmMWJjZDI0NjY3NyIsImMiOjN9" target="_blank" rel="noopener noreferrer">Attacks on Science Tracker</a><span class="nojs-kind">Database · Federal policy · Union of Concerned Scientists (UCS)</span><p>A public online tool created by the Union of Concerned Scientists (UCS) to document political interference, censorship, funding cuts, and rollbacks affecting federally supported science and evidence-based decision-making.</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/events-and-meetings/policy-action-institute" target="_blank" rel="noopener noreferrer">APHA Policy Action Institute</a><span class="nojs-kind">Event · Educational events · American Public Health Association (APHA)</span><p>An annual multi-day event hosted by the American Public Health Association (APHA). It brings together public health professionals, policymakers, and advocates to discuss federal health policy, build advocacy skills, and navigate changing political and legislative landscapes.</p></li>
+<li class="nojs-item"><a href="https://esal.us/civics-101/" target="_blank" rel="noopener noreferrer">Civics 101</a><span class="nojs-kind">Educational information · Engineers and Scientists Acting Locally (ESAL)</span><p>From managing growth in the face of climate change to regulating driverless vehicles, local governments and communities must address a breadth of STEM-related policy issues. Despite these challenges, city, county, and state governments often lack the technical resources and expertise needed to assess the science and technology dimensions of issues. You can help fill this gap. Get started by learning more about how local government structures and processes.</p></li>
+<li class="nojs-item"><a href="https://esal.us/infographics/" target="_blank" rel="noopener noreferrer">ESAL Civic Engagement Infographics</a><span class="nojs-kind">Educational information · Engineers and Scientists Acting Locally (ESAL)</span><p>Instructional content, guides, and visual infographics (such as civic engagement checklists and local action roadmaps) to simplify how technical experts interface with civic processes.</p></li>
+<li class="nojs-item"><a href="https://www.agu.org/science-policy/days-of-action" target="_blank" rel="noopener noreferrer">AGU Day of Action</a><span class="nojs-kind">Event · Webinars · Advancing Earth and Space Sciences (AGU)</span><p>AGU Days of Action and their associated webinars are organized by AGU (Advancing Earth and Space Sciences, formerly the American Geophysical Union). They provide training, tools, and community frameworks for Earth and space scientists to engage effectively in science policy, advocate for research funding, and communicate the societal value of science to the public and legislators.</p></li>
+<li class="nojs-item"><a href="https://scholars.org/policyworkshops" target="_blank" rel="noopener noreferrer">Policy workshops</a><span class="nojs-kind">Event · Workshops · Scholars Strategy Network (SSN)</span><p>Interactive training sessions designed to help academic researchers translate complex data into clear, jargon-free language and effectively engage with lawmakers, journalists, and civic leaders.</p></li>
+<li class="nojs-item"><a href="https://sciencevotesthefuture.org/" target="_blank" rel="noopener noreferrer">Science Votes the Future: Webinar Series</a><span class="nojs-kind">Event · Webinars · Advancing Earth and Space Sciences (AGU)</span><p>is a nonpartisan civic engagement and get-out-the-vote initiative launched by the American Geophysical Union (AGU). Its integrated webinar series and resource hub educate scientists, researchers, and STEM students on how to vote, understand election rules, and advocate for science-backed policies during election seasons.</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/policy-and-advocacy/advocacy-for-public-health/speak-for-health/state-fact-sheets" target="_blank" rel="noopener noreferrer">Speak for Health: State-by-State</a><span class="nojs-kind">Fact sheets · American Public Health Association (APHA)</span><p>Downloadable PDFs that show how public health funding and specific health threats impact individual states.</p></li>
+<li class="nojs-item"><a href="https://nationalcosh.org/heat-organizing-toolkit" target="_blank" rel="noopener noreferrer">Heat Organizing Toolkit</a><span class="nojs-kind">Fact sheets · National Council for Occupational Safety and Health (NCOSH)</span><p>Through the Fired Up! Workers for Heat Justice campaign, National COSH helps workers and communities build collective power against unsafe working conditions due to extreme heat. From know-your-rights resources to a heat safety trainers’ facilitation guide, this toolkit is designed to supercharge workers’ campaigns for heat safety at every level. All resources are available for free as digital downloads below or can be purchased for print and delivery directly to your door.</p></li>
+<li class="nojs-item"><a href="https://www.agu.org/resource-center#catalog" target="_blank" rel="noopener noreferrer">AGU Resource Guide for Science Communication</a><span class="nojs-kind">Fact sheets · Advancing Earth and Space Sciences (AGU)</span><p>Guides to how to communicated science to a broader audience, factsheets, webinars, and Toolbox.</p></li>
+<li class="nojs-item"><a href="https://www.standupforscience.net/microflyering" target="_blank" rel="noopener noreferrer">SUFS Micoflyer</a><span class="nojs-kind">Flyers · Stand up for Science (SUFS)</span><p>Activists leave these slips in everyday public spots like waiting rooms, bus seats, and restrooms to share messaging and push back against political interference in research.</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/getcontentasset/333d08f3-c766-49ab-b22b-f5a1096998ee/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/apha_proinspire_workbook_english.pdf?language=en" target="_blank" rel="noopener noreferrer">An Exploration of Individual and Collective Practices for Community-Based Leaders in Times of Transition</a><span class="nojs-kind">Guide · Community based engagement · American Public Health Association (APHA)</span><p>A guidebook released by ProInspire in partnership with the American Public Health Association (APHA). It equips environmental justice and community leaders with tools, inner wisdom, and racial equity frameworks to navigate systemic change.</p></li>
+<li class="nojs-item"><a href="https://www.arborday.org/our-work" target="_blank" rel="noopener noreferrer">Tree City USA</a><span class="nojs-kind">Guide · Community based engagement · Arbor Day Foundation</span><p>Tree City USA is a national recognition program by the Arbor Day Foundation that helps towns and cities manage and grow their public trees. Started in 1976, it gives local governments a simple framework to protect green spaces and improve community health</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/getcontentasset/5c445c81-8257-45e1-9bd8-b67461779335/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/oped_tips.pdf?language=en" target="_blank" rel="noopener noreferrer">Write an Op-Ed</a><span class="nojs-kind">Guide · Communication · American Public Health Association (APHA)</span><p>A communication assignment or advocacy campaign where you write a persuasive opinion piece on a public health issue. The goal is to influence public opinion, educate readers, and prompt policy action in local or national media.</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/getcontentasset/008b4f8d-6705-4821-8bba-56e22bbf24ca/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/260731_s4h_public_forum_questions.pdf?language=en" target="_blank" rel="noopener noreferrer">Speak For Health</a><span class="nojs-kind">Guide · Communication · American Public Health Association (APHA)</span><p>Guide to speaking up at town halls</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/getcontentasset/05f6a899-5789-4e9c-b9af-126be53a42aa/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/communicationsstrategiesforsocialjustice_final.pdf?language=en" target="_blank" rel="noopener noreferrer">Communications Strategies For Social Justice</a><span class="nojs-kind">Guide · Communication · American Public Health Association (APHA)</span><p>Apractical guide designed to help equity-focused organizations build inclusive messaging, design communication plans, and motivate community action</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/first-amendment/" target="_blank" rel="noopener noreferrer">A Pocket Guide for Scientists: The First Amendment</a><span class="nojs-kind">Guide · Advocacy · Climate Science Legal Defense Fund</span><p>Guide so scientists can make informed decisions about how to safely and effectively participate in advocacy and activism.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/participating-in-political-campaigns-elections/" target="_blank" rel="noopener noreferrer">A Pocket Guide for Scientists: Participating in Political Campaigns and Elections</a><span class="nojs-kind">Guide · for how government employees can communicate · Climate Science Legal Defense Fund</span><p>This guide helps scientists, particularly those employed by federal agencies, understand how to participate in political campaigns and elections, and what restrictions on political activity might affect them. It includes general best practices, guidelines for different groups of scientists, and a Frequently Asked Questions section to address specific concerns.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/know-your-rights-scientific-activism-and-protests/" target="_blank" rel="noopener noreferrer">Know Your Rights: Scientific Activism and Protests</a><span class="nojs-kind">Guide · for how researchers can communicate · Climate Science Legal Defense Fund</span><p>This guide is intended to help researchers safely engage in advocacy and protests, and understand whether their activities are constitutionally protected.</p></li>
+<li class="nojs-item"><a href="https://scholars.org/resource/how-best-practices-being-interviewed-reporters" target="_blank" rel="noopener noreferrer">How To: Best Practices for Being Interviewed by Reporters</a><span class="nojs-kind">Guide · Communication · Scholars Strategy Network (SSN)</span><p>Downloadable tip sheet and resource published by SSN to help scholars communicate effectively with the media.</p></li>
+<li class="nojs-item"><a href="https://esal.us/playbook/" target="_blank" rel="noopener noreferrer">Local Engagement Playbook</a><span class="nojs-kind">Guide · Community based engagement · Engineers and Scientists Acting Locally (ESAL)</span><p>Curated resources and step-by-step guides designed to help STEM professionals navigate local government, tackle community issues, and apply their technical expertise to municipal, county, and state civic life.</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/what-is-public-health/vote-for-health#toolkit" target="_blank" rel="noopener noreferrer">Vote for Health</a><span class="nojs-kind">Guide · Voting · American Public Health Association (APHA)</span><p>APHA’s Vote for Health campaign seeks to simplify the voting process for the public and shine a light on the impact voting has on our health. We have curated a collection of resources for your assistance.</p></li>
+<li class="nojs-item"><a href="https://dosomething.org/article/volunteering-ideas-to-help-the-environment" target="_blank" rel="noopener noreferrer">The Do'ers Toolkit</a><span class="nojs-kind">Guide · Community based engagement · Do Something</span><p>Basic steps to kick off a local volunteer project or community service campaign.</p></li>
+<li class="nojs-item"><a href="https://esal.us/local-civic-engagement-toolkit/" target="_blank" rel="noopener noreferrer">The Local Civic Engagement Toolkit</a><span class="nojs-kind">Guide · Community based engagement · Engineers and Scientists Acting Locally (ESAL)</span><p>&quot;The Toolkit&quot; is for anyone with a STEM background wondering how they can take action in their local communities. If you have ever wondered how you can plug-in to your community, or how you can use your STEM skills to support local efforts, this course is for you.</p></li>
+<li class="nojs-item"><a href="https://nchh.org/tools-and-data/technical-assistance/lead-legal-strategies-partnership/local-policy-toolbox/" target="_blank" rel="noopener noreferrer">Local Policy Toolbox</a><span class="nojs-kind">Guide · Community based engagement · National Center for Healthy Housing</span><p>A digital collection of resources and technical assistance materials. It is designed to help local communities, advocates, and government leaders improve housing policies, enforce safe building standards, and prevent environmental health hazards like lead poisoning</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/campus-reps-program/" target="_blank" rel="noopener noreferrer">Campus Reps Program</a><span class="nojs-kind">Legal resource · Climate Science Legal Defense Fund</span><p>This initiative engages law professors in helping scientists understand how to protect themselves from harassment and legal attacks. We created the program with the goal of building a national network of lawyers at public and private universities who can serve as the first point of contact for researchers with questions about legal issues. Campus Reps do not provide direct representation to researchers, but serve as an educational resource and refer scientists to us as needed.</p></li>
+<li class="nojs-item"><a href="https://peer.org/state-and-federal-watch/" target="_blank" rel="noopener noreferrer">Legal Resource Center (for government employees)</a><span class="nojs-kind">Legal resource · Public Employees for Environmental Responsibility</span><p>PEER’s work includes representing whistleblowers, protecting government workers’ First Amendment rights, and upholding civil service laws. We also work with government employees, usually anonymously, to address issues through official channels and to bring hidden information into the light of day. In addition, we file complaints with Inspector Generals and other investigatory bodies to further the interests of our clients.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/legal-services/" target="_blank" rel="noopener noreferrer">Legal services</a><span class="nojs-kind">Legal resource · Climate Science Legal Defense Fund</span><p>Free, confidential counseling services are available to scientists from all disciplines dealing with harassment or legal intimidation. They also help those who find themselves involved in legal discussions about their work, correspondence, public statements, or science advocacy.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/activism-and-advocacy/" target="_blank" rel="noopener noreferrer">Activism &amp; Advocacy Toolkit</a><span class="nojs-kind">Legal resource · Climate Science Legal Defense Fund</span><p>Climate Science Legal Defense Fund is a free online legal resource. It helps researchers and scientists understand how to safely speak out, protest, and engage in public policy or advocacy without risking their jobs or facing legal trouble.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/climate-litigation-toolkit/" target="_blank" rel="noopener noreferrer">Climate Litigation Toolkit</a><span class="nojs-kind">Legal resource · Climate Science Legal Defense Fund</span><p>The free legal resources in our Climate Litigation Toolkit explain the best practices for safely and effectively engaging in climate litigation and other scientific consulting work.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resource/political-action-toolkit-draft/" target="_blank" rel="noopener noreferrer">Political Action Toolkit</a><span class="nojs-kind">Legal resource · Climate Science Legal Defense Fund</span><p>The free legal resources in our Political Action Toolkit explain the best practices for safely and effectively engaging in political advocacy.</p></li>
+<li class="nojs-item"><a href="https://www.csldf.org/resources/" target="_blank" rel="noopener noreferrer">Climate Science Legal Defense Fund Resources</a><span class="nojs-kind">Legal resource · Climate Science Legal Defense Fund</span><p>Free educational resources to help scientists understand and tackle the risks they may face as a result of their work</p></li>
+<li class="nojs-item"><a href="https://earthjustice.org/wp-content/uploads/2025/08/letter-to-the-editor-memo.pdf" target="_blank" rel="noopener noreferrer">Letters to the Editor</a><span class="nojs-kind">Letter writing · Op-ed writing · Earth Justice</span><p>Letters to the editor are a simple but effective way for concerned community members to make their voices heard, to highlight how big-picture policies connect to life on the ground, and to influence decision-makers who monitor local sentiment. Elected officials, newspaper editors, and community leaders regularly review these sections to gauge public opinion, making it an ideal platform for spotlighting environmental harms and championing solutions.</p></li>
+<li class="nojs-item"><a href="https://site.thoracic.org/advocacy-patients/advocacy/voter-voice" target="_blank" rel="noopener noreferrer">Voter Voice</a><span class="nojs-kind">Letter writing · Policy Maker Outreach and/or comment writing · American Thoracic Society (ATS)</span><p>Voter Voice is an online advocacy tool provided by the American Thoracic Society (ATS). It lets members and the public contact elected leaders easily. Users take action on laws and rules that affect lung health, sleep disorders, and critical care medicine.</p></li>
+<li class="nojs-item"><a href="https://www.lung.org/policy-advocacy/take-action/letters-to-the-editor" target="_blank" rel="noopener noreferrer">Letters to the Editor</a><span class="nojs-kind">Letter writing · Op-ed writing · American Lung Association (ALA)</span><p>Offers guidance and toolkits to help advocates draft, format, and submit impactful opinion pieces to local newspapers.</p></li>
+<li class="nojs-item"><a href="https://www.apha.org/policy-and-advocacy/advocacy-for-public-health/action-alerts" target="_blank" rel="noopener noreferrer">Action Alerts</a><span class="nojs-kind">Letter writing · Policy Maker Outreach and/or comment writing · American Public Health Association (APHA)</span><p>Pre-written messages and advocacy tools sent to members. They make it simple to contact elected officials and urge support for science-based public health laws.</p></li>
+<li class="nojs-item"><a href="https://indivisible.org/get-involved/take-action/?sort=newest&amp;act_address=" target="_blank" rel="noopener noreferrer">Take Action</a><span class="nojs-kind">Letter writing · Policy Maker Outreach and/or comment writing · Indivisible</span><p>Search by zip code or address to find the actions that’ll have the most impact based on your state and federal elected officials.</p></li>
+<li class="nojs-item"><a href="https://votefwd.org/" target="_blank" rel="noopener noreferrer">Vote Forward</a><span class="nojs-kind">Letter writing · Letter writing to voters · Vote Forward</span><p>Vote Forward is a nonpartisan, non-profit organization that empowers volunteers to send personalized, handwritten letters to civic-minded and historically underrepresented voters to boost voter turnout.</p></li>
+<li class="nojs-item"><a href="https://weact.org/programs/environmental-justice-leadership-forum/" target="_blank" rel="noopener noreferrer">Environmental Justice Leadership Forum</a><span class="nojs-kind">Letter writing · Policy Maker Outreach and/or comment writing · We Act for Environmental Justice</span><p>WE ACT facilitates the Environmental Justice Leadership Forum (EJ Forum), a national coalition of 42 environmental justice organizations across 24 states and the District of Columbia working together to advance climate justice and impact policy to ensure the health and well-being of communities of color and low-income communities throughout the U.S.</p></li>
+<li class="nojs-item"><a href="https://www.ucs.org/take-action" target="_blank" rel="noopener noreferrer">USC Take Action</a><span class="nojs-kind">Letter writing · Letter writing and signing petitions · Union of Concerned Scientists (UCS)</span><p>An active mobilization platform where scientists and citizens lobby lawmakers, petition agencies, and advocate for science-based solutions to global issues.</p></li>
+<li class="nojs-item"><a href="https://www.lung.org/policy-advocacy/take-action/action-alerts?topic=healthy-air-advocacy,indoor-air-advocacy,outdoor-air-advocacy" target="_blank" rel="noopener noreferrer">Action Alerts and Petitions</a><span class="nojs-kind">Letter writing · Letter writing and signing petitions · American Lung Association (ALA)</span><p>American Lung Association (ALA) Action Alerts and Petitions program is an online advocacy platform. It lets people contact lawmakers and sign petitions to support clean air, fund lung disease research, and pass public health laws.</p></li>
+<li class="nojs-item"><a href="https://www.standupforscience.net/petitions" target="_blank" rel="noopener noreferrer">SUFS Petitions</a><span class="nojs-kind">Letter writing · Petitions · Stand up for Science (SUFS)</span><p>Dedicated citizen campaigns, hand-delivered declarations, and public comment actions to push back against political interference in research.</p></li>
+<li class="nojs-item"><a href="https://www.agu.org/science-policy/grassroots-action" target="_blank" rel="noopener noreferrer">AGU Grassroots Actions</a><span class="nojs-kind">Letter writing · Policy Maker Outreach and/or comment writing · American Geophysical Union (AGU)</span><p>AGU Grassroots Actions refer to advocacy initiatives by the American Geophysical Union (AGU) that empower Earth and space scientists to contact legislators, support science-backed policies, and engage communities in local-to-global decision-making.</p></li>
+<li class="nojs-item"><a href="https://www.agu.org/resource-center" target="_blank" rel="noopener noreferrer">Science Policy Toolbox</a><span class="nojs-kind">Letter writing · Policy Maker Outreach and/or comment writing · Advancing Earth and Space Sciences (AGU)</span><p>The AGU Science Policy initiative by the American Geophysical Union provides resources, toolkits, and training to help Earth and space scientists engage with lawmakers, write effective public comments, and advocate for science-informed policies.</p></li>
+<li class="nojs-item"><a href="https://www.addsteam.org/" target="_blank" rel="noopener noreferrer">Science In Democracy Initiative</a><span class="nojs-kind">Network · ADDSTEAM</span><p>The Science in Democracy initiative by ADDSTEAM is a national movement designed to make science and empirical evidence core components of public leadership and democratic policymaking. It encourages active civic participation during election cycles to ensure policy decisions around topics like health, climate, and technology are data-informed.</p></li>
+<li class="nojs-item"><a href="https://www.lung.org/policy-advocacy/take-action/lung-action-network" target="_blank" rel="noopener noreferrer">Lung Action Network</a><span class="nojs-kind">Network · American Lung Association (ALA)</span><p>The Lung Action Network is a grassroots advocacy community run by the American Lung Association (ALA). It unites volunteers who receive periodic email alerts, updates, and action petitions to contact elected officials on public health policies regarding clean air, tobacco control, and lung disease prevention</p></li>
+<li class="nojs-item"><a href="https://site.thoracic.org/advocacy-patients/advocacy/stay-informed" target="_blank" rel="noopener noreferrer">ATS Stay Informed</a><span class="nojs-kind">Newsletter · American Thoracic Society (ATS)</span><p>The ATS Washington Letter, written by the ATS government relations staff in our Washington, D.C., office, keeps clinicians, scientists, and patients abreast of legislative, judicial, and regulatory issues throughout the year.
+
+The ATS Coding and Billing Quarterly, written by the joint ATS/CHEST Clinical Practice Committee, provides ATS members with information about coding, billing, and regulation compliance information for practicing pulmonary, critical care, and sleep medicine clinicians. The newsletter includes information on new and evolving CPT codes, ICD-10 codes, Medicare reimbursement policy, and regulatory news that impact the field of respiratory medicine.
+
+The ATS Research News Quarterly, written by the ATS Research Advocacy Committee, offers interviews and insight from thought leaders at key federal research programs including the NIH, VA, EPA, and CDC.</p></li>
+<li class="nojs-item"><a href="https://earthjustice.org/action/alerts" target="_blank" rel="noopener noreferrer">Take Action Alerts</a><span class="nojs-kind">Newsletter · Earth Justice</span><p>Earthjustice Action Alerts are notification tools that inform the public about urgent environmental threats, upcoming federal agency public comment periods, and pending legislation. They provide direct ways for individuals to contact lawmakers and government agencies to support conservation and legal battles.</p></li>
+<li class="nojs-item"><a href="https://act.standupforscience.net/event_campaigns/fight-to-save-science-and-health?source=website&amp;utm_source=website&amp;utm_medium=homepage&amp;utm_campaign=fightforscience" target="_blank" rel="noopener noreferrer">SUFS Protests</a><span class="nojs-kind">Protests · Stand up for Science (SUFS)</span><p>Organizes nationwide rallies, walkouts, and protests to oppose federal funding cuts, policy changes, and political interference affecting scientific institutions and public health agencies under the Trump administration.</p></li>
+<li class="nojs-item"><a href="https://www.314action.org/" target="_blank" rel="noopener noreferrer">3.14 Action</a><span class="nojs-kind">Run for Office · 3.14 Action</span><p>Recruits, trains, and elects Democratic candidates with backgrounds in STEM</p></li>
+<li class="nojs-item"><a href="https://www.congress.gov/members/find-your-member" target="_blank" rel="noopener noreferrer">Find your Members of Congress</a><span class="nojs-kind">Tool · Congress</span><p>Identify who represents you in Congress based on where you live.</p></li>
+<li class="nojs-item"><a href="https://sciencevotesthefuture.org/" target="_blank" rel="noopener noreferrer">Science Votes for the Future</a><span class="nojs-kind">Tool · Advancing Earth and Space Sciences (AGU)</span><p>Enter your information to check your voter registration status, find out when your primary elections are taking place, information on your candidates, and more.</p></li>
+</ol>
+  </noscript>
+
+  <footer class="foot">
+    <span>Click a card to open the resource · hover for full details · press <kbd>/</kbd> to search</span>
+    <span id="stamp"></span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>window.__RESOURCES__=[{"resource":"Thriving Earth Exchange","creator":"Advancing Earth and Space Sciences (AGU)","type":"Advocacy","subtype":"Skill share","description":"Volunteer as a scientist to share you skills and expertise to support the technical aspects of projects.","stem":"Yes","link":"https://thrivingearthexchange.org/"},{"resource":"Global Science Policy at AGU","creator":"Advancing Earth and Space Sciences (AGU)","type":"Advocacy","subtype":"Skill share","description":"AGU provides scientists at all levels, including students, with opportunities to become effective advocates for science policy and use their expertise to address global challenges.","stem":"Yes","link":"https://www.agu.org/science-policy/programs/global-science-policy"},{"resource":"Help Staff your Local Polling Place","creator":"Power the polls","type":"Civic Engagement","subtype":"","description":"Poll workers are hired by local election officials to help check in voters, distribute ballots, tally votes, and assist voters in the polling place.","stem":"No","link":"https://www.powerthepolls.org/"},{"resource":"Environmental Data \u0026 Governance Initiative","creator":"Envionmental Data \u0026 Governance Initiative","type":"Data governance/ preservation","subtype":"","description":"EDGI documents, contextualizes, and analyzes current changes to environmental data and governance practices through multidisciplinary and cross-professional collaborative work.","stem":"Yes","link":"https://envirodatagov.org/volunteer/"},{"resource":"Data Rescue Project","creator":"Data Resource Project","type":"Data governance/ preservation","subtype":"","description":"\"The Data Rescue Project is a grassroots volunteer community dedicated to access to public data for the public good. We enable rapid response efforts for at-risk public data grounded in recognized data stewardship principles. We partner with allied communities of data creators, carers, and their organizations to advocate for sustainable data access.","stem":"No","link":"https://www.datarescueproject.org/resources/"},{"resource":"Checklist for USA Federal Data Backups","creator":"MIT Libraries","type":"Data governance/ preservation","subtype":"","description":"Back up governmental webpages and non-interactive datasets that are hosted on them in the Internet Archive’s Wayback Machine","stem":"Yes","link":"https://libraries.mit.edu/data-management/store/backups/checklist-usa/"},{"resource":"Policy Brief Database","creator":"American Public Health Association (APHA)","type":"Database","subtype":"Policy briefs","description":"The American Public Health Association (APHA) Policy Brief Database (formerly policy statements) is an online searchable archive containing public health positions and recommendations from 1948 to the present. It provides evidence-based guidance to shape legislation, regulatory actions, and educational outreach on critical health topics","stem":"Yes","link":"https://www.apha.org/policy-and-advocacy/public-health-policy-briefs/policy-Database"},{"resource":"Environmental Justice Index","creator":"Center of Disease Control (CDC)","type":"Database","subtype":"Health effects","description":"The first nationwide, community-level tool created by the Centers for Disease Control and Prevention (CDC) and the Agency for Toxic Substances and Disease Registry (ATSDR). It measures the total health effects of environmental pollution combined with social and economic challenges for every census tract in the United States.","stem":"Yes","link":"https://www.atsdr.cdc.gov/place-health/php/eji/index.html"},{"resource":"Silencing Science Tracker","creator":"Climate Science Legal Defense Fund","type":"Database","subtype":"Federal policy","description":"The Silencing Science Tracker is a joint initiative of the Sabin Center for Climate Change Law and the Climate Science Legal Defense Fund. It is intended to record reports of federal, state, and local government attempts to “silence science” since the November 2016 election.","stem":"Yes","link":"https://silencingscience.org/"},{"resource":"ESAL Local STEM Database","creator":"Engineers and Scientists Acting Locally (ESAL)","type":"Database","subtype":"Local policy","description":"Crowd-sourced database to find opportunities to engage locally. This resource contains searchable listings of community-based initiatives, agencies, and programs that benefit from having users, supporters, volunteers, and participants with a STEM background as well as content resources for learning more about issues at the intersection of STEM and local communities.","stem":"Yes","link":"https://esal.us/local-stem-database/"},{"resource":"Data to Power Your Advocacy","creator":"Public Health \u0026 Equity Resource Navigator","type":"Database","subtype":"Local policy","description":"(PHERN) is an online hub. It helps changemakers find data, tools, and stories to support public health and equity advocacy. The American Public Health Association, the Alliance for the Public's Health, and the Institute for People, Place, and Possibility run the platform.","stem":"Yes","link":"https://phern.communitycommons.org/advocacy/taking-action-advocacy-for-public-health/advancing-public-health-policies/advancing-policies-for-environmental-health-and-climate-resilience/"},{"resource":"Public Health \u0026 Equity Resource Navigator","creator":"Public Health \u0026 Equity Resource Navigator","type":"Database","subtype":"Local policy","description":"featuring over 3,000 curated tools, articles, and learning paths. It helps public health workers and changemakers find equitable strategies for community health, partnership building, and sustainable public health systems.","stem":"Yes","link":"https://phern.communitycommons.org/"},{"resource":"Mapping the Impacts of Science Funding Cuts","creator":"Science \u0026 Community Impacts Mapping Project (SciMap)","type":"Database","subtype":"Local policy","description":"A data tool and initiative that tracks and visualizes the local and national consequences of federal funding cuts to science and medical research. It highlights how reductions in federal investments affect communities, universities, and health programs.","stem":"Yes","link":"https://scienceimpacts.org/"},{"resource":"Attacks on Science Tracker","creator":"Union of Concerned Scientists (UCS)","type":"Database","subtype":"Federal policy","description":"A public online tool created by the Union of Concerned Scientists (UCS) to document political interference, censorship, funding cuts, and rollbacks affecting federally supported science and evidence-based decision-making.","stem":"Yes","link":"https://app.powerbi.com/view?ucsdf=attacksonscience.org\u0026r=eyJrIjoiYjdiM2M1ZWUtYjljYS00ODQyLTliYzAtMWFhNjk4OGYxZjdkIiwidCI6ImJjZTQxNzViLTZjOTYtNGI0ZC1hZjc1LTBmMWJjZDI0NjY3NyIsImMiOjN9"},{"resource":"APHA Policy Action Institute","creator":"American Public Health Association (APHA)","type":"Event","subtype":"Educational events","description":"An annual multi-day event hosted by the American Public Health Association (APHA). It brings together public health professionals, policymakers, and advocates to discuss federal health policy, build advocacy skills, and navigate changing political and legislative landscapes.","stem":"Yes","link":"https://www.apha.org/events-and-meetings/policy-action-institute"},{"resource":"Civics 101","creator":"Engineers and Scientists Acting Locally (ESAL)","type":"Educational information","subtype":"","description":"From managing growth in the face of climate change to regulating driverless vehicles, local governments and communities must address a breadth of STEM-related policy issues. Despite these challenges, city, county, and state governments often lack the technical resources and expertise needed to assess the science and technology dimensions of issues. You can help fill this gap. Get started by learning more about how local government structures and processes.","stem":"Yes","link":"https://esal.us/civics-101/"},{"resource":"ESAL Civic Engagement Infographics","creator":"Engineers and Scientists Acting Locally (ESAL)","type":"Educational information","subtype":"","description":"Instructional content, guides, and visual infographics (such as civic engagement checklists and local action roadmaps) to simplify how technical experts interface with civic processes.","stem":"Yes","link":"https://esal.us/infographics/"},{"resource":"AGU Day of Action","creator":"Advancing Earth and Space Sciences (AGU)","type":"Event","subtype":"Webinars","description":"AGU Days of Action and their associated webinars are organized by AGU (Advancing Earth and Space Sciences, formerly the American Geophysical Union). They provide training, tools, and community frameworks for Earth and space scientists to engage effectively in science policy, advocate for research funding, and communicate the societal value of science to the public and legislators.","stem":"Yes","link":"https://www.agu.org/science-policy/days-of-action"},{"resource":"Policy workshops","creator":"Scholars Strategy Network (SSN)","type":"Event","subtype":"Workshops","description":"Interactive training sessions designed to help academic researchers translate complex data into clear, jargon-free language and effectively engage with lawmakers, journalists, and civic leaders.","stem":"No","link":"https://scholars.org/policyworkshops"},{"resource":"Science Votes the Future: Webinar Series","creator":"Advancing Earth and Space Sciences (AGU)","type":"Event","subtype":"Webinars","description":"is a nonpartisan civic engagement and get-out-the-vote initiative launched by the American Geophysical Union (AGU). Its integrated webinar series and resource hub educate scientists, researchers, and STEM students on how to vote, understand election rules, and advocate for science-backed policies during election seasons.","stem":"Yes","link":"https://sciencevotesthefuture.org/"},{"resource":"Speak for Health: State-by-State","creator":"American Public Health Association (APHA)","type":"Fact sheets","subtype":"","description":"Downloadable PDFs that show how public health funding and specific health threats impact individual states.","stem":"Yes","link":"https://www.apha.org/policy-and-advocacy/advocacy-for-public-health/speak-for-health/state-fact-sheets"},{"resource":"Heat Organizing Toolkit","creator":"National Council for Occupational Safety and Health (NCOSH)","type":"Fact sheets","subtype":"","description":"Through the Fired Up! Workers for Heat Justice campaign, National COSH helps workers and communities build collective power against unsafe working conditions due to extreme heat. From know-your-rights resources to a heat safety trainers’ facilitation guide, this toolkit is designed to supercharge workers’ campaigns for heat safety at every level. All resources are available for free as digital downloads below or can be purchased for print and delivery directly to your door.","stem":"Yes","link":"https://nationalcosh.org/heat-organizing-toolkit"},{"resource":"AGU Resource Guide for Science Communication","creator":"Advancing Earth and Space Sciences (AGU)","type":"Fact sheets","subtype":"","description":"Guides to how to communicated science to a broader audience, factsheets, webinars, and Toolbox.","stem":"Yes","link":"https://www.agu.org/resource-center#catalog"},{"resource":"SUFS Micoflyer","creator":"Stand up for Science (SUFS)","type":"Flyers","subtype":"","description":"Activists leave these slips in everyday public spots like waiting rooms, bus seats, and restrooms to share messaging and push back against political interference in research.","stem":"Yes","link":"https://www.standupforscience.net/microflyering"},{"resource":"An Exploration of Individual and Collective Practices for Community-Based Leaders in Times of Transition","creator":"American Public Health Association (APHA)","type":"Guide","subtype":"Community based engagement","description":"A guidebook released by ProInspire in partnership with the American Public Health Association (APHA). It equips environmental justice and community leaders with tools, inner wisdom, and racial equity frameworks to navigate systemic change.","stem":"Yes","link":"https://www.apha.org/getcontentasset/333d08f3-c766-49ab-b22b-f5a1096998ee/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/apha_proinspire_workbook_english.pdf?language=en"},{"resource":"Tree City USA","creator":"Arbor Day Foundation","type":"Guide","subtype":"Community based engagement","description":"Tree City USA is a national recognition program by the Arbor Day Foundation that helps towns and cities manage and grow their public trees. Started in 1976, it gives local governments a simple framework to protect green spaces and improve community health","stem":"No","link":"https://www.arborday.org/our-work"},{"resource":"Write an Op-Ed","creator":"American Public Health Association (APHA)","type":"Guide","subtype":"Communication","description":"A communication assignment or advocacy campaign where you write a persuasive opinion piece on a public health issue. The goal is to influence public opinion, educate readers, and prompt policy action in local or national media.","stem":"Yes","link":"https://www.apha.org/getcontentasset/5c445c81-8257-45e1-9bd8-b67461779335/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/oped_tips.pdf?language=en"},{"resource":"Speak For Health","creator":"American Public Health Association (APHA)","type":"Guide","subtype":"Communication","description":"Guide to speaking up at town halls","stem":"Yes","link":"https://www.apha.org/getcontentasset/008b4f8d-6705-4821-8bba-56e22bbf24ca/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/260731_s4h_public_forum_questions.pdf?language=en"},{"resource":"Communications Strategies For Social Justice","creator":"American Public Health Association (APHA)","type":"Guide","subtype":"Communication","description":"Apractical guide designed to help equity-focused organizations build inclusive messaging, design communication plans, and motivate community action","stem":"Yes","link":"https://www.apha.org/getcontentasset/05f6a899-5789-4e9c-b9af-126be53a42aa/7ca0dc9d-611d-46e2-9fd3-26a4c03ddcbb/communicationsstrategiesforsocialjustice_final.pdf?language=en"},{"resource":"A Pocket Guide for Scientists: The First Amendment","creator":"Climate Science Legal Defense Fund","type":"Guide","subtype":"Advocacy","description":"Guide so scientists can make informed decisions about how to safely and effectively participate in advocacy and activism.","stem":"Yes","link":"https://www.csldf.org/resource/first-amendment/"},{"resource":"A Pocket Guide for Scientists: Participating in Political Campaigns and Elections","creator":"Climate Science Legal Defense Fund","type":"Guide","subtype":"for how government employees can communicate","description":"This guide helps scientists, particularly those employed by federal agencies, understand how to participate in political campaigns and elections, and what restrictions on political activity might affect them. It includes general best practices, guidelines for different groups of scientists, and a Frequently Asked Questions section to address specific concerns.","stem":"Yes","link":"https://www.csldf.org/resource/participating-in-political-campaigns-elections/"},{"resource":"Know Your Rights: Scientific Activism and Protests","creator":"Climate Science Legal Defense Fund","type":"Guide","subtype":"for how researchers can communicate","description":"This guide is intended to help researchers safely engage in advocacy and protests, and understand whether their activities are constitutionally protected.","stem":"Yes","link":"https://www.csldf.org/resource/know-your-rights-scientific-activism-and-protests/"},{"resource":"How To: Best Practices for Being Interviewed by Reporters","creator":"Scholars Strategy Network (SSN)","type":"Guide","subtype":"Communication","description":"Downloadable tip sheet and resource published by SSN to help scholars communicate effectively with the media.","stem":"No","link":"https://scholars.org/resource/how-best-practices-being-interviewed-reporters"},{"resource":"Local Engagement Playbook","creator":"Engineers and Scientists Acting Locally (ESAL)","type":"Guide","subtype":"Community based engagement","description":"Curated resources and step-by-step guides designed to help STEM professionals navigate local government, tackle community issues, and apply their technical expertise to municipal, county, and state civic life.","stem":"Yes","link":"https://esal.us/playbook/"},{"resource":"Vote for Health","creator":"American Public Health Association (APHA)","type":"Guide","subtype":"Voting","description":"APHA’s Vote for Health campaign seeks to simplify the voting process for the public and shine a light on the impact voting has on our health. We have curated a collection of resources for your assistance.","stem":"Yes","link":"https://www.apha.org/what-is-public-health/vote-for-health#toolkit"},{"resource":"The Do'ers Toolkit","creator":"Do Something","type":"Guide","subtype":"Community based engagement","description":"Basic steps to kick off a local volunteer project or community service campaign.","stem":"No","link":"https://dosomething.org/article/volunteering-ideas-to-help-the-environment"},{"resource":"The Local Civic Engagement Toolkit","creator":"Engineers and Scientists Acting Locally (ESAL)","type":"Guide","subtype":"Community based engagement","description":"\"The Toolkit\" is for anyone with a STEM background wondering how they can take action in their local communities. If you have ever wondered how you can plug-in to your community, or how you can use your STEM skills to support local efforts, this course is for you.","stem":"Yes","link":"https://esal.us/local-civic-engagement-toolkit/"},{"resource":"Local Policy Toolbox","creator":"National Center for Healthy Housing","type":"Guide","subtype":"Community based engagement","description":"A digital collection of resources and technical assistance materials. It is designed to help local communities, advocates, and government leaders improve housing policies, enforce safe building standards, and prevent environmental health hazards like lead poisoning","stem":"No","link":"https://nchh.org/tools-and-data/technical-assistance/lead-legal-strategies-partnership/local-policy-toolbox/"},{"resource":"Campus Reps Program","creator":"Climate Science Legal Defense Fund","type":"Legal resource","subtype":"","description":"This initiative engages law professors in helping scientists understand how to protect themselves from harassment and legal attacks. We created the program with the goal of building a national network of lawyers at public and private universities who can serve as the first point of contact for researchers with questions about legal issues. Campus Reps do not provide direct representation to researchers, but serve as an educational resource and refer scientists to us as needed.","stem":"Yes","link":"https://www.csldf.org/resource/campus-reps-program/"},{"resource":"Legal Resource Center (for government employees)","creator":"Public Employees for Environmental Responsibility","type":"Legal resource","subtype":"","description":"PEER’s work includes representing whistleblowers, protecting government workers’ First Amendment rights, and upholding civil service laws. We also work with government employees, usually anonymously, to address issues through official channels and to bring hidden information into the light of day. In addition, we file complaints with Inspector Generals and other investigatory bodies to further the interests of our clients.","stem":"Yes","link":"https://peer.org/state-and-federal-watch/"},{"resource":"Legal services","creator":"Climate Science Legal Defense Fund","type":"Legal resource","subtype":"","description":"Free, confidential counseling services are available to scientists from all disciplines dealing with harassment or legal intimidation. They also help those who find themselves involved in legal discussions about their work, correspondence, public statements, or science advocacy.","stem":"Yes","link":"https://www.csldf.org/legal-services/"},{"resource":"Activism \u0026 Advocacy Toolkit","creator":"Climate Science Legal Defense Fund","type":"Legal resource","subtype":"","description":"Climate Science Legal Defense Fund is a free online legal resource. It helps researchers and scientists understand how to safely speak out, protest, and engage in public policy or advocacy without risking their jobs or facing legal trouble.","stem":"Yes","link":"https://www.csldf.org/resource/activism-and-advocacy/"},{"resource":"Climate Litigation Toolkit","creator":"Climate Science Legal Defense Fund","type":"Legal resource","subtype":"","description":"The free legal resources in our Climate Litigation Toolkit explain the best practices for safely and effectively engaging in climate litigation and other scientific consulting work.","stem":"Yes","link":"https://www.csldf.org/resource/climate-litigation-toolkit/"},{"resource":"Political Action Toolkit","creator":"Climate Science Legal Defense Fund","type":"Legal resource","subtype":"","description":"The free legal resources in our Political Action Toolkit explain the best practices for safely and effectively engaging in political advocacy.","stem":"Yes","link":"https://www.csldf.org/resource/political-action-toolkit-draft/"},{"resource":"Climate Science Legal Defense Fund Resources","creator":"Climate Science Legal Defense Fund","type":"Legal resource","subtype":"","description":"Free educational resources to help scientists understand and tackle the risks they may face as a result of their work","stem":"Yes","link":"https://www.csldf.org/resources/"},{"resource":"Letters to the Editor","creator":"Earth Justice","type":"Letter writing","subtype":"Op-ed writing","description":"Letters to the editor are a simple but effective way for concerned community members to make their voices heard, to highlight how big-picture policies connect to life on the ground, and to influence decision-makers who monitor local sentiment. Elected officials, newspaper editors, and community leaders regularly review these sections to gauge public opinion, making it an ideal platform for spotlighting environmental harms and championing solutions.","stem":"Yes","link":"https://earthjustice.org/wp-content/uploads/2025/08/letter-to-the-editor-memo.pdf"},{"resource":"Voter Voice","creator":"American Thoracic Society (ATS)","type":"Letter writing","subtype":"Policy Maker Outreach and/or comment writing","description":"Voter Voice is an online advocacy tool provided by the American Thoracic Society (ATS). It lets members and the public contact elected leaders easily. Users take action on laws and rules that affect lung health, sleep disorders, and critical care medicine.","stem":"Yes","link":"https://site.thoracic.org/advocacy-patients/advocacy/voter-voice"},{"resource":"Letters to the Editor","creator":"American Lung Association (ALA)","type":"Letter writing","subtype":"Op-ed writing","description":"Offers guidance and toolkits to help advocates draft, format, and submit impactful opinion pieces to local newspapers.","stem":"Yes","link":"https://www.lung.org/policy-advocacy/take-action/letters-to-the-editor"},{"resource":"Action Alerts","creator":"American Public Health Association (APHA)","type":"Letter writing","subtype":"Policy Maker Outreach and/or comment writing","description":"Pre-written messages and advocacy tools sent to members. They make it simple to contact elected officials and urge support for science-based public health laws.","stem":"Yes","link":"https://www.apha.org/policy-and-advocacy/advocacy-for-public-health/action-alerts"},{"resource":"Take Action","creator":"Indivisible","type":"Letter writing","subtype":"Policy Maker Outreach and/or comment writing","description":"Search by zip code or address to find the actions that’ll have the most impact based on your state and federal elected officials.","stem":"No","link":"https://indivisible.org/get-involved/take-action/?sort=newest\u0026act_address="},{"resource":"Vote Forward","creator":"Vote Forward","type":"Letter writing","subtype":"Letter writing to voters","description":"Vote Forward is a nonpartisan, non-profit organization that empowers volunteers to send personalized, handwritten letters to civic-minded and historically underrepresented voters to boost voter turnout.","stem":"No","link":"https://votefwd.org/"},{"resource":"Environmental Justice Leadership Forum","creator":"We Act for Environmental Justice","type":"Letter writing","subtype":"Policy Maker Outreach and/or comment writing","description":"WE ACT facilitates the Environmental Justice Leadership Forum (EJ Forum), a national coalition of 42 environmental justice organizations across 24 states and the District of Columbia working together to advance climate justice and impact policy to ensure the health and well-being of communities of color and low-income communities throughout the U.S.","stem":"Yes","link":"https://weact.org/programs/environmental-justice-leadership-forum/"},{"resource":"USC Take Action","creator":"Union of Concerned Scientists (UCS)","type":"Letter writing","subtype":"Letter writing and signing petitions","description":"An active mobilization platform where scientists and citizens lobby lawmakers, petition agencies, and advocate for science-based solutions to global issues.","stem":"Yes","link":"https://www.ucs.org/take-action"},{"resource":"Action Alerts and Petitions","creator":"American Lung Association (ALA)","type":"Letter writing","subtype":"Letter writing and signing petitions","description":"American Lung Association (ALA) Action Alerts and Petitions program is an online advocacy platform. It lets people contact lawmakers and sign petitions to support clean air, fund lung disease research, and pass public health laws.","stem":"Yes","link":"https://www.lung.org/policy-advocacy/take-action/action-alerts?topic=healthy-air-advocacy,indoor-air-advocacy,outdoor-air-advocacy"},{"resource":"SUFS Petitions","creator":"Stand up for Science (SUFS)","type":"Letter writing","subtype":"Petitions","description":"Dedicated citizen campaigns, hand-delivered declarations, and public comment actions to push back against political interference in research.","stem":"Yes","link":"https://www.standupforscience.net/petitions"},{"resource":"AGU Grassroots Actions","creator":"American Geophysical Union (AGU)","type":"Letter writing","subtype":"Policy Maker Outreach and/or comment writing","description":"AGU Grassroots Actions refer to advocacy initiatives by the American Geophysical Union (AGU) that empower Earth and space scientists to contact legislators, support science-backed policies, and engage communities in local-to-global decision-making.","stem":"Yes","link":"https://www.agu.org/science-policy/grassroots-action"},{"resource":"Science Policy Toolbox","creator":"Advancing Earth and Space Sciences (AGU)","type":"Letter writing","subtype":"Policy Maker Outreach and/or comment writing","description":"The AGU Science Policy initiative by the American Geophysical Union provides resources, toolkits, and training to help Earth and space scientists engage with lawmakers, write effective public comments, and advocate for science-informed policies.","stem":"Yes","link":"https://www.agu.org/resource-center"},{"resource":"Science In Democracy Initiative","creator":"ADDSTEAM","type":"Network","subtype":"","description":"The Science in Democracy initiative by ADDSTEAM is a national movement designed to make science and empirical evidence core components of public leadership and democratic policymaking. It encourages active civic participation during election cycles to ensure policy decisions around topics like health, climate, and technology are data-informed.","stem":"Yes","link":"https://www.addsteam.org/"},{"resource":"Lung Action Network","creator":"American Lung Association (ALA)","type":"Network","subtype":"","description":"The Lung Action Network is a grassroots advocacy community run by the American Lung Association (ALA). It unites volunteers who receive periodic email alerts, updates, and action petitions to contact elected officials on public health policies regarding clean air, tobacco control, and lung disease prevention","stem":"Yes","link":"https://www.lung.org/policy-advocacy/take-action/lung-action-network"},{"resource":"ATS Stay Informed","creator":"American Thoracic Society (ATS)","type":"Newsletter","subtype":"","description":"The ATS Washington Letter, written by the ATS government relations staff in our Washington, D.C., office, keeps clinicians, scientists, and patients abreast of legislative, judicial, and regulatory issues throughout the year.\n\nThe ATS Coding and Billing Quarterly, written by the joint ATS/CHEST Clinical Practice Committee, provides ATS members with information about coding, billing, and regulation compliance information for practicing pulmonary, critical care, and sleep medicine clinicians. The newsletter includes information on new and evolving CPT codes, ICD-10 codes, Medicare reimbursement policy, and regulatory news that impact the field of respiratory medicine.\n\nThe ATS Research News Quarterly, written by the ATS Research Advocacy Committee, offers interviews and insight from thought leaders at key federal research programs including the NIH, VA, EPA, and CDC.","stem":"Yes","link":"https://site.thoracic.org/advocacy-patients/advocacy/stay-informed"},{"resource":"Take Action Alerts","creator":"Earth Justice","type":"Newsletter","subtype":"","description":"Earthjustice Action Alerts are notification tools that inform the public about urgent environmental threats, upcoming federal agency public comment periods, and pending legislation. They provide direct ways for individuals to contact lawmakers and government agencies to support conservation and legal battles.","stem":"Yes","link":"https://earthjustice.org/action/alerts"},{"resource":"SUFS Protests","creator":"Stand up for Science (SUFS)","type":"Protests","subtype":"","description":"Organizes nationwide rallies, walkouts, and protests to oppose federal funding cuts, policy changes, and political interference affecting scientific institutions and public health agencies under the Trump administration.","stem":"Yes","link":"https://act.standupforscience.net/event_campaigns/fight-to-save-science-and-health?source=website\u0026utm_source=website\u0026utm_medium=homepage\u0026utm_campaign=fightforscience"},{"resource":"3.14 Action","creator":"3.14 Action","type":"Run for Office","subtype":"","description":"Recruits, trains, and elects Democratic candidates with backgrounds in STEM","stem":"Yes","link":"https://www.314action.org/"},{"resource":"Find your Members of Congress","creator":"Congress","type":"Tool","subtype":"","description":"Identify who represents you in Congress based on where you live.","stem":"No","link":"https://www.congress.gov/members/find-your-member"},{"resource":"Science Votes for the Future","creator":"Advancing Earth and Space Sciences (AGU)","type":"Tool","subtype":"","description":"Enter your information to check your voter registration status, find out when your primary elections are taking place, information on your candidates, and more.","stem":"Yes","link":"https://sciencevotesthefuture.org/"}];window.__BUILT__="2026-08-10";</script>
+<script>
+/* Resource Menu — shared app logic.
+ *
+ * Runs in two modes with no changes:
+ *   hosted     -> fetches data/resources.csv at runtime (GitHub Pages, local server)
+ *   standalone -> reads window.__RESOURCES__ injected by tools/build.py
+ */
+(function () {
+  "use strict";
+
+  // Relative to index.html at the site root, so it works both locally and
+  // under a GitHub Pages project subpath (…github.io/<repo>/).
+  var CSV_PATH = "data/resources.csv";
+
+  /* ---------------- CSV parsing ---------------- */
+
+  // Full RFC-4180-ish parser: quoted fields, embedded commas/newlines,
+  // "" escapes, CRLF or LF, ragged rows, stray blank lines.
+  function parseCSV(text) {
+    var rows = [];
+    var row = [];
+    var field = "";
+    var inQuotes = false;
+    var i = 0;
+
+    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // strip BOM
+
+    function endField() {
+      row.push(field);
+      field = "";
+    }
+    function endRow() {
+      endField();
+      rows.push(row);
+      row = [];
+    }
+
+    while (i < text.length) {
+      var ch = text[i];
+
+      if (inQuotes) {
+        if (ch === '"') {
+          if (text[i + 1] === '"') {
+            field += '"';
+            i += 2;
+            continue;
+          }
+          inQuotes = false;
+          i++;
+          continue;
+        }
+        field += ch;
+        i++;
+        continue;
+      }
+
+      if (ch === '"') {
+        // Only treat as an opening quote at the start of a field; a stray
+        // quote mid-field is kept literally rather than throwing.
+        if (field === "") {
+          inQuotes = true;
+          i++;
+          continue;
+        }
+        field += ch;
+        i++;
+        continue;
+      }
+      if (ch === ",") {
+        endField();
+        i++;
+        continue;
+      }
+      if (ch === "\r") {
+        if (text[i + 1] === "\n") i++;
+        endRow();
+        i++;
+        continue;
+      }
+      if (ch === "\n") {
+        endRow();
+        i++;
+        continue;
+      }
+      field += ch;
+      i++;
+    }
+    if (field !== "" || row.length) endRow();
+
+    // Drop rows that are entirely empty.
+    return rows.filter(function (r) {
+      return r.some(function (c) {
+        return String(c).trim() !== "";
+      });
+    });
+  }
+
+  function rowsToRecords(rows) {
+    if (!rows.length) return [];
+    var header = rows[0].map(function (h) {
+      return String(h).trim();
+    });
+    var idx = {};
+    header.forEach(function (h, i) {
+      if (!(h in idx)) idx[h] = i;
+    });
+
+    function pick(row, name) {
+      var i = idx[name];
+      if (i === undefined || i >= row.length) return "";
+      return String(row[i] == null ? "" : row[i]).trim();
+    }
+
+    var out = [];
+    for (var r = 1; r < rows.length; r++) {
+      var row = rows[r];
+      var rec = {
+        resource: pick(row, "Resource"),
+        creator: pick(row, "Creator"),
+        type: pick(row, "Type"),
+        subtype: pick(row, "Subtype"),
+        description: pick(row, "Description"),
+        stem: pick(row, "STEM Yes/No"),
+        link: pick(row, "Link"),
+      };
+      if (!rec.resource && !rec.link) continue; // nothing renderable
+      if (!rec.resource) rec.resource = "(untitled resource)";
+      out.push(rec);
+    }
+    return out;
+  }
+
+  /* ---------------- helpers ---------------- */
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function reEsc(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function norm(s) {
+    return String(s || "").toLowerCase();
+  }
+
+  // Escape text, wrapping every occurrence of any search term in <mark>.
+  function highlight(text, terms) {
+    var t = String(text == null ? "" : text);
+    if (!terms.length) return esc(t);
+    var rx = new RegExp("(" + terms.map(reEsc).join("|") + ")", "gi");
+    var out = "";
+    var last = 0;
+    var m;
+    while ((m = rx.exec(t)) !== null) {
+      if (m[0].length === 0) {
+        rx.lastIndex++;
+        continue;
+      }
+      if (m.index > last) out += esc(t.slice(last, m.index));
+      out += "<mark>" + esc(m[0]) + "</mark>";
+      last = m.index + m[0].length;
+    }
+    return out + esc(t.slice(last));
+  }
+
+  function safeUrl(u) {
+    var s = String(u || "").trim();
+    if (!s) return "";
+    // Allow only http(s)/mailto; anything else (javascript:, data:) is dropped.
+    if (/^https?:\/\//i.test(s) || /^mailto:/i.test(s)) return s;
+    if (/^www\./i.test(s)) return "https://" + s;
+    return "";
+  }
+
+  // Deterministic, well-spaced hues so each Type keeps its colour across rebuilds.
+  var HUES = [210, 145, 28, 340, 265, 190, 95, 12, 300, 45, 170, 240, 320, 70, 355, 225];
+
+  /* ---------------- state ---------------- */
+
+  var ALL = [];
+  var typeHue = {};
+  var state = {
+    q: "",
+    terms: [],
+    types: [], // selected Type values (OR within group)
+    subs: [],  // selected Subtype values (OR within group)
+  };
+
+  var el = {};
+  var toastTimer = null;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  /* ---------------- filtering ---------------- */
+
+  function matchesSearch(r) {
+    if (!state.terms.length) return true;
+    var hay = norm(r.resource + "\n" + r.creator + "\n" + r.description);
+    return state.terms.every(function (t) {
+      return hay.indexOf(t) !== -1;
+    });
+  }
+
+  // `skip` lets us compute facet counts that ignore their own dimension.
+  function passes(r, skip) {
+    if (skip !== "search" && !matchesSearch(r)) return false;
+    if (skip !== "type" && state.types.length && state.types.indexOf(r.type) === -1) return false;
+    if (skip !== "sub" && state.subs.length && state.subs.indexOf(r.subtype) === -1) return false;
+    return true;
+  }
+
+  function hasActiveFilters() {
+    return !!(state.q.trim() || state.types.length || state.subs.length);
+  }
+
+  function clearAll() {
+    state.types.length = 0;
+    state.subs.length = 0;
+    setSearch("");
+    el.search.value = "";
+  }
+
+  function currentResults() {
+    return ALL.filter(function (r) {
+      return passes(r, null);
+    });
+  }
+
+  function countBy(field, skip) {
+    var counts = Object.create(null);
+    ALL.forEach(function (r) {
+      if (!passes(r, skip)) return;
+      var v = r[field];
+      if (!v) return;
+      counts[v] = (counts[v] || 0) + 1;
+    });
+    return counts;
+  }
+
+  /* ---------------- rendering ---------------- */
+
+  var ICON = {
+    search:
+      '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+    person:
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    copy:
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    check:
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    empty:
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M8.5 11h5"/></svg>',
+    dice:
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/></svg>',
+  };
+
+  function pillHTML(value, count, active, kind) {
+    var hue = kind === "type" ? typeHue[value] : null;
+    return (
+      '<button class="pill' + (count === 0 ? " is-empty" : "") + '"' +
+      ' type="button"' +
+      ' aria-pressed="' + (active ? "true" : "false") + '"' +
+      ' data-filter="' + kind + '"' +
+      ' data-value="' + esc(value) + '"' +
+      ' data-tagkey="' + kind + ":" + esc(value) + '"' +
+      (hue != null ? ' style="--type-h:' + hue + '"' : "") +
+      ">" +
+      (kind === "type" ? '<span class="dot"></span>' : "") +
+      "<span>" + esc(value) + "</span>" +
+      '<span class="n">' + count + "</span>" +
+      "</button>"
+    );
+  }
+
+  function renderFilters() {
+    var typeCounts = countBy("type", "type");
+    var subCounts = countBy("subtype", "sub");
+
+    var types = Object.keys(typeHue).sort(function (a, b) {
+      return (typeCounts[b] || 0) - (typeCounts[a] || 0) || a.localeCompare(b);
+    });
+    el.typePills.innerHTML = types
+      .map(function (t) {
+        return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
+      })
+      .join("");
+
+    var allSubs = {};
+    ALL.forEach(function (r) {
+      if (r.subtype) allSubs[r.subtype] = true;
+    });
+    var subs = Object.keys(allSubs).sort(function (a, b) {
+      return (subCounts[b] || 0) - (subCounts[a] || 0) || a.localeCompare(b);
+    });
+    el.subPills.innerHTML = subs
+      .map(function (s) {
+        return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
+      })
+      .join("");
+  }
+
+  function renderCrumbs() {
+    var parts = [];
+    if (state.q.trim()) {
+      parts.push(crumb("search", "Search", state.q.trim()));
+    }
+    state.types.forEach(function (v) {
+      parts.push(crumb("type", "Type", v));
+    });
+    state.subs.forEach(function (v) {
+      parts.push(crumb("sub", "Subtype", v));
+    });
+    el.crumbs.innerHTML = parts.join("");
+  }
+
+  function crumb(kind, label, value) {
+    return (
+      '<button class="crumb" type="button" data-crumb="' + kind + '"' +
+      ' data-value="' + esc(value) + '"' +
+      ' aria-label="Remove filter ' + esc(label) + ": " + esc(value) + '">' +
+      '<span class="k">' + esc(label) + ":</span> " +
+      "<span>" + esc(value) + "</span>" +
+      '<span class="x" aria-hidden="true">×</span>' +
+      "</button>"
+    );
+  }
+
+  function cardHTML(r, i) {
+    var terms = state.terms;
+    var hue = typeHue[r.type] != null ? typeHue[r.type] : 220;
+    var url = safeUrl(r.link);
+    var delay = Math.min(i, 18) * 22;
+
+    var tags = "";
+    if (r.type) {
+      tags +=
+        '<button class="tag type" type="button" data-filter="type"' +
+        ' data-value="' + esc(r.type) + '" data-tagkey="type:' + esc(r.type) + '"' +
+        ' aria-pressed="' + (state.types.indexOf(r.type) !== -1 ? "true" : "false") + '"' +
+        ' title="Filter by ' + esc(r.type) + '">' + esc(r.type) + "</button>";
+    }
+    if (r.subtype) {
+      tags +=
+        '<button class="tag sub" type="button" data-filter="sub"' +
+        ' data-value="' + esc(r.subtype) + '" data-tagkey="sub:' + esc(r.subtype) + '"' +
+        ' aria-pressed="' + (state.subs.indexOf(r.subtype) !== -1 ? "true" : "false") + '"' +
+        ' title="Filter by ' + esc(r.subtype) + '">' + esc(r.subtype) + "</button>";
+    }
+
+    var meta = "";
+    if (r.creator) {
+      meta +=
+        '<span class="meta-item">' + ICON.person +
+        '<span class="v">' + highlight(r.creator, terms) + "</span></span>";
+    }
+
+    var title = url
+      ? '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' +
+        highlight(r.resource, terms) + "</a>"
+      : highlight(r.resource, terms);
+
+    return (
+      '<article class="card" style="--type-h:' + hue + ";--d:" + delay + 'ms"' +
+      ' data-type="' + esc(r.type) + '" data-sub="' + esc(r.subtype) + '"' +
+      (url ? ' data-url="' + esc(url) + '" tabindex="0"' : "") +
+      ">" +
+      '<div class="card-head"><h3>' + title + "</h3>" +
+      (url
+        ? '<button class="copy" type="button" data-copy="' + esc(url) +
+          '" title="Copy link" aria-label="Copy link to ' + esc(r.resource) + '">' +
+          ICON.copy + "</button>"
+        : "") +
+      "</div>" +
+      (tags ? '<div class="tagrow">' + tags + "</div>" : "") +
+      '<p class="desc">' + highlight(r.description || "No description provided.", terms) + "</p>" +
+      (meta ? '<div class="meta"><div><div class="meta-inner">' + meta + "</div></div></div>" : "") +
+      "</article>"
+    );
+  }
+
+  function render() {
+    renderFilters();
+    renderCrumbs();
+
+    var results = currentResults();
+
+    el.count.innerHTML =
+      "<strong>" + results.length + "</strong> of " + ALL.length + " resources";
+    el.random.disabled = results.length === 0;
+    el.clearFilters.disabled = !hasActiveFilters();
+
+    // Show how many pill filters are active, since they're collapsed on mobile
+    var activePills = state.types.length + state.subs.length;
+    el.filterBadge.textContent = activePills ? String(activePills) : "";
+
+    if (!results.length) {
+      el.grid.className = "";
+      el.grid.innerHTML =
+        '<div class="state">' +
+        '<div class="icon">' + ICON.empty + "</div>" +
+        "<h2>No resources match</h2>" +
+        "<p>Try removing a filter or searching for something broader" +
+        (state.q.trim() ? " than “" + esc(state.q.trim()) + "”" : "") +
+        ".</p>" +
+        '<button class="btn" type="button" data-crumb="all">Clear all filters</button>' +
+        "</div>";
+      return;
+    }
+
+    el.grid.className = "grid";
+    el.grid.setAttribute("aria-busy", "false");
+    el.grid.innerHTML = results
+      .map(function (r, i) {
+        return cardHTML(r, i);
+      })
+      .join("");
+  }
+
+  /* ---------------- interactions ---------------- */
+
+  function toggleIn(list, value) {
+    var i = list.indexOf(value);
+    if (i === -1) list.push(value);
+    else list.splice(i, 1);
+  }
+
+  function setSearch(v) {
+    state.q = v;
+    state.terms = norm(v).split(/\s+/).filter(Boolean);
+    el.searchbox.classList.toggle("has-value", v.length > 0);
+  }
+
+  function toast(msg) {
+    el.toast.textContent = msg;
+    el.toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.toast.classList.remove("show");
+    }, 1900);
+  }
+
+  function copyText(text, btn) {
+    function ok() {
+      if (btn) {
+        btn.classList.add("copied");
+        btn.innerHTML = ICON.check;
+        setTimeout(function () {
+          btn.classList.remove("copied");
+          btn.innerHTML = ICON.copy;
+        }, 1400);
+      }
+      toast("Link copied");
+    }
+    // Clipboard API needs a secure context; fall back for file:// use.
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () {
+        legacyCopy(text) ? ok() : toast("Couldn't copy — press ⌘C");
+      });
+      return;
+    }
+    legacyCopy(text) ? ok() : toast("Couldn't copy — press ⌘C");
+  }
+
+  function legacyCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+      document.body.appendChild(ta);
+      ta.select();
+      var okc = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return okc;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function applyFilterClick(kind, value) {
+    if (kind === "type") toggleIn(state.types, value);
+    else if (kind === "sub") toggleIn(state.subs, value);
+    render();
+  }
+
+  function clearTagHighlight() {
+    el.grid.classList.remove("dimming");
+    var marked = el.grid.querySelectorAll(".card.tag-match");
+    for (var i = 0; i < marked.length; i++) marked[i].classList.remove("tag-match");
+  }
+
+  function applyTagHighlight(tagkey) {
+    var sep = tagkey.indexOf(":");
+    var kind = tagkey.slice(0, sep);
+    var value = tagkey.slice(sep + 1);
+    var attr = kind === "type" ? "data-type" : "data-sub";
+    var cards = el.grid.querySelectorAll(".card");
+    var any = false;
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].getAttribute(attr) === value) {
+        cards[i].classList.add("tag-match");
+        any = true;
+      }
+    }
+    if (any) el.grid.classList.add("dimming");
+  }
+
+  function wire() {
+    // Search
+    el.search.addEventListener("input", function () {
+      setSearch(el.search.value);
+      render();
+    });
+    el.clearSearch.addEventListener("click", function () {
+      setSearch("");
+      el.search.value = "";
+      el.search.focus();
+      render();
+    });
+
+    // "/" focuses search; Escape clears it
+    document.addEventListener("keydown", function (e) {
+      var tag = (e.target.tagName || "").toLowerCase();
+      var typing = tag === "input" || tag === "textarea" || e.target.isContentEditable;
+      if (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        el.search.focus();
+        el.search.select();
+      } else if (e.key === "Escape" && e.target === el.search) {
+        if (el.search.value) {
+          setSearch("");
+          el.search.value = "";
+          render();
+        } else {
+          el.search.blur();
+        }
+      }
+    });
+
+    // Clear-filters button (next to the search bar)
+    el.clearFilters.addEventListener("click", function () {
+      clearAll();
+      render();
+      el.search.focus();
+    });
+
+    // Filter pills (delegated on the whole controls area)
+    el.controls.addEventListener("click", function (e) {
+      var p = e.target.closest(".pill");
+      if (!p) return;
+      applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
+    });
+
+    // Breadcrumbs (and the empty-state "clear all" button)
+    document.addEventListener("click", function (e) {
+      var c = e.target.closest("[data-crumb]");
+      if (!c) return;
+      var kind = c.getAttribute("data-crumb");
+      var value = c.getAttribute("data-value");
+      if (kind === "all") {
+        clearAll();
+      } else if (kind === "search") {
+        setSearch("");
+        el.search.value = "";
+      } else if (kind === "type") {
+        toggleIn(state.types, value);
+      } else if (kind === "sub") {
+        toggleIn(state.subs, value);
+      }
+      render();
+    });
+
+    // Card interactions
+    el.grid.addEventListener("click", function (e) {
+      var copyBtn = e.target.closest(".copy");
+      if (copyBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        copyText(copyBtn.getAttribute("data-copy"), copyBtn);
+        return;
+      }
+      var tag = e.target.closest(".tag");
+      if (tag) {
+        e.preventDefault();
+        e.stopPropagation();
+        clearTagHighlight();
+        applyFilterClick(tag.getAttribute("data-filter"), tag.getAttribute("data-value"));
+        return;
+      }
+      if (e.target.closest("a")) return; // let the title link work normally
+      var card = e.target.closest(".card[data-url]");
+      if (card) window.open(card.getAttribute("data-url"), "_blank", "noopener");
+    });
+
+    el.grid.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var card = e.target.closest(".card[data-url]");
+      if (card && e.target === card) window.open(card.getAttribute("data-url"), "_blank", "noopener");
+    });
+
+    // Hovering any Type/Subtype tag highlights every card sharing it.
+    // Skipped on touch devices: tapping there synthesises a mouseover and would
+    // leave the grid dimmed with no way to un-hover.
+    var canHover =
+      !window.matchMedia || window.matchMedia("(hover: hover)").matches;
+
+    if (canHover) {
+      document.addEventListener("mouseover", function (e) {
+        var t = e.target.closest("[data-tagkey]");
+        if (!t) return;
+        clearTagHighlight();
+        applyTagHighlight(t.getAttribute("data-tagkey"));
+      });
+      document.addEventListener("mouseout", function (e) {
+        var t = e.target.closest("[data-tagkey]");
+        if (!t) return;
+        var to = e.relatedTarget;
+        if (to && to.closest && to.closest("[data-tagkey]") === t) return;
+        clearTagHighlight();
+      });
+    }
+
+    // Filters disclosure (visible on narrow screens only)
+    el.filterToggle.addEventListener("click", function () {
+      var open = !el.controls.classList.contains("filters-open");
+      el.controls.classList.toggle("filters-open", open);
+      el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    // Random resource
+    el.random.addEventListener("click", function () {
+      var results = currentResults();
+      if (!results.length) return;
+      var n = Math.floor(Math.random() * results.length);
+      var card = el.grid.children[n];
+      if (!card) return;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      var cards = el.grid.querySelectorAll(".card.flash");
+      for (var i = 0; i < cards.length; i++) cards[i].classList.remove("flash");
+      void card.offsetWidth; // restart the animation
+      card.classList.add("flash");
+      toast("Random pick: " + results[n].resource);
+    });
+
+    // Sticky-header shadow
+    var sentinel = el.controls.offsetTop;
+    window.addEventListener(
+      "scroll",
+      function () {
+        el.controls.classList.toggle("is-stuck", window.scrollY > sentinel);
+      },
+      { passive: true }
+    );
+  }
+
+  /* ---------------- boot ---------------- */
+
+  // Deliberately reaches for the DOM directly rather than the cached `el`, so it
+  // still works if boot() failed before those lookups happened.
+  function showError(msg, detail) {
+    var grid = document.getElementById("grid");
+    var count = document.getElementById("count");
+    if (count) count.textContent = "";
+    if (!grid) return;
+    grid.className = "";
+    grid.setAttribute("aria-busy", "false");
+    grid.innerHTML =
+      '<div class="error-box"><strong>' + esc(msg) + "</strong>" +
+      (detail ? "<p>" + detail + "</p>" : "") +
+      "</div>";
+  }
+
+  function errText(e) {
+    return esc((e && (e.message || e.name)) || String(e));
+  }
+
+  // Last resort: never leave the user staring at "Loading…" with no explanation.
+  if (typeof window !== "undefined" && window.addEventListener) {
+    window.addEventListener("error", function (ev) {
+      var count = document.getElementById("count");
+      if (count && count.textContent.indexOf("Loading") !== -1) {
+        showError("The app hit an error while starting.", esc(ev.message || "Unknown error"));
+      }
+    });
+  }
+
+  function start(records) {
+    ALL = records;
+
+    Object.keys(
+      ALL.reduce(function (acc, r) {
+        if (r.type) acc[r.type] = 1;
+        return acc;
+      }, {})
+    )
+      .sort()
+      .forEach(function (t, i) {
+        // Offset each wrap so new Types stay visually distinct past 16.
+        var shift = 13 * Math.floor(i / HUES.length);
+        typeHue[t] = (HUES[i % HUES.length] + shift) % 360;
+      });
+
+    if (!ALL.length) {
+      showError("No resources found in the data file.", "Check that the CSV has rows below its header.");
+      return;
+    }
+
+    wire();
+    render();
+  }
+
+  function boot() {
+    el = {
+      controls: $("controls"),
+      search: $("search"),
+      searchbox: $("searchbox"),
+      clearSearch: $("clear-search"),
+      typePills: $("type-pills"),
+      subPills: $("sub-pills"),
+      clearFilters: $("clear-filters"),
+      filterToggle: $("filter-toggle"),
+      filterBadge: $("filter-badge"),
+      crumbs: $("crumbs"),
+      count: $("count"),
+      grid: $("grid"),
+      random: $("random"),
+      toast: $("toast"),
+    };
+
+    var missing = [];
+    for (var k in el) {
+      if (Object.prototype.hasOwnProperty.call(el, k) && !el[k]) missing.push(k);
+    }
+    if (missing.length) {
+      showError(
+        "This page is missing elements the app needs.",
+        "Missing: <code>" + esc(missing.join(", ")) + "</code>"
+      );
+      return;
+    }
+
+    try {
+      $("search-icon").innerHTML = ICON.search;
+      el.random.insertAdjacentHTML("afterbegin", ICON.dice);
+    } catch (e) {
+      /* icons are decorative — never block startup on them */
+    }
+
+    // Standalone build: the data is already here, so render synchronously.
+    // No promises, no network, nothing that can leave the page hanging.
+    var embedded = typeof window !== "undefined" && window.__RESOURCES__;
+    if (embedded && embedded.length) {
+      try {
+        start(embedded);
+      } catch (e) {
+        showError("Couldn't display the resources.", errText(e));
+      }
+      return;
+    }
+
+    // Dev preview only: read the CSV over HTTP.
+    var devHint = function (err) {
+      var viaFile =
+        typeof location !== "undefined" && location.protocol === "file:";
+      return (
+        "Reading <code>" + esc(CSV_PATH) + "</code> failed (" + errText(err) + "). " +
+        (viaFile
+          ? "Browsers block local file reads, so this page needs to be served over " +
+            "HTTP — run <code>python3 -m http.server 8000</code> from the project " +
+            "folder and open <code>http://localhost:8000/</code>. For an offline " +
+            "copy you can email, use <code>dist/resources-app.html</code> instead."
+          : "Check that <code>data/resources.csv</code> exists alongside this page " +
+            "and try reloading.")
+      );
+    };
+
+    try {
+      if (typeof fetch !== "function") throw new Error("fetch unavailable");
+      fetch(CSV_PATH, { cache: "no-store" })
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        })
+        .then(function (text) {
+          start(rowsToRecords(parseCSV(text)));
+        })
+        // A single .catch also covers anything start() throws, so a render
+        // error surfaces instead of vanishing into an unhandled rejection.
+        .catch(function (err) {
+          showError("Couldn't load the resource data.", devHint(err));
+        });
+    } catch (e) {
+      showError("Couldn't load the resource data.", devHint(e));
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+
+</script>
+<script>document.addEventListener("DOMContentLoaded",function(){var s=document.getElementById("stamp");if(s)s.textContent="65 resources · built "+window.__BUILT__;});</script>
+</body>
+</html>
