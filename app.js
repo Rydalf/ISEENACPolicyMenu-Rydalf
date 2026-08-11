@@ -713,9 +713,9 @@
       toast("Random pick: " + results[n].resource);
     });
 
-    // Sticky-header shadow, plus (on mobile, via CSS scoping) hiding the
-    // filter bar on scroll-down and revealing it on scroll-up. Purely
-    // visual — never touches filter state or the "See more filters" state.
+    // Sticky-header shadow, plus hiding the filter bar on scroll-down and
+    // revealing it on scroll-up (desktop and mobile alike). Purely visual —
+    // never touches filter state or the "See more filters" state.
     var sentinel = el.controls.offsetTop;
     var lastScrollY = window.scrollY;
     var scrollTicking = false;

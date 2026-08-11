@@ -94,12 +94,28 @@ body {
   border-bottom: 1px solid transparent;
   padding: 14px 0 12px;
   margin-bottom: 6px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.22s ease, opacity 0.22s ease,
+    border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Promotes the bar to its own GPU layer ahead of time so the
+     transform/opacity transition doesn't have to compete with
+     backdrop-filter's blur recompute during a fast scroll — without
+     this, fast flicks can skip the animation and snap straight in. */
+  will-change: transform, opacity;
 }
 
 .controls.is-stuck {
   border-bottom-color: var(--border);
   box-shadow: 0 6px 18px -12px rgba(16, 24, 40, 0.5);
+}
+
+/* Scrolling down slides the whole filter bar (search, buttons, match
+   toggle, and Type/Subtype pills) out of the way for more card space;
+   scrolling back up brings it straight back. Purely visual — toggled
+   independently of filter state and the "See more filters" state. */
+.controls.controls-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .searchrow {
@@ -767,21 +783,7 @@ mark {
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
 
-  .controls {
-    padding-top: 10px;
-    transition: transform 0.22s ease, opacity 0.22s ease,
-      border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  /* Scrolling down slides the whole filter bar (search, buttons, match
-     toggle, and Type/Subtype pills) out of the way for more card space;
-     scrolling back up brings it straight back. Purely visual — toggled
-     independently of filter state and the "See more filters" state. */
-  .controls.controls-hidden {
-    transform: translateY(-100%);
-    opacity: 0;
-    pointer-events: none;
-  }
+  .controls { padding-top: 10px; }
 
   /* 16px minimum stops iOS Safari zooming the page on focus */
   #search { font-size: 16px; padding: 12px 44px 12px 40px; }
