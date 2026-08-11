@@ -260,8 +260,14 @@
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/></svg>',
   };
 
-  function pillHTML(value, count, active, kind) {
+  // mobileOrder/mobileMore only apply to Type pills: on narrow screens the
+  // first 10 show alphabetically (via the --m-order flex order) and the
+  // rest stay behind "See more filters" (via data-mobile-more).
+  function pillHTML(value, count, active, kind, mobileOrder, mobileMore) {
     var hue = kind === "type" ? typeHue[value] : null;
+    var styleParts = [];
+    if (hue != null) styleParts.push("--type-h:" + hue);
+    if (mobileOrder != null) styleParts.push("--m-order:" + mobileOrder);
     return (
       '<button class="pill' + (count === 0 ? " is-empty" : "") + '"' +
       ' type="button"' +
@@ -269,7 +275,8 @@
       ' data-filter="' + kind + '"' +
       ' data-value="' + esc(value) + '"' +
       ' data-tagkey="' + kind + ":" + esc(value) + '"' +
-      (hue != null ? ' style="--type-h:' + hue + '"' : "") +
+      (mobileMore ? ' data-mobile-more="true"' : "") +
+      (styleParts.length ? ' style="' + styleParts.join(";") + '"' : "") +
       ">" +
       (kind === "type" ? '<span class="dot"></span>' : "") +
       "<span>" + esc(value) + "</span>" +
@@ -285,9 +292,30 @@
     var types = Object.keys(typeHue).sort(function (a, b) {
       return (typeCounts[b] || 0) - (typeCounts[a] || 0) || a.localeCompare(b);
     });
+
+    // On mobile the Type pills are shown alphabetically, first 10 by
+    // default with the rest behind "See more filters" — independent of
+    // the count-based order above, which still drives the desktop layout.
+    var alphaRank = {};
+    types
+      .slice()
+      .sort(function (a, b) {
+        return a.localeCompare(b);
+      })
+      .forEach(function (t, i) {
+        alphaRank[t] = i;
+      });
+
     el.typePills.innerHTML = types
       .map(function (t) {
-        return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
+        return pillHTML(
+          t,
+          typeCounts[t] || 0,
+          state.types.indexOf(t) !== -1,
+          "type",
+          alphaRank[t],
+          alphaRank[t] >= 10
+        );
       })
       .join("");
 
@@ -633,6 +661,16 @@
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
 
+    // "See more filters" (mobile only): reveals the Type tags past the
+    // first 10 plus every Subtype tag, both hidden by default on narrow
+    // screens so the page opens without a wall of pills.
+    el.seeMoreFilters.addEventListener("click", function () {
+      var open = !el.controls.classList.contains("filters-expanded");
+      el.controls.classList.toggle("filters-expanded", open);
+      el.seeMoreFilters.setAttribute("aria-expanded", open ? "true" : "false");
+      el.seeMoreFilters.textContent = open ? "See fewer filters" : "See more filters";
+    });
+
     // Random resource
     el.random.addEventListener("click", function () {
       var results = currentResults();
@@ -726,6 +764,7 @@
       clearFilters: $("clear-filters"),
       filterToggle: $("filter-toggle"),
       filterBadge: $("filter-badge"),
+      seeMoreFilters: $("see-more-filters"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),

@@ -205,8 +205,12 @@ kbd {
   color: var(--text-3);
 }
 
-/* Filters disclosure — only used on narrow screens */
+/* Filters disclosure — superseded by the inline mobile filters below,
+   kept in the DOM (hidden) so app.js's element wiring stays intact. */
 #filter-toggle { display: none; }
+
+/* "See more filters" — only used on narrow screens, see the mobile block below */
+#see-more-filters { display: none; }
 
 .badge {
   font-size: 11.5px;
@@ -732,7 +736,7 @@ mark {
   .searchbox { flex: 1 1 100%; }
 
   /* Buttons share a second row evenly instead of overflowing */
-  #filter-toggle, #clear-filters, #random {
+  #clear-filters, #random {
     display: inline-flex;
     justify-content: center;
     flex: 1 1 0;
@@ -741,14 +745,24 @@ mark {
     font-size: 13.5px;
   }
 
-  /* 35 pills would swallow the screen, so collapse them behind a toggle */
-  .filters { display: none; }
-  .controls.filters-open .filters {
-    display: grid;
-    max-height: 45vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-right: 2px;
+  /* Type tags sit directly on the page (first 10, A–Z, via --m-order)
+     instead of behind a tap-to-open toggle. Subtype tags and the rest of
+     the Type tags stay collapsed behind "See more filters" until tapped. */
+  #type-pills .pill { order: var(--m-order, 0); }
+  #type-pills .pill[data-mobile-more="true"] { display: none; }
+  .controls.filters-expanded #type-pills .pill[data-mobile-more="true"] {
+    display: inline-flex;
+  }
+
+  #sub-fgroup { display: none; }
+  .controls.filters-expanded #sub-fgroup { display: grid; }
+
+  #see-more-filters {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+    padding: 11px 10px;
+    font-size: 13.5px;
   }
 
   /* Comfortable tap targets (~40px) */
