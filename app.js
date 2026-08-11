@@ -188,6 +188,7 @@
     terms: [],
     types: [], // selected Type values (OR within group)
     subs: [],  // selected Subtype values (OR within group)
+    matchMode: "all", // "all" (Type AND Subtype) or "any" (Type OR Subtype)
   };
 
   var el = {};
@@ -207,11 +208,23 @@
     });
   }
 
-  // `skip` lets us compute facet counts that ignore their own dimension.
+  // `skip` lets us compute facet counts that ignore their own dimension —
+  // bypassing a dimension this way always leaves at most one of
+  // typeActive/subActive true, so matchMode (which only matters when both
+  // are active at once) never affects facet counts, only the actual grid.
   function passes(r, skip) {
     if (skip !== "search" && !matchesSearch(r)) return false;
-    if (skip !== "type" && state.types.length && state.types.indexOf(r.type) === -1) return false;
-    if (skip !== "sub" && state.subs.length && state.subs.indexOf(r.subtype) === -1) return false;
+
+    var typeActive = skip !== "type" && state.types.length > 0;
+    var subActive = skip !== "sub" && state.subs.length > 0;
+    var typeOk = !typeActive || state.types.indexOf(r.type) !== -1;
+    var subOk = !subActive || state.subs.indexOf(r.subtype) !== -1;
+
+    if (typeActive && subActive) {
+      return state.matchMode === "any" ? typeOk || subOk : typeOk && subOk;
+    }
+    if (typeActive) return typeOk;
+    if (subActive) return subOk;
     return true;
   }
 
@@ -222,6 +235,7 @@
   function clearAll() {
     state.types.length = 0;
     state.subs.length = 0;
+    state.matchMode = "all";
     setSearch("");
     el.search.value = "";
   }
@@ -413,6 +427,9 @@
   }
 
   function render() {
+    el.matchAllBtn.setAttribute("aria-pressed", state.matchMode === "all" ? "true" : "false");
+    el.matchAnyBtn.setAttribute("aria-pressed", state.matchMode === "any" ? "true" : "false");
+
     renderFilters();
     renderCrumbs();
 
@@ -583,6 +600,16 @@
       var p = e.target.closest(".pill");
       if (!p) return;
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
+    });
+
+    // Match-mode toggle: how Type and Subtype selections combine
+    el.matchMode.addEventListener("click", function (e) {
+      var b = e.target.closest(".seg-btn");
+      if (!b) return;
+      var mode = b.getAttribute("data-mode");
+      if (mode === state.matchMode) return;
+      state.matchMode = mode;
+      render();
     });
 
     // Breadcrumbs (and the empty-state "clear all" button)
@@ -765,6 +792,9 @@
       filterToggle: $("filter-toggle"),
       filterBadge: $("filter-badge"),
       seeMoreFilters: $("see-more-filters"),
+      matchMode: $("match-mode"),
+      matchAllBtn: $("match-all-btn"),
+      matchAnyBtn: $("match-any-btn"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),

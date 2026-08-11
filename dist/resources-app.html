@@ -323,6 +323,44 @@ kbd {
 .pill.is-empty { opacity: 0.34; }
 .pill.is-empty:hover { transform: none; }
 
+/* ---------- Match-mode toggle (Type ↔ Subtype: all vs. any) ---------- */
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+  background: var(--surface);
+}
+
+.seg-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 560;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.seg-btn:hover { color: var(--text); }
+.seg-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.seg-btn[aria-pressed="true"] {
+  color: #fff;
+  background: var(--accent);
+}
+
+.matchmode-hint {
+  margin: -3px 0 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
 /* ---------- Status bar / breadcrumbs ---------- */
 
 .statusbar {
@@ -916,6 +954,14 @@ footer.foot {
 
     <div class="filters" id="filters">
       <div class="fgroup">
+        <span class="flabel" id="lbl-match">Match</span>
+        <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
+          <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
+          <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
+        </div>
+      </div>
+      <p class="matchmode-hint">Match all: a resource needs both Type and Subtype · Match any: either one is enough</p>
+      <div class="fgroup">
         <span class="flabel" id="lbl-type">Type</span>
         <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
       </div>
@@ -1225,6 +1271,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     terms: [],
     types: [], // selected Type values (OR within group)
     subs: [],  // selected Subtype values (OR within group)
+    matchMode: "all", // "all" (Type AND Subtype) or "any" (Type OR Subtype)
   };
 
   var el = {};
@@ -1244,11 +1291,23 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     });
   }
 
-  // `skip` lets us compute facet counts that ignore their own dimension.
+  // `skip` lets us compute facet counts that ignore their own dimension —
+  // bypassing a dimension this way always leaves at most one of
+  // typeActive/subActive true, so matchMode (which only matters when both
+  // are active at once) never affects facet counts, only the actual grid.
   function passes(r, skip) {
     if (skip !== "search" && !matchesSearch(r)) return false;
-    if (skip !== "type" && state.types.length && state.types.indexOf(r.type) === -1) return false;
-    if (skip !== "sub" && state.subs.length && state.subs.indexOf(r.subtype) === -1) return false;
+
+    var typeActive = skip !== "type" && state.types.length > 0;
+    var subActive = skip !== "sub" && state.subs.length > 0;
+    var typeOk = !typeActive || state.types.indexOf(r.type) !== -1;
+    var subOk = !subActive || state.subs.indexOf(r.subtype) !== -1;
+
+    if (typeActive && subActive) {
+      return state.matchMode === "any" ? typeOk || subOk : typeOk && subOk;
+    }
+    if (typeActive) return typeOk;
+    if (subActive) return subOk;
     return true;
   }
 
@@ -1259,6 +1318,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   function clearAll() {
     state.types.length = 0;
     state.subs.length = 0;
+    state.matchMode = "all";
     setSearch("");
     el.search.value = "";
   }
@@ -1450,6 +1510,9 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   }
 
   function render() {
+    el.matchAllBtn.setAttribute("aria-pressed", state.matchMode === "all" ? "true" : "false");
+    el.matchAnyBtn.setAttribute("aria-pressed", state.matchMode === "any" ? "true" : "false");
+
     renderFilters();
     renderCrumbs();
 
@@ -1620,6 +1683,16 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       var p = e.target.closest(".pill");
       if (!p) return;
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
+    });
+
+    // Match-mode toggle: how Type and Subtype selections combine
+    el.matchMode.addEventListener("click", function (e) {
+      var b = e.target.closest(".seg-btn");
+      if (!b) return;
+      var mode = b.getAttribute("data-mode");
+      if (mode === state.matchMode) return;
+      state.matchMode = mode;
+      render();
     });
 
     // Breadcrumbs (and the empty-state "clear all" button)
@@ -1802,6 +1875,9 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       filterToggle: $("filter-toggle"),
       filterBadge: $("filter-badge"),
       seeMoreFilters: $("see-more-filters"),
+      matchMode: $("match-mode"),
+      matchAllBtn: $("match-all-btn"),
+      matchAnyBtn: $("match-any-btn"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),

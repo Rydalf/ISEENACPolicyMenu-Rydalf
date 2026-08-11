@@ -315,6 +315,44 @@ kbd {
 .pill.is-empty { opacity: 0.34; }
 .pill.is-empty:hover { transform: none; }
 
+/* ---------- Match-mode toggle (Type ↔ Subtype: all vs. any) ---------- */
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+  background: var(--surface);
+}
+
+.seg-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 560;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.seg-btn:hover { color: var(--text); }
+.seg-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.seg-btn[aria-pressed="true"] {
+  color: #fff;
+  background: var(--accent);
+}
+
+.matchmode-hint {
+  margin: -3px 0 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
 /* ---------- Status bar / breadcrumbs ---------- */
 
 .statusbar {

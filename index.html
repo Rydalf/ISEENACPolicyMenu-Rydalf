@@ -36,6 +36,14 @@
 
     <div class="filters" id="filters">
       <div class="fgroup">
+        <span class="flabel" id="lbl-match">Match</span>
+        <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
+          <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
+          <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
+        </div>
+      </div>
+      <p class="matchmode-hint">Match all: a resource needs both Type and Subtype · Match any: either one is enough</p>
+      <div class="fgroup">
         <span class="flabel" id="lbl-type">Type</span>
         <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
       </div>
