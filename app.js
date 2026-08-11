@@ -713,12 +713,36 @@
       toast("Random pick: " + results[n].resource);
     });
 
-    // Sticky-header shadow
+    // Sticky-header shadow, plus (on mobile, via CSS scoping) hiding the
+    // filter bar on scroll-down and revealing it on scroll-up. Purely
+    // visual — never touches filter state or the "See more filters" state.
     var sentinel = el.controls.offsetTop;
+    var lastScrollY = window.scrollY;
+    var scrollTicking = false;
+
+    function handleScroll() {
+      var y = window.scrollY;
+      var stuck = y > sentinel;
+      el.controls.classList.toggle("is-stuck", stuck);
+
+      if (!stuck) {
+        el.controls.classList.remove("controls-hidden");
+      } else {
+        var delta = y - lastScrollY;
+        if (delta < -2) el.controls.classList.remove("controls-hidden");
+        else if (delta > 2) el.controls.classList.add("controls-hidden");
+      }
+      lastScrollY = y;
+      scrollTicking = false;
+    }
+
     window.addEventListener(
       "scroll",
       function () {
-        el.controls.classList.toggle("is-stuck", window.scrollY > sentinel);
+        if (!scrollTicking) {
+          window.requestAnimationFrame(handleScroll);
+          scrollTicking = true;
+        }
       },
       { passive: true }
     );

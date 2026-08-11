@@ -766,7 +766,22 @@ mark {
   .fgroup > .flabel { padding-top: 0; }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
-  .controls { padding-top: 10px; }
+
+  .controls {
+    padding-top: 10px;
+    transition: transform 0.22s ease, opacity 0.22s ease,
+      border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Scrolling down slides the whole filter bar (search, buttons, match
+     toggle, and Type/Subtype pills) out of the way for more card space;
+     scrolling back up brings it straight back. Purely visual — toggled
+     independently of filter state and the "See more filters" state. */
+  .controls.controls-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
 
   /* 16px minimum stops iOS Safari zooming the page on focus */
   #search { font-size: 16px; padding: 12px 44px 12px 40px; }

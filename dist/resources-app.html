@@ -774,7 +774,22 @@ mark {
   .fgroup > .flabel { padding-top: 0; }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
-  .controls { padding-top: 10px; }
+
+  .controls {
+    padding-top: 10px;
+    transition: transform 0.22s ease, opacity 0.22s ease,
+      border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Scrolling down slides the whole filter bar (search, buttons, match
+     toggle, and Type/Subtype pills) out of the way for more card space;
+     scrolling back up brings it straight back. Purely visual — toggled
+     independently of filter state and the "See more filters" state. */
+  .controls.controls-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
 
   /* 16px minimum stops iOS Safari zooming the page on focus */
   #search { font-size: 16px; padding: 12px 44px 12px 40px; }
@@ -1796,12 +1811,36 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       toast("Random pick: " + results[n].resource);
     });
 
-    // Sticky-header shadow
+    // Sticky-header shadow, plus (on mobile, via CSS scoping) hiding the
+    // filter bar on scroll-down and revealing it on scroll-up. Purely
+    // visual — never touches filter state or the "See more filters" state.
     var sentinel = el.controls.offsetTop;
+    var lastScrollY = window.scrollY;
+    var scrollTicking = false;
+
+    function handleScroll() {
+      var y = window.scrollY;
+      var stuck = y > sentinel;
+      el.controls.classList.toggle("is-stuck", stuck);
+
+      if (!stuck) {
+        el.controls.classList.remove("controls-hidden");
+      } else {
+        var delta = y - lastScrollY;
+        if (delta < -2) el.controls.classList.remove("controls-hidden");
+        else if (delta > 2) el.controls.classList.add("controls-hidden");
+      }
+      lastScrollY = y;
+      scrollTicking = false;
+    }
+
     window.addEventListener(
       "scroll",
       function () {
-        el.controls.classList.toggle("is-stuck", window.scrollY > sentinel);
+        if (!scrollTicking) {
+          window.requestAnimationFrame(handleScroll);
+          scrollTicking = true;
+        }
       },
       { passive: true }
     );
