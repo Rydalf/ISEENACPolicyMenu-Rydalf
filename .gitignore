@@ -27,3 +27,7 @@ dist/PolicyMenu.html
 # Python
 __pycache__/
 *.py[cod]
+
+# Local source copy of the header logo — img/isee-logo.png is the tracked
+# asset the site actually references.
+/ISEENAC.png

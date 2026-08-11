@@ -14,6 +14,7 @@ Usage:
     python3 tools/build.py
 """
 
+import base64
 import csv
 import datetime
 import json
@@ -27,6 +28,7 @@ CSV_IN = os.path.join(ROOT, "data", "resources.csv")
 HTML_IN = os.path.join(ROOT, "index.html")
 CSS_IN = os.path.join(ROOT, "styles.css")
 JS_IN = os.path.join(ROOT, "app.js")
+LOGO_IN = os.path.join(ROOT, "img", "isee-logo.png")
 OUT = os.path.join(ROOT, "dist", "resources-app.html")
 
 FIELDS = {
@@ -137,6 +139,12 @@ def noscript_list(records):
     return '<ol class="nojs-list">\n' + "\n".join(items) + "\n</ol>"
 
 
+def data_uri(path, mime):
+    with open(path, "rb") as fh:
+        b64 = base64.b64encode(fh.read()).decode("ascii")
+    return "data:%s;base64,%s" % (mime, b64)
+
+
 def js_string_safe(text):
     """Keep inlined script/style text from prematurely closing its tag."""
     return re.sub(r"</(script|style)", r"<\\/\1", text, flags=re.IGNORECASE)
@@ -164,6 +172,16 @@ def main():
     html = read_text(HTML_IN)
     css = read_text(CSS_IN)
     js = read_text(JS_IN)
+
+    # Inline the header logo so the standalone file has no external assets.
+    if 'src="img/isee-logo.png"' not in html:
+        raise SystemExit('Could not find the logo <img src="img/isee-logo.png"> tag in index.html')
+    if not os.path.exists(LOGO_IN):
+        raise SystemExit("Missing required file: %s" % LOGO_IN)
+    html = html.replace(
+        'src="img/isee-logo.png"',
+        'src="%s"' % data_uri(LOGO_IN, "image/png"),
+    )
 
     # Drop the dev-only preview banner.
     html = re.sub(

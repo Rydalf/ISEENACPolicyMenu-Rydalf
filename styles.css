@@ -9,14 +9,22 @@
   --text: #131720;
   --text-2: #5a6472;
   --text-3: #8a93a2;
-  --accent: #1f6feb;
-  --accent-soft: #e8f0fe;
+
+  /* Brand palette (ISEE-aligned) — fixed navy/slate, constant across themes */
+  --brand-navy: #1b3a5c;
+  --brand-navy-deep: #122a44;
+  --brand-slate: #5b84a8;
+
+  /* Theme-adaptive accent: navy for primary/active/focus, slate for hover/highlight */
+  --accent: #1b3a5c;
+  --accent-2: #5b84a8;
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, white);
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
   --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 14px 34px rgba(16, 24, 40, 0.14);
   --radius: 14px;
   --radius-sm: 8px;
-  --ring: 0 0 0 3px rgba(31, 111, 235, 0.28);
+  --ring: 0 0 0 3px rgba(27, 58, 92, 0.28);
   --type-s: 62%;
   --type-l: 42%;
   --type-tint-l: 96%;
@@ -32,12 +40,13 @@
     --text: #e8ecf2;
     --text-2: #a3adbb;
     --text-3: #78828f;
-    --accent: #62a0ff;
-    --accent-soft: #17263f;
+    --accent: #7fa8c9;
+    --accent-2: #a9c6de;
+    --accent-soft: color-mix(in srgb, var(--accent) 22%, var(--surface));
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.6);
-    --ring: 0 0 0 3px rgba(98, 160, 255, 0.35);
+    --ring: 0 0 0 3px rgba(127, 168, 201, 0.35);
     --type-s: 55%;
     --type-l: 66%;
     --type-tint-l: 20%;
@@ -65,19 +74,53 @@ body {
   padding: 32px 20px 96px;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header / nav bar ---------- */
 
-.masthead { margin-bottom: 22px; }
-
-.masthead h1 {
-  margin: 0 0 6px;
-  font-size: clamp(23px, 3.4vw, 31px);
-  letter-spacing: -0.02em;
-  font-weight: 680;
+.site-header {
+  background: var(--brand-navy);
+  color: #fff;
 }
 
-.masthead p {
+.site-header-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Logo sits on its own white card so it reads cleanly against the navy bar
+   regardless of the source image's own background. Sized by height with
+   width auto so it scales proportionally and never stretches. */
+.brand-logo {
+  height: 34px;
+  width: auto;
+  flex: none;
+  display: block;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 9px;
+  object-fit: contain;
+}
+
+.brand-name {
   margin: 0;
+  font-size: clamp(17px, 2.4vw, 21px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.intro {
+  margin: 0 0 22px;
   color: var(--text-2);
   max-width: 62ch;
 }
@@ -211,7 +254,7 @@ kbd {
     background 0.16s ease, border-color 0.16s ease;
 }
 
-.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); box-shadow: var(--shadow-sm); }
+.btn:hover:not(:disabled) { border-color: var(--accent-2); color: var(--accent-2); box-shadow: var(--shadow-sm); }
 .btn:active:not(:disabled) { transform: translateY(1px); }
 .btn:focus-visible { outline: none; box-shadow: var(--ring); }
 
@@ -219,6 +262,19 @@ kbd {
   opacity: 0.42;
   cursor: default;
   color: var(--text-3);
+}
+
+/* Primary CTA (Random resource) — solid brand navy, slate on hover */
+.btn-primary {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: #fff;
 }
 
 /* Filters disclosure — superseded by the inline mobile filters below,
@@ -625,7 +681,7 @@ kbd {
 .card:focus-within .copy,
 .copy:focus-visible { opacity: 1; transform: none; }
 
-.copy:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.copy:hover { color: var(--accent-2); border-color: var(--accent-2); background: var(--accent-soft); }
 .copy:focus-visible { outline: none; box-shadow: var(--ring); }
 .copy.copied { color: #0a7d55; border-color: #a9e3cb; background: #e3f7ee; }
 
@@ -838,7 +894,10 @@ mark {
   .clear-search { width: 26px; height: 26px; }
 
   .card { padding: 16px 15px 14px; }
-  .masthead h1 { font-size: 22px; }
+
+  .site-header-inner { padding: 12px 14px; }
+  .brand-logo { height: 26px; padding: 3px 7px; }
+  .brand-name { font-size: 17px; }
 
   /* Wrap the creator rather than truncating it — there's room in one column */
   .meta-item .v { white-space: normal; }
@@ -883,7 +942,7 @@ mark {
   overflow-wrap: anywhere;
 }
 
-.nojs-item a:hover { color: var(--accent); text-decoration: underline; }
+.nojs-item a:hover { color: var(--accent-2); text-decoration: underline; }
 
 .nojs-kind {
   display: block;
