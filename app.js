@@ -872,6 +872,14 @@
       var open = !el.controls.classList.contains("filters-open");
       el.controls.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      // The full pill wall can run taller than the viewport; a sticky bar
+      // that tall stays pinned for the whole scroll range below it (its
+      // containing block is the entire page), so scrolling would appear
+      // to do nothing — or the bar would auto-hide mid-scroll and leave a
+      // blank gap the size of that huge panel. Drop out of sticky/hidden
+      // entirely while expanded so it just scrolls away normally; both
+      // resume once the panel is collapsed again.
+      if (open) el.controls.classList.remove("controls-hidden", "is-stuck");
     });
 
     // "See more filters" (mobile only): reveals the Type tags past the
@@ -908,6 +916,17 @@
 
     function handleScroll() {
       var y = window.scrollY;
+
+      // The full pill wall is dropped out of sticky positioning (see the
+      // filter-toggle handler above) while expanded, so there's nothing
+      // to stick or hide here — just keep lastScrollY current so the
+      // delta calc isn't a stale jump once it collapses again.
+      if (el.controls.classList.contains("filters-open")) {
+        lastScrollY = y;
+        scrollTicking = false;
+        return;
+      }
+
       var stuck = y > sentinel;
       el.controls.classList.toggle("is-stuck", stuck);
 

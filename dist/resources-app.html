@@ -255,6 +255,16 @@ body {
 
 .controls-inner { overflow: hidden; min-height: 0; padding: 8px 0 6px; }
 
+/* The full pill wall (all Type/Subtype/Organization tags, no preview
+   trimming) can run taller than the viewport. A sticky element that tall
+   stays pinned at the top for the entire scroll range of its containing
+   block — here, the whole page — so it would block scrolling from
+   revealing anything below it until you'd scrolled past its own huge
+   height. Dropping sticky while expanded lets it scroll away like normal
+   content instead; app.js's scroll handler skips its stick/hide logic
+   for the same reason while this class is present. */
+.controls.filters-open { position: static; }
+
 .controls.is-stuck {
   border-bottom-color: var(--border);
   box-shadow: 0 6px 18px -12px rgba(16, 24, 40, 0.5);
@@ -1046,6 +1056,22 @@ mark {
 
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
+
+  /* The preview pill counts (PREVIEW_TYPE_COUNT etc. in app.js) were
+     sized to fill "roughly 3 rows" at typical desktop widths. A narrow
+     phone fits far fewer pills per row, so the same counts were wrapping
+     into a dozen-plus rows per category — the default (collapsed) filter
+     bar measured over 1300px tall on a 390px-wide screen, tall enough
+     that its sticky positioning stayed pinned for the entire scroll
+     range of the page below it. Clamp each preview category's own pill
+     area to ~2 rows here (tighter than desktop's 3, since three stacked
+     categories compound fast on a narrow screen) regardless of how many
+     pills are rendered; "Browse all filters" is still right there for
+     the full list. */
+  .filters-preview .pills {
+    max-height: 70px;
+    overflow: hidden;
+  }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
 
@@ -2326,6 +2352,14 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       var open = !el.controls.classList.contains("filters-open");
       el.controls.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      // The full pill wall can run taller than the viewport; a sticky bar
+      // that tall stays pinned for the whole scroll range below it (its
+      // containing block is the entire page), so scrolling would appear
+      // to do nothing — or the bar would auto-hide mid-scroll and leave a
+      // blank gap the size of that huge panel. Drop out of sticky/hidden
+      // entirely while expanded so it just scrolls away normally; both
+      // resume once the panel is collapsed again.
+      if (open) el.controls.classList.remove("controls-hidden", "is-stuck");
     });
 
     // "See more filters" (mobile only): reveals the Type tags past the
@@ -2362,6 +2396,17 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
 
     function handleScroll() {
       var y = window.scrollY;
+
+      // The full pill wall is dropped out of sticky positioning (see the
+      // filter-toggle handler above) while expanded, so there's nothing
+      // to stick or hide here — just keep lastScrollY current so the
+      // delta calc isn't a stale jump once it collapses again.
+      if (el.controls.classList.contains("filters-open")) {
+        lastScrollY = y;
+        scrollTicking = false;
+        return;
+      }
+
       var stuck = y > sentinel;
       el.controls.classList.toggle("is-stuck", stuck);
 

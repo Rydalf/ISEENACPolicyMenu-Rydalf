@@ -247,6 +247,16 @@ body {
 
 .controls-inner { overflow: hidden; min-height: 0; padding: 8px 0 6px; }
 
+/* The full pill wall (all Type/Subtype/Organization tags, no preview
+   trimming) can run taller than the viewport. A sticky element that tall
+   stays pinned at the top for the entire scroll range of its containing
+   block — here, the whole page — so it would block scrolling from
+   revealing anything below it until you'd scrolled past its own huge
+   height. Dropping sticky while expanded lets it scroll away like normal
+   content instead; app.js's scroll handler skips its stick/hide logic
+   for the same reason while this class is present. */
+.controls.filters-open { position: static; }
+
 .controls.is-stuck {
   border-bottom-color: var(--border);
   box-shadow: 0 6px 18px -12px rgba(16, 24, 40, 0.5);
@@ -1038,6 +1048,22 @@ mark {
 
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
+
+  /* The preview pill counts (PREVIEW_TYPE_COUNT etc. in app.js) were
+     sized to fill "roughly 3 rows" at typical desktop widths. A narrow
+     phone fits far fewer pills per row, so the same counts were wrapping
+     into a dozen-plus rows per category — the default (collapsed) filter
+     bar measured over 1300px tall on a 390px-wide screen, tall enough
+     that its sticky positioning stayed pinned for the entire scroll
+     range of the page below it. Clamp each preview category's own pill
+     area to ~2 rows here (tighter than desktop's 3, since three stacked
+     categories compound fast on a narrow screen) regardless of how many
+     pills are rendered; "Browse all filters" is still right there for
+     the full list. */
+  .filters-preview .pills {
+    max-height: 70px;
+    overflow: hidden;
+  }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
 
