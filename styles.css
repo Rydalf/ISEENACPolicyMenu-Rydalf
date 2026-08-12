@@ -425,20 +425,21 @@ kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 23px;
+  height: 23px;
   flex: none;
   padding: 0;
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--accent-2);
   border-radius: 50%;
-  background: var(--surface);
-  color: var(--text-3);
+  background: var(--accent-soft);
+  color: var(--accent-2);
   cursor: pointer;
 }
 
 .info-btn:hover,
 .info-btn:focus-visible {
-  color: var(--accent);
+  color: #fff;
+  background: var(--accent);
   border-color: var(--accent);
 }
 .info-btn:focus-visible { outline: none; box-shadow: var(--ring); }

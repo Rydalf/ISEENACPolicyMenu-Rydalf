@@ -615,10 +615,15 @@
         "<strong>" + filtered.length + "</strong> of " + ALL.length + " resources";
     }
     el.backToAll.hidden = !randomPick;
+    el.anotherRandom.hidden = !randomPick;
     // Re-roll needs at least one match in the filtered set, regardless of
     // whether we're currently narrowed to a single random pick.
     el.random.disabled = filtered.length === 0;
-    el.clearFilters.disabled = !hasActiveFilters();
+    // While viewing a random pick, Clear filters exits that view even if
+    // there's otherwise nothing to clear (see its handler below) — so it
+    // must stay enabled in that case too, not just when a real filter is
+    // active.
+    el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
 
     // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
@@ -789,9 +794,16 @@
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar)
+    // Clear-filters button (next to the search bar). While viewing a
+    // random pick, this exits that view only — same as "Back to all
+    // resources" — rather than also clearing search/filters the pick
+    // itself doesn't touch; otherwise it's the normal full clear.
     el.clearFilters.addEventListener("click", function () {
-      clearAll();
+      if (randomPick) {
+        randomPick = null;
+      } else {
+        clearAll();
+      }
       render();
       el.search.focus();
     });
@@ -920,11 +932,11 @@
     // *currently filtered* results, not always all 65 — so it stays
     // relevant to whatever search/filters are already active rather than
     // potentially handing back something outside the current narrowing.
-    // Clicking again while a pick is already showing re-rolls a new one
-    // from that same pool (currentResults() ignores randomPick, so this
-    // naturally draws from the full filtered set even while narrowed to
-    // one card).
-    el.random.addEventListener("click", function () {
+    // Shared by the main button and "Another random resource" (shown only
+    // while a pick is already up), so re-rolling works the same from
+    // either place — currentResults() ignores randomPick, so this always
+    // draws from the full filtered pool even while narrowed to one card.
+    function pickRandom() {
       var results = currentResults();
       if (!results.length) return;
       var n = Math.floor(Math.random() * results.length);
@@ -937,7 +949,10 @@
         card.classList.add("flash");
       }
       toast("Random pick: " + randomPick.resource);
-    });
+    }
+
+    el.random.addEventListener("click", pickRandom);
+    el.anotherRandom.addEventListener("click", pickRandom);
 
     // Leaves the single-pick view without touching search/filter state.
     el.backToAll.addEventListener("click", function () {
@@ -1082,6 +1097,7 @@
       count: $("count"),
       grid: $("grid"),
       random: $("random"),
+      anotherRandom: $("another-random"),
       backToAll: $("back-to-all"),
       toast: $("toast"),
     };

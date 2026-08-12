@@ -433,20 +433,21 @@ kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 23px;
+  height: 23px;
   flex: none;
   padding: 0;
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--accent-2);
   border-radius: 50%;
-  background: var(--surface);
-  color: var(--text-3);
+  background: var(--accent-soft);
+  color: var(--accent-2);
   cursor: pointer;
 }
 
 .info-btn:hover,
 .info-btn:focus-visible {
-  color: var(--accent);
+  color: #fff;
+  background: var(--accent);
   border-color: var(--accent);
 }
 .info-btn:focus-visible { outline: none; box-shadow: var(--ring); }
@@ -1357,7 +1358,7 @@ footer.foot {
           <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
         </div>
         <button class="info-btn" id="match-info" type="button" aria-label="What do Match all and Match any mean?">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="11" x2="12" y2="16"></line>
             <circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"></circle>
@@ -1420,6 +1421,7 @@ footer.foot {
 
   <div class="statusbar">
     <span class="count" id="count" aria-live="polite">Loading…</span>
+    <button class="btn btn-primary" id="another-random" type="button" hidden>Another random resource</button>
     <button class="btn btn-primary" id="back-to-all" type="button" hidden>← Back to all resources</button>
     <span class="crumbs" id="crumbs"></span>
   </div>
@@ -2142,10 +2144,15 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
         "<strong>" + filtered.length + "</strong> of " + ALL.length + " resources";
     }
     el.backToAll.hidden = !randomPick;
+    el.anotherRandom.hidden = !randomPick;
     // Re-roll needs at least one match in the filtered set, regardless of
     // whether we're currently narrowed to a single random pick.
     el.random.disabled = filtered.length === 0;
-    el.clearFilters.disabled = !hasActiveFilters();
+    // While viewing a random pick, Clear filters exits that view even if
+    // there's otherwise nothing to clear (see its handler below) — so it
+    // must stay enabled in that case too, not just when a real filter is
+    // active.
+    el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
 
     // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
@@ -2316,9 +2323,16 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar)
+    // Clear-filters button (next to the search bar). While viewing a
+    // random pick, this exits that view only — same as "Back to all
+    // resources" — rather than also clearing search/filters the pick
+    // itself doesn't touch; otherwise it's the normal full clear.
     el.clearFilters.addEventListener("click", function () {
-      clearAll();
+      if (randomPick) {
+        randomPick = null;
+      } else {
+        clearAll();
+      }
       render();
       el.search.focus();
     });
@@ -2447,11 +2461,11 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     // *currently filtered* results, not always all 65 — so it stays
     // relevant to whatever search/filters are already active rather than
     // potentially handing back something outside the current narrowing.
-    // Clicking again while a pick is already showing re-rolls a new one
-    // from that same pool (currentResults() ignores randomPick, so this
-    // naturally draws from the full filtered set even while narrowed to
-    // one card).
-    el.random.addEventListener("click", function () {
+    // Shared by the main button and "Another random resource" (shown only
+    // while a pick is already up), so re-rolling works the same from
+    // either place — currentResults() ignores randomPick, so this always
+    // draws from the full filtered pool even while narrowed to one card.
+    function pickRandom() {
       var results = currentResults();
       if (!results.length) return;
       var n = Math.floor(Math.random() * results.length);
@@ -2464,7 +2478,10 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
         card.classList.add("flash");
       }
       toast("Random pick: " + randomPick.resource);
-    });
+    }
+
+    el.random.addEventListener("click", pickRandom);
+    el.anotherRandom.addEventListener("click", pickRandom);
 
     // Leaves the single-pick view without touching search/filter state.
     el.backToAll.addEventListener("click", function () {
@@ -2609,6 +2626,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       count: $("count"),
       grid: $("grid"),
       random: $("random"),
+      anotherRandom: $("another-random"),
       backToAll: $("back-to-all"),
       toast: $("toast"),
     };

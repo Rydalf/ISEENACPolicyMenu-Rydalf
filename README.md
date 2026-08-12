@@ -163,7 +163,10 @@ the CSV (simplest) or the spreadsheet — and stick with it.
   time
 - A **Clear filters** button drops the search and every active filter at
   once. It stays greyed out until something is actually filtering, so it
-  never looks clickable when there's nothing to clear
+  never looks clickable when there's nothing to clear. While viewing a
+  random pick, it instead just exits that view — same as **Back to all
+  resources** — rather than also clearing filters the pick itself never
+  touched
 - Press <kbd>/</kbd> anywhere to jump to the search box, <kbd>Esc</kbd> to clear
 
 **Hover interactions**
@@ -179,10 +182,10 @@ just on hover.
 - Each Type gets its own colour (stripe + tag), assigned deterministically so
   colours stay stable across rebuilds
 - "Random resource" narrows the grid to a single card drawn from the
-  *current* filtered results (not always all 65), with a **Back to all
-  resources** button to return — clicking Random again while a pick is
-  showing re-rolls a new one from the same pool without needing to go back
-  first. Changing any search/filter exits the single-pick view automatically
+  *current* filtered results (not always all 65). While a pick is showing,
+  **Another random resource** re-rolls a new one from the same pool, and
+  **Back to all resources** returns to the normal grid. Changing any
+  search/filter exits the single-pick view automatically
 - Designed empty state and a shimmer loading state
 - Respects dark mode and reduced-motion settings
 - The card grid uses a fluid column count (CSS Grid `auto-fit`/`minmax`)
