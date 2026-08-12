@@ -244,14 +244,16 @@ body {
   margin-bottom: 3px;
   display: grid;
   grid-template-rows: 1fr;
-  /* Revealing: the box grows for its full duration, but opacity waits a
-     beat (0.06s delay) before fading in over a shorter span — so there's
-     visibly more room before content appears, instead of text popping in
-     squished into a still-short box. See .controls-hidden below for the
-     reverse (collapsing) timing — an asymmetric fade is what keeps the
-     whole thing from reading as a ghosted, half-cut mid-transition mess. */
-  transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.18s ease 0.06s, border-color 0.2s ease, box-shadow 0.2s ease;
+  /* grid-template-rows and opacity must stay in lockstep — same duration,
+     same easing, no relative delay. An earlier attempt offset opacity
+     from height to avoid a mid-fade "ghosted text" look, but that opened
+     a window where the box had real height and zero opacity, which reads
+     as a blank gap (a transient version of the exact bug this whole
+     collapse mechanism exists to avoid). Kept fast (0.16s) so any
+     mid-transition moment is barely perceptible either way. */
+  transition: grid-template-rows 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease, box-shadow 0.2s ease;
   /* Promotes the bar to its own GPU layer ahead of time so the
      transition doesn't have to compete with backdrop-filter's blur
      recompute during a fast scroll — without this, fast flicks can skip
@@ -279,17 +281,13 @@ body {
 /* Scrolling down collapses the whole filter bar (search, buttons, match
    toggle, and Type/Subtype pills) out of the way for more card space;
    scrolling back up brings it straight back. Purely visual — toggled
-   independently of filter state and the "See more filters" state.
-   Collapsing: opacity fades out fast with no delay, well before the box
-   finishes shrinking, so there's no ghosted/half-cut content visible
-   during the slower height collapse — the opposite ordering from the
-   reveal transition above. */
+   independently of filter state and the "See more filters" state. Uses
+   the same transition declared on .controls above (both directions of
+   this toggle need identical, synchronized timing). */
 .controls.controls-hidden {
   grid-template-rows: 0fr;
   opacity: 0;
   pointer-events: none;
-  transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchrow {
