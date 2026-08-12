@@ -136,14 +136,14 @@ the CSV (simplest) or the spreadsheet — and stick with it.
   that update as you narrow (e.g. `Guide (14)`); pills that would return nothing
   fade out
 - By default you see a preview of the top pills in each of the three —
-  sized to roughly fill 3 rows apiece at a typical desktop width for Type
-  and Subtype (fewer Subtype pills fit per row since those labels run
-  longer); Organization's preview shows exactly the organizations with more
-  than one resource today — plus anything already active, even if it'd
-  otherwise fall outside that top slice, rather than the full wall or
-  nothing at all. Whenever a preview is hiding real values, a trailing
-  **+N more** pill (styled like the others) sits at the end of that row —
-  clicking it opens **Browse all filters**, same as the button
+  sized to roughly fill a single row at a typical width (an estimate, not
+  a measurement of actual layout, backstopped by a CSS clamp so it can't
+  visibly wrap into a partial second row even if the estimate runs a
+  little generous) — plus anything already active, even if it'd otherwise
+  fall outside that top slice, rather than the full wall or nothing at
+  all. Whenever a preview is hiding real values, a trailing **+N more**
+  pill (styled like the others) sits at the end of that row — clicking it
+  opens **Browse all filters**, same as the button
 - The **Match all / Match any** toggle is always visible (it's not part of
   the collapse below) since it governs how every active facet combines.
   Label and toggle share one compact line at every screen width; the

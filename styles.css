@@ -520,6 +520,17 @@ kbd {
 .filters-preview { display: grid; gap: 5px; }
 .filter-bar.filters-open .filters-preview { display: none; }
 
+/* TRYING: clamp each preview row to a single line, backstopping the
+   reduced PREVIEW_TYPE/SUB/ORG_COUNT constants in app.js in case a
+   viewport is narrow enough that even that trimmed count would still
+   wrap. Base .pill is 13px/1.2 line-height + 6px vertical padding + 1px
+   border each side ≈ 30px tall with a 4px row-gap, so row 2 would start
+   at 34px — 32px sits in that gap, showing exactly one clean row. */
+.filters-preview .pills {
+  max-height: 32px;
+  overflow: hidden;
+}
+
 /* Collapsed by default so first-time visitors aren't hit with the full
    pill wall — "Browse all filters" reveals it via filters-open. */
 .filters { display: none; gap: 5px; }
@@ -1097,23 +1108,13 @@ mark {
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
 
-  /* The preview pill counts (PREVIEW_TYPE_COUNT etc. in app.js) were
-     sized to fill "roughly 3 rows" at typical desktop widths. A narrow
-     phone fits far fewer pills per row, so the same counts were wrapping
-     into a dozen-plus rows per category — the default (collapsed) filter
-     bar measured over 1300px tall on a 390px-wide screen, tall enough
-     that its sticky positioning stayed pinned for the entire scroll
-     range of the page below it. Clamp each preview category's own pill
-     area to ~2 rows here (tighter than desktop's 3, since three stacked
-     categories compound fast on a narrow screen) regardless of how many
-     pills are rendered; "Browse all filters" is still right there for
-     the full list. */
+  /* TRYING (matches the base rule): clamp each preview category to a
+     single row on mobile too, using mobile's own pill height — the
+     mobile-only .pill override further down renders pills at 36px tall
+     (vs. 30px on desktop) with the same 4px row-gap, so row 2 would start
+     at 40px; 38px sits in that gap, showing exactly one clean row. */
   .filters-preview .pills {
-    /* Measured: pills render 36px tall with a 4px row-gap at this width,
-       so two full rows end at 76px and the third starts at 80px — 78px
-       sits in that 4px gap, showing exactly 2 clean rows instead of
-       slicing into a third (70px was cutting mid-pill). */
-    max-height: 78px;
+    max-height: 38px;
     overflow: hidden;
   }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }

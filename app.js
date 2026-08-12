@@ -402,20 +402,18 @@
   // collapsed. `sorted` is filtered rather than resliced so the preview
   // keeps the same count-based order as the full list.
   //
-  // The two counts are sized to roughly fill 3 rows of wrapped pills at a
-  // typical desktop width, not a fixed row count — Subtype gets a lower
-  // count than Type because its labels run much longer (e.g. "Policy Maker
-  // Outreach and/or comment writing"), so fewer fit per row. Actual rows
-  // will still vary with viewport width and with how label text changes
-  // as the data grows.
-  var PREVIEW_TYPE_COUNT = 14;
-  var PREVIEW_SUB_COUNT = 13;
-  // Organization (Creator) labels run even longer on average than
-  // Subtype's, and there are 29 distinct ones today — 10 happens to be
-  // exactly how many currently have more than one resource, so the preview
-  // surfaces every organization with real weight and tucks the rest (all
-  // one-off contributors right now) behind "Browse all filters".
-  var PREVIEW_ORG_COUNT = 10;
+  // TRYING: counts sized to roughly fill a single row at a typical desktop
+  // width instead of ~3 rows, paired with a matching CSS max-height clamp
+  // on .filters-preview .pills as a backstop against spilling into a
+  // partial second row. This is an approximation, not an exact fit — it
+  // depends on viewport width and label lengths, and doesn't (yet) measure
+  // actual layout to size the "+N more" count precisely. Subtype and
+  // Organization get lower counts than Type because their labels run
+  // longer (e.g. "Policy Maker Outreach and/or comment writing"), so fewer
+  // fit per row.
+  var PREVIEW_TYPE_COUNT = 6;
+  var PREVIEW_SUB_COUNT = 4;
+  var PREVIEW_ORG_COUNT = 3;
 
   function previewSubset(sorted, active, count) {
     var keep = Object.create(null);
