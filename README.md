@@ -141,7 +141,9 @@ the CSV (simplest) or the spreadsheet — and stick with it.
   longer); Organization's preview shows exactly the organizations with more
   than one resource today — plus anything already active, even if it'd
   otherwise fall outside that top slice, rather than the full wall or
-  nothing at all
+  nothing at all. Whenever a preview is hiding real values, a trailing
+  **+N more** pill (styled like the others) sits at the end of that row —
+  clicking it opens **Browse all filters**, same as the button
 - The **Match all / Match any** toggle is always visible (it's not part of
   the collapse below) since it governs how every active facet combines
 - **Random resource** sits directly beside the search bar. Below that,
@@ -170,7 +172,11 @@ the CSV (simplest) or the spreadsheet — and stick with it.
 **Other**
 - Each Type gets its own colour (stripe + tag), assigned deterministically so
   colours stay stable across rebuilds
-- "Random resource" jumps to and flashes a random card from the current results
+- "Random resource" narrows the grid to a single card drawn from the
+  *current* filtered results (not always all 65), with a **Back to all
+  resources** button to return — clicking Random again while a pick is
+  showing re-rolls a new one from the same pool without needing to go back
+  first. Changing any search/filter exits the single-pick view automatically
 - Designed empty state and a shimmer loading state
 - Respects dark mode and reduced-motion settings
 - The card grid uses a fluid column count (CSS Grid `auto-fit`/`minmax`)

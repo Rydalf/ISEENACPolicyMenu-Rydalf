@@ -255,6 +255,13 @@
   var el = {};
   var toastTimer = null;
 
+  // Set by "Random resource" to narrow the grid to that single pick; null
+  // means show the normal filtered results. Any actual filter/search
+  // change (not the random/back actions themselves) clears this — see
+  // setSearch, applyFilterClick, and the match-mode/crumb handlers below —
+  // so a stale single-card view never survives a real state change.
+  var randomPick = null;
+
   function $(id) {
     return document.getElementById(id);
   }
@@ -373,6 +380,22 @@
     );
   }
 
+  // Trailing "+N more" pill appended to a preview row whenever it's
+  // hiding real values — styled like the other pills (via the shared
+  // .pill class) so it reads as part of the same row, but it isn't a
+  // filter itself: clicking it just opens "Browse all filters" (see the
+  // el.filterBar delegated click handler below), same as the button.
+  function moreTagHTML(hiddenCount, label) {
+    if (hiddenCount <= 0) return "";
+    return (
+      '<button class="pill pill-more" type="button" data-more-toggle="true"' +
+      ' aria-label="Show ' + hiddenCount + " more " + esc(label) +
+      " option" + (hiddenCount === 1 ? "" : "s") + '">' +
+      "+" + hiddenCount + " more" +
+      "</button>"
+    );
+  }
+
   // Default-visible pill preview: the top N by count, plus whatever's
   // already active (even if it'd otherwise fall outside the top N) — so an
   // active filter never silently drops out of view when the full wall is
@@ -422,11 +445,13 @@
       })
       .join("");
 
-    el.typePillsPreview.innerHTML = previewSubset(types, state.types, PREVIEW_TYPE_COUNT)
-      .map(function (t) {
-        return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
-      })
-      .join("");
+    var typePreview = previewSubset(types, state.types, PREVIEW_TYPE_COUNT);
+    el.typePillsPreview.innerHTML =
+      typePreview
+        .map(function (t) {
+          return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
+        })
+        .join("") + moreTagHTML(types.length - typePreview.length, "Type");
 
     var allSubs = {};
     ALL.forEach(function (r) {
@@ -441,11 +466,13 @@
       })
       .join("");
 
-    el.subPillsPreview.innerHTML = previewSubset(subs, state.subs, PREVIEW_SUB_COUNT)
-      .map(function (s) {
-        return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
-      })
-      .join("");
+    var subPreview = previewSubset(subs, state.subs, PREVIEW_SUB_COUNT);
+    el.subPillsPreview.innerHTML =
+      subPreview
+        .map(function (s) {
+          return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
+        })
+        .join("") + moreTagHTML(subs.length - subPreview.length, "Subtype");
 
     // "Organization" in the UI is the Creator column underneath — same
     // top-by-count sort, preview, zero-count, and Match all/any pattern as
@@ -463,11 +490,13 @@
       })
       .join("");
 
-    el.orgPillsPreview.innerHTML = previewSubset(orgs, state.orgs, PREVIEW_ORG_COUNT)
-      .map(function (o) {
-        return pillHTML(o, orgCounts[o] || 0, state.orgs.indexOf(o) !== -1, "org");
-      })
-      .join("");
+    var orgPreview = previewSubset(orgs, state.orgs, PREVIEW_ORG_COUNT);
+    el.orgPillsPreview.innerHTML =
+      orgPreview
+        .map(function (o) {
+          return pillHTML(o, orgCounts[o] || 0, state.orgs.indexOf(o) !== -1, "org");
+        })
+        .join("") + moreTagHTML(orgs.length - orgPreview.length, "Organization");
   }
 
   function renderStartHere() {
@@ -572,11 +601,23 @@
     renderStartHere();
     renderCrumbs();
 
-    var results = currentResults();
+    var filtered = currentResults();
+    var results = randomPick ? [randomPick] : filtered;
 
-    el.count.innerHTML =
-      "<strong>" + results.length + "</strong> of " + ALL.length + " resources";
-    el.random.disabled = results.length === 0;
+    if (randomPick) {
+      var scope = hasActiveFilters()
+        ? filtered.length + " filtered"
+        : "all " + ALL.length;
+      var noun = filtered.length === 1 ? " resource" : " resources";
+      el.count.innerHTML = "<strong>Random pick</strong> from " + scope + noun;
+    } else {
+      el.count.innerHTML =
+        "<strong>" + filtered.length + "</strong> of " + ALL.length + " resources";
+    }
+    el.backToAll.hidden = !randomPick;
+    // Re-roll needs at least one match in the filtered set, regardless of
+    // whether we're currently narrowed to a single random pick.
+    el.random.disabled = filtered.length === 0;
     el.clearFilters.disabled = !hasActiveFilters();
 
     // Show how many pill filters are active, since they're collapsed on mobile
@@ -618,6 +659,7 @@
     state.q = v;
     state.terms = norm(v).split(/\s+/).filter(Boolean);
     el.searchbox.classList.toggle("has-value", v.length > 0);
+    randomPick = null;
   }
 
   function toast(msg) {
@@ -671,6 +713,7 @@
     if (kind === "type") toggleIn(state.types, value);
     else if (kind === "sub") toggleIn(state.subs, value);
     else if (kind === "org") toggleIn(state.orgs, value);
+    randomPick = null;
     render();
   }
 
@@ -757,6 +800,11 @@
     // container since it moved out of #controls to be a plain, never-
     // sticky sibling; #controls now holds only the compact search row).
     el.filterBar.addEventListener("click", function (e) {
+      var more = e.target.closest(".pill-more");
+      if (more) {
+        el.filterToggle.click();
+        return;
+      }
       var p = e.target.closest(".pill");
       if (!p) return;
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
@@ -769,6 +817,7 @@
       var mode = b.getAttribute("data-mode");
       if (mode === state.matchMode) return;
       state.matchMode = mode;
+      randomPick = null;
       render();
     });
 
@@ -778,6 +827,7 @@
       if (!c) return;
       var kind = c.getAttribute("data-crumb");
       var value = c.getAttribute("data-value");
+      randomPick = null;
       if (kind === "all") {
         clearAll();
       } else if (kind === "search") {
@@ -854,19 +904,33 @@
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
 
-    // Random resource
+    // Random resource: narrows the grid to a single pick drawn from the
+    // *currently filtered* results, not always all 65 — so it stays
+    // relevant to whatever search/filters are already active rather than
+    // potentially handing back something outside the current narrowing.
+    // Clicking again while a pick is already showing re-rolls a new one
+    // from that same pool (currentResults() ignores randomPick, so this
+    // naturally draws from the full filtered set even while narrowed to
+    // one card).
     el.random.addEventListener("click", function () {
       var results = currentResults();
       if (!results.length) return;
       var n = Math.floor(Math.random() * results.length);
-      var card = el.grid.children[n];
-      if (!card) return;
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
-      var cards = el.grid.querySelectorAll(".card.flash");
-      for (var i = 0; i < cards.length; i++) cards[i].classList.remove("flash");
-      void card.offsetWidth; // restart the animation
-      card.classList.add("flash");
-      toast("Random pick: " + results[n].resource);
+      randomPick = results[n];
+      render();
+      el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
+      var card = el.grid.children[0];
+      if (card) {
+        void card.offsetWidth; // restart the animation
+        card.classList.add("flash");
+      }
+      toast("Random pick: " + randomPick.resource);
+    });
+
+    // Leaves the single-pick view without touching search/filter state.
+    el.backToAll.addEventListener("click", function () {
+      randomPick = null;
+      render();
     });
 
     // Sticky-header shadow, plus (mobile only — see the matching
@@ -1005,6 +1069,7 @@
       count: $("count"),
       grid: $("grid"),
       random: $("random"),
+      backToAll: $("back-to-all"),
       toast: $("toast"),
     };
 

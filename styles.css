@@ -526,6 +526,21 @@ kbd {
 .pill.is-empty { opacity: 0.34; }
 .pill.is-empty:hover { transform: none; }
 
+/* Trailing "+N more" pill in a preview row — same shape/size as a real
+   filter pill, but dashed and accent-colored so it reads as an action
+   ("there's more, tap to see it") rather than a selectable value. */
+.pill-more {
+  color: var(--accent-2);
+  border-style: dashed;
+  font-weight: 600;
+}
+
+.pill-more:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 /* ---------- Match-mode toggle (Type ↔ Subtype: all vs. any) ---------- */
 
 .segmented {
