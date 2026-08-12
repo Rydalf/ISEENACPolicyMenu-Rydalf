@@ -867,27 +867,23 @@
       });
     }
 
-    // Filters disclosure (visible on narrow screens only)
+    // Filters disclosure (visible on narrow screens only). .filter-bar is
+    // plain in-flow content (never sticky, unlike the compact search bar
+    // in #controls), so expanding it to its full, possibly-viewport-
+    // exceeding height needs no special-casing here — it just pushes
+    // page content down and scrolls normally.
     el.filterToggle.addEventListener("click", function () {
-      var open = !el.controls.classList.contains("filters-open");
-      el.controls.classList.toggle("filters-open", open);
+      var open = !el.filterBar.classList.contains("filters-open");
+      el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      // The full pill wall can run taller than the viewport; a sticky bar
-      // that tall stays pinned for the whole scroll range below it (its
-      // containing block is the entire page), so scrolling would appear
-      // to do nothing — or the bar would auto-hide mid-scroll and leave a
-      // blank gap the size of that huge panel. Drop out of sticky/hidden
-      // entirely while expanded so it just scrolls away normally; both
-      // resume once the panel is collapsed again.
-      if (open) el.controls.classList.remove("controls-hidden", "is-stuck");
     });
 
     // "See more filters" (mobile only): reveals the Type tags past the
     // first 10 plus every Subtype tag, both hidden by default on narrow
     // screens so the page opens without a wall of pills.
     el.seeMoreFilters.addEventListener("click", function () {
-      var open = !el.controls.classList.contains("filters-expanded");
-      el.controls.classList.toggle("filters-expanded", open);
+      var open = !el.filterBar.classList.contains("filters-expanded");
+      el.filterBar.classList.toggle("filters-expanded", open);
       el.seeMoreFilters.setAttribute("aria-expanded", open ? "true" : "false");
       el.seeMoreFilters.textContent = open ? "See fewer filters" : "See more filters";
     });
@@ -907,47 +903,57 @@
       toast("Random pick: " + results[n].resource);
     });
 
-    // Sticky-header shadow, plus hiding the filter bar on scroll-down and
-    // revealing it on scroll-up (desktop and mobile alike). Purely visual —
-    // never touches filter state or the "See more filters" state.
+    // Sticky-header shadow, plus (mobile only — see the matching
+    // max-width:720px media query in styles.css) hiding the compact
+    // search bar on scroll-down and revealing it on scroll-up. This class
+    // toggle runs unconditionally on every screen size, but only has any
+    // visual effect where that media query applies, so "mobile only" is
+    // guaranteed by CSS rather than by a JS width check here.
+    //
+    // Threshold + throttle, deliberately not a per-frame/per-pixel
+    // handler: we only look at scroll position on a timer (every
+    // SCROLL_CHECK_MS), and only act once the position has moved more
+    // than SCROLL_THRESHOLD px since the last time we acted. Small
+    // jitter — trackpad micro-movements, momentum-scroll deceleration —
+    // never touches the class at all, which is what earlier per-pixel/
+    // tiny-delta attempts got wrong and caused visible flicker. A slow
+    // steady scroll still accumulates past the threshold and triggers
+    // normally; it just takes a couple of checks to get there.
+    var SCROLL_CHECK_MS = 120;
+    var SCROLL_THRESHOLD = 24;
     var sentinel = el.controls.offsetTop;
-    var lastScrollY = window.scrollY;
-    var scrollTicking = false;
+    var lastActedY = window.scrollY;
+    var scrollCheckTimer = null;
 
-    function handleScroll() {
+    function checkScroll() {
+      scrollCheckTimer = null;
       var y = window.scrollY;
-
-      // The full pill wall is dropped out of sticky positioning (see the
-      // filter-toggle handler above) while expanded, so there's nothing
-      // to stick or hide here — just keep lastScrollY current so the
-      // delta calc isn't a stale jump once it collapses again.
-      if (el.controls.classList.contains("filters-open")) {
-        lastScrollY = y;
-        scrollTicking = false;
-        return;
-      }
-
       var stuck = y > sentinel;
       el.controls.classList.toggle("is-stuck", stuck);
 
       if (!stuck) {
         el.controls.classList.remove("controls-hidden");
-      } else {
-        var delta = y - lastScrollY;
-        if (delta < -2) el.controls.classList.remove("controls-hidden");
-        else if (delta > 2) el.controls.classList.add("controls-hidden");
+        lastActedY = y;
+        return;
       }
-      lastScrollY = y;
-      scrollTicking = false;
+
+      var delta = y - lastActedY;
+      if (delta > SCROLL_THRESHOLD) {
+        el.controls.classList.add("controls-hidden");
+        lastActedY = y;
+      } else if (delta < -SCROLL_THRESHOLD) {
+        el.controls.classList.remove("controls-hidden");
+        lastActedY = y;
+      }
+      // Otherwise: within the threshold, keep accumulating — lastActedY
+      // stays put so small back-and-forth movement never fires either.
     }
 
     window.addEventListener(
       "scroll",
       function () {
-        if (!scrollTicking) {
-          window.requestAnimationFrame(handleScroll);
-          scrollTicking = true;
-        }
+        if (scrollCheckTimer) return;
+        scrollCheckTimer = setTimeout(checkScroll, SCROLL_CHECK_MS);
       },
       { passive: true }
     );
@@ -1012,6 +1018,7 @@
   function boot() {
     el = {
       controls: $("controls"),
+      filterBar: $("filter-bar"),
       startHere: $("start-here"),
       search: $("search"),
       searchbox: $("searchbox"),

@@ -224,15 +224,15 @@ body {
 
 /* ---------- Controls ---------- */
 
-/* .controls stays sticky at all times; only its inner row height
-   animates. A sticky element's reserved space in normal flow is based on
-   its own box size regardless of any transform applied to it — the
-   earlier transform:translateY(-100%) approach slid the bar out of view
-   but left its full height reserved, so the grid/results below sat
-   exactly where they always did, showing as a blank gap where the bar
-   used to be. Collapsing grid-template-rows (with padding living on
-   .controls-inner, inside the collapsing track) shrinks the box itself,
-   so content below shifts up to fill the space instead of leaving a gap. */
+/* Only the compact search row lives here — not the Type/Subtype/
+   Organization filter area (that's .filter-bar, a plain sibling below,
+   never sticky). Keeping .controls small like this is deliberate: a
+   sticky element reserves layout space equal to its own box size
+   regardless of any transform applied to it, so hiding a *tall* sticky
+   element via transform leaves its full height reserved as a blank gap
+   (that was the original bug). A compact search row's reserved height is
+   small enough that this is a non-issue, which is what makes a simple
+   transform-based hide safe here without resorting to animating height. */
 .controls {
   position: sticky;
   top: 0;
@@ -241,53 +241,13 @@ body {
   backdrop-filter: saturate(1.6) blur(10px);
   -webkit-backdrop-filter: saturate(1.6) blur(10px);
   border-bottom: 1px solid transparent;
+  padding: 8px 0 6px;
   margin-bottom: 3px;
-  display: grid;
-  grid-template-rows: 1fr;
-  /* grid-template-rows and opacity must stay in lockstep — same duration,
-     same easing, no relative delay. An earlier attempt offset opacity
-     from height to avoid a mid-fade "ghosted text" look, but that opened
-     a window where the box had real height and zero opacity, which reads
-     as a blank gap (a transient version of the exact bug this whole
-     collapse mechanism exists to avoid). Kept fast (0.16s) so any
-     mid-transition moment is barely perceptible either way. */
-  transition: grid-template-rows 0.16s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.16s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.2s ease, box-shadow 0.2s ease;
-  /* Promotes the bar to its own GPU layer ahead of time so the
-     transition doesn't have to compete with backdrop-filter's blur
-     recompute during a fast scroll — without this, fast flicks can skip
-     the animation and snap straight in. */
-  will-change: grid-template-rows, opacity;
 }
-
-.controls-inner { overflow: hidden; min-height: 0; padding: 8px 0 6px; }
-
-/* The full pill wall (all Type/Subtype/Organization tags, no preview
-   trimming) can run taller than the viewport. A sticky element that tall
-   stays pinned at the top for the entire scroll range of its containing
-   block — here, the whole page — so it would block scrolling from
-   revealing anything below it until you'd scrolled past its own huge
-   height. Dropping sticky while expanded lets it scroll away like normal
-   content instead; app.js's scroll handler skips its stick/hide logic
-   for the same reason while this class is present. */
-.controls.filters-open { position: static; }
 
 .controls.is-stuck {
   border-bottom-color: var(--border);
   box-shadow: 0 6px 18px -12px rgba(16, 24, 40, 0.5);
-}
-
-/* Scrolling down collapses the whole filter bar (search, buttons, match
-   toggle, and Type/Subtype pills) out of the way for more card space;
-   scrolling back up brings it straight back. Purely visual — toggled
-   independently of filter state and the "See more filters" state. Uses
-   the same transition declared on .controls above (both directions of
-   this toggle need identical, synchronized timing). */
-.controls.controls-hidden {
-  grid-template-rows: 0fr;
-  opacity: 0;
-  pointer-events: none;
 }
 
 .searchrow {
@@ -493,12 +453,12 @@ kbd {
    sitting above it — once "Browse all filters" is open, so the same pills
    never render twice. */
 .filters-preview { display: grid; gap: 6px; }
-.controls.filters-open .filters-preview { display: none; }
+.filter-bar.filters-open .filters-preview { display: none; }
 
 /* Collapsed by default so first-time visitors aren't hit with the full
    pill wall — "Browse all filters" reveals it via filters-open. */
 .filters { display: none; gap: 6px; }
-.controls.filters-open .filters { display: grid; }
+.filter-bar.filters-open .filters { display: grid; }
 
 .fgroup {
   display: grid;
@@ -1101,6 +1061,27 @@ mark {
     justify-content: center;
   }
 
+  /* Hide the (small, compact) search bar on scroll-down, reveal it on
+     scroll-up — mobile only, gated by this media query rather than a JS
+     width check, so no amount of class-toggling in app.js has any visual
+     effect above 720px. Transform + opacity only, never height/padding:
+     a pure compositor animation with no layout recalculation, which is
+     what keeps it smooth. app.js throttles + thresholds the scroll
+     listener so this class only flips on a real directional scroll, not
+     on every pixel of jitter. */
+  .controls {
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform, opacity;
+  }
+
+  .controls.controls-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
   /* Limited width: tags stack above the action buttons instead of sitting
      beside them, and the buttons share a row evenly instead of forming a
      tall column. */
@@ -1123,13 +1104,13 @@ mark {
      stay collapsed behind the nested "See more filters" until tapped. */
   #type-pills .pill { order: var(--m-order, 0); }
   #type-pills .pill[data-mobile-more="true"] { display: none; }
-  .controls.filters-expanded #type-pills .pill[data-mobile-more="true"] {
+  .filter-bar.filters-expanded #type-pills .pill[data-mobile-more="true"] {
     display: inline-flex;
   }
 
   #sub-fgroup, #org-fgroup { display: none; }
-  .controls.filters-expanded #sub-fgroup,
-  .controls.filters-expanded #org-fgroup {
+  .filter-bar.filters-expanded #sub-fgroup,
+  .filter-bar.filters-expanded #org-fgroup {
     display: grid;
   }
 
@@ -1138,7 +1119,7 @@ mark {
      even once "See more filters" reveals its group. Re-renders on every
      filter change, so tags reappear the moment they're relevant again. */
   .pill.is-empty { display: none; }
-  .controls.filters-expanded #type-pills .pill[data-mobile-more="true"].is-empty {
+  .filter-bar.filters-expanded #type-pills .pill[data-mobile-more="true"].is-empty {
     display: none;
   }
 
@@ -1302,7 +1283,6 @@ footer.foot {
   </section>
 
   <div class="controls" id="controls">
-    <div class="controls-inner">
     <div class="searchrow">
       <div class="searchbox" id="searchbox">
         <span id="search-icon"></span>
@@ -1316,8 +1296,9 @@ footer.foot {
       </div>
       <button class="btn" id="random" type="button">Random resource</button>
     </div>
+  </div>
 
-    <div class="filter-bar">
+  <div class="filter-bar" id="filter-bar">
       <div class="match-row">
         <div class="fgroup">
           <span class="flabel" id="lbl-match">Match</span>
@@ -1382,8 +1363,6 @@ footer.foot {
         <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       </div>
       </div>
-    </div>
-    </div>
   </div>
 
   <div class="statusbar">
@@ -2361,27 +2340,23 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       });
     }
 
-    // Filters disclosure (visible on narrow screens only)
+    // Filters disclosure (visible on narrow screens only). .filter-bar is
+    // plain in-flow content (never sticky, unlike the compact search bar
+    // in #controls), so expanding it to its full, possibly-viewport-
+    // exceeding height needs no special-casing here — it just pushes
+    // page content down and scrolls normally.
     el.filterToggle.addEventListener("click", function () {
-      var open = !el.controls.classList.contains("filters-open");
-      el.controls.classList.toggle("filters-open", open);
+      var open = !el.filterBar.classList.contains("filters-open");
+      el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      // The full pill wall can run taller than the viewport; a sticky bar
-      // that tall stays pinned for the whole scroll range below it (its
-      // containing block is the entire page), so scrolling would appear
-      // to do nothing — or the bar would auto-hide mid-scroll and leave a
-      // blank gap the size of that huge panel. Drop out of sticky/hidden
-      // entirely while expanded so it just scrolls away normally; both
-      // resume once the panel is collapsed again.
-      if (open) el.controls.classList.remove("controls-hidden", "is-stuck");
     });
 
     // "See more filters" (mobile only): reveals the Type tags past the
     // first 10 plus every Subtype tag, both hidden by default on narrow
     // screens so the page opens without a wall of pills.
     el.seeMoreFilters.addEventListener("click", function () {
-      var open = !el.controls.classList.contains("filters-expanded");
-      el.controls.classList.toggle("filters-expanded", open);
+      var open = !el.filterBar.classList.contains("filters-expanded");
+      el.filterBar.classList.toggle("filters-expanded", open);
       el.seeMoreFilters.setAttribute("aria-expanded", open ? "true" : "false");
       el.seeMoreFilters.textContent = open ? "See fewer filters" : "See more filters";
     });
@@ -2401,47 +2376,57 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       toast("Random pick: " + results[n].resource);
     });
 
-    // Sticky-header shadow, plus hiding the filter bar on scroll-down and
-    // revealing it on scroll-up (desktop and mobile alike). Purely visual —
-    // never touches filter state or the "See more filters" state.
+    // Sticky-header shadow, plus (mobile only — see the matching
+    // max-width:720px media query in styles.css) hiding the compact
+    // search bar on scroll-down and revealing it on scroll-up. This class
+    // toggle runs unconditionally on every screen size, but only has any
+    // visual effect where that media query applies, so "mobile only" is
+    // guaranteed by CSS rather than by a JS width check here.
+    //
+    // Threshold + throttle, deliberately not a per-frame/per-pixel
+    // handler: we only look at scroll position on a timer (every
+    // SCROLL_CHECK_MS), and only act once the position has moved more
+    // than SCROLL_THRESHOLD px since the last time we acted. Small
+    // jitter — trackpad micro-movements, momentum-scroll deceleration —
+    // never touches the class at all, which is what earlier per-pixel/
+    // tiny-delta attempts got wrong and caused visible flicker. A slow
+    // steady scroll still accumulates past the threshold and triggers
+    // normally; it just takes a couple of checks to get there.
+    var SCROLL_CHECK_MS = 120;
+    var SCROLL_THRESHOLD = 24;
     var sentinel = el.controls.offsetTop;
-    var lastScrollY = window.scrollY;
-    var scrollTicking = false;
+    var lastActedY = window.scrollY;
+    var scrollCheckTimer = null;
 
-    function handleScroll() {
+    function checkScroll() {
+      scrollCheckTimer = null;
       var y = window.scrollY;
-
-      // The full pill wall is dropped out of sticky positioning (see the
-      // filter-toggle handler above) while expanded, so there's nothing
-      // to stick or hide here — just keep lastScrollY current so the
-      // delta calc isn't a stale jump once it collapses again.
-      if (el.controls.classList.contains("filters-open")) {
-        lastScrollY = y;
-        scrollTicking = false;
-        return;
-      }
-
       var stuck = y > sentinel;
       el.controls.classList.toggle("is-stuck", stuck);
 
       if (!stuck) {
         el.controls.classList.remove("controls-hidden");
-      } else {
-        var delta = y - lastScrollY;
-        if (delta < -2) el.controls.classList.remove("controls-hidden");
-        else if (delta > 2) el.controls.classList.add("controls-hidden");
+        lastActedY = y;
+        return;
       }
-      lastScrollY = y;
-      scrollTicking = false;
+
+      var delta = y - lastActedY;
+      if (delta > SCROLL_THRESHOLD) {
+        el.controls.classList.add("controls-hidden");
+        lastActedY = y;
+      } else if (delta < -SCROLL_THRESHOLD) {
+        el.controls.classList.remove("controls-hidden");
+        lastActedY = y;
+      }
+      // Otherwise: within the threshold, keep accumulating — lastActedY
+      // stays put so small back-and-forth movement never fires either.
     }
 
     window.addEventListener(
       "scroll",
       function () {
-        if (!scrollTicking) {
-          window.requestAnimationFrame(handleScroll);
-          scrollTicking = true;
-        }
+        if (scrollCheckTimer) return;
+        scrollCheckTimer = setTimeout(checkScroll, SCROLL_CHECK_MS);
       },
       { passive: true }
     );
@@ -2506,6 +2491,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   function boot() {
     el = {
       controls: $("controls"),
+      filterBar: $("filter-bar"),
       startHere: $("start-here"),
       search: $("search"),
       searchbox: $("searchbox"),
