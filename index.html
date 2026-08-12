@@ -65,14 +65,19 @@
 
   <div class="filter-bar" id="filter-bar">
       <div class="match-row">
-        <div class="fgroup">
-          <span class="flabel" id="lbl-match">Match</span>
-          <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
-            <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
-            <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
-          </div>
+        <span class="flabel" id="lbl-match">Match</span>
+        <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
+          <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
+          <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
         </div>
-        <p class="matchmode-hint">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</p>
+        <button class="info-btn" id="match-info" type="button" aria-label="What do Match all and Match any mean?">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <span class="tooltip" role="tooltip">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</span>
+        </button>
       </div>
 
       <div class="filter-bar-lower">

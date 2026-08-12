@@ -821,6 +821,18 @@
       render();
     });
 
+    // Match-mode info tooltip: :hover/:focus-visible in CSS already
+    // reveal it for mouse and keyboard. Touch has no :hover, so a tap
+    // needs to explicitly open *and* close it — toggle a class here, and
+    // close it on any click elsewhere.
+    el.matchInfo.addEventListener("click", function (e) {
+      e.stopPropagation();
+      el.matchInfo.classList.toggle("info-open");
+    });
+    document.addEventListener("click", function () {
+      el.matchInfo.classList.remove("info-open");
+    });
+
     // Breadcrumbs (and the empty-state "clear all" button)
     document.addEventListener("click", function (e) {
       var c = e.target.closest("[data-crumb]");
@@ -1065,6 +1077,7 @@
       matchMode: $("match-mode"),
       matchAllBtn: $("match-all-btn"),
       matchAnyBtn: $("match-any-btn"),
+      matchInfo: $("match-info"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),

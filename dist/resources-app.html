@@ -82,7 +82,7 @@ body {
 .wrap {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 16px clamp(16px, 4vw, 40px) 96px;
+  padding: 14px clamp(16px, 4vw, 40px) 96px;
 }
 
 /* ---------- Header / nav bar ---------- */
@@ -138,7 +138,7 @@ body {
    blue in dark mode, so this stays readable on a dark background instead
    of the fixed --brand-navy going low-contrast there. */
 .intro {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   color: var(--accent);
   text-align: center;
   font-size: 15.5px;
@@ -154,15 +154,15 @@ body {
 /* ---------- Start Here ---------- */
 
 .start-here {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   background: var(--accent-soft);
   border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
   border-radius: calc(var(--radius) + 4px);
-  padding: 12px 16px 14px;
+  padding: 10px 14px 12px;
 }
 
 .start-here-title {
-  margin: 0 0 3px;
+  margin: 0 0 2px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,7 +177,7 @@ body {
 .start-here-icon { display: inline-flex; flex: none; }
 
 .start-here-subtitle {
-  margin: 0 auto 8px;
+  margin: 0 auto 6px;
   max-width: 50ch;
   font-size: 13.5px;
   color: var(--text-2);
@@ -187,7 +187,7 @@ body {
 .start-here-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: clamp(8px, 1.2vw, 12px);
+  gap: clamp(6px, 1vw, 10px);
 }
 
 @media (min-width: 721px) {
@@ -201,11 +201,11 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 14px;
+  padding: 10px 12px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   box-shadow: var(--shadow-sm);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
@@ -241,8 +241,8 @@ body {
   backdrop-filter: saturate(1.6) blur(10px);
   -webkit-backdrop-filter: saturate(1.6) blur(10px);
   border-bottom: 1px solid transparent;
-  padding: 8px 0 6px;
-  margin-bottom: 3px;
+  padding: 6px 0 5px;
+  margin-bottom: 2px;
 }
 
 .controls.is-stuck {
@@ -398,16 +398,83 @@ kbd {
    the action column sit in a second row below it, so the buttons align
    with the top of the boxes rather than the Match toggle above them. */
 .filter-bar {
-  margin-top: 8px;
+  margin-top: 6px;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* Match all/any is a persistent control, not part of the collapse — it
    always applies across whichever facets are active, so it stays visible
    regardless of whether the boxes below are showing their preview or the
-   full pill wall. */
-.match-row { display: grid; gap: 3px; }
+   full pill wall. Label, toggle, and info icon sit on one line at every
+   width (unlike .fgroup, which stacks on mobile) — there's nothing here
+   that needs the room a stacked layout buys, and staying inline keeps
+   this row's footprint minimal. */
+.match-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+/* Small circular (i) button that reveals the Match all/any explanation
+   on hover, keyboard focus, or tap — replacing the always-visible
+   .matchmode-hint line this used to sit next to. */
+.info-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.info-btn:hover,
+.info-btn:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.info-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.info-btn .tooltip {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  top: calc(100% + 8px);
+  width: max-content;
+  max-width: min(320px, 80vw);
+  background: var(--text);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  padding: 8px 11px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Hover/focus cover mouse and keyboard; .info-open (toggled in app.js)
+   covers touch, where :hover can't be relied on to open *and* close it
+   again on a second tap. */
+.info-btn:hover .tooltip,
+.info-btn:focus-visible .tooltip,
+.info-btn.info-open .tooltip {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
@@ -423,7 +490,7 @@ kbd {
 .filter-bar-tags {
   min-width: 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .filter-actions {
@@ -440,7 +507,7 @@ kbd {
 .filter-group-box {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 8px 12px;
+  padding: 6px 10px;
   background: var(--surface);
 }
 
@@ -449,12 +516,12 @@ kbd {
    the full wall. Swaps out for the full .filters panel — rather than
    sitting above it — once "Browse all filters" is open, so the same pills
    never render twice. */
-.filters-preview { display: grid; gap: 6px; }
+.filters-preview { display: grid; gap: 5px; }
 .filter-bar.filters-open .filters-preview { display: none; }
 
 /* Collapsed by default so first-time visitors aren't hit with the full
    pill wall — "Browse all filters" reveals it via filters-open. */
-.filters { display: none; gap: 6px; }
+.filters { display: none; gap: 5px; }
 .filter-bar.filters-open .filters { display: grid; }
 
 .fgroup {
@@ -466,12 +533,20 @@ kbd {
   align-items: start;
 }
 
-.fgroup > .flabel {
+/* Plain .flabel (not just .fgroup > .flabel) so the same label style
+   works in .match-row too, which isn't a .fgroup. */
+.flabel {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--text-3);
+}
+
+.fgroup > .flabel {
+  /* Aligns the label's baseline with the first row of pills beside it,
+     which only matters for .fgroup's grid layout — .match-row centers
+     its items instead, so it needs no such offset. */
   padding-top: 7px;
 }
 
@@ -585,11 +660,6 @@ kbd {
   background: var(--accent);
 }
 
-.matchmode-hint {
-  margin: -3px 0 0;
-  font-size: 13.5px;
-  color: var(--text-3);
-}
 
 /* ---------- Status bar / breadcrumbs ---------- */
 
@@ -598,7 +668,7 @@ kbd {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 8px 0 10px;
+  margin: 6px 0 8px;
   min-height: 30px;
 }
 
@@ -805,23 +875,10 @@ kbd {
   line-clamp: 30;
 }
 
-/* Secondary metadata — hidden until hover to keep the base card clean */
+/* Secondary metadata (Organization) — always visible, not just on hover;
+   same spot and style at the bottom of the card as before. */
 .meta {
   padding-left: 6px;
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition: grid-template-rows 0.26s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.22s ease, margin-top 0.26s ease;
-  margin-top: 0;
-}
-
-.meta > div { overflow: hidden; min-height: 0; }
-
-.card:hover .meta,
-.card:focus-within .meta {
-  grid-template-rows: 1fr;
-  opacity: 1;
   margin-top: 11px;
 }
 
@@ -869,11 +926,11 @@ kbd {
 .copy.copied { color: #0a7d55; border-color: #a9e3cb; background: #e3f7ee; }
 
 /* Touch devices have no hover, so nothing may hide behind it: show the copy
-   button, the full description, and the metadata outright. */
+   button and the full description outright (.meta is always visible now,
+   on every input type, so it needs no override here). */
 @media (hover: none) {
   .copy { opacity: 1; transform: none; }
   .desc { -webkit-line-clamp: unset; line-clamp: unset; display: block; overflow: visible; }
-  .meta { grid-template-rows: 1fr; opacity: 1; margin-top: 11px; }
   .card:active { transform: scale(0.985); box-shadow: var(--shadow-md); }
 }
 
@@ -1018,11 +1075,11 @@ mark {
 @media (max-width: 720px) {
   /* Horizontal padding stays governed by the fluid clamp() on .wrap so it
      keeps scaling smoothly instead of jumping at this one breakpoint. */
-  .wrap { padding-top: 12px; padding-bottom: 72px; }
+  .wrap { padding-top: 10px; padding-bottom: 72px; }
 
   /* Smaller, tighter-lined intro so the tagline sentence and the
      "New to..." line take less room before Start Here. */
-  .intro { margin: 0 0 8px; font-size: 13px; line-height: 1.35; }
+  .intro { margin: 0 0 6px; font-size: 13px; line-height: 1.35; }
   .intro-lead { font-size: 15px; }
 
   /* Start Here: tighter box padding/margins, and 2 cards per row instead
@@ -1030,11 +1087,11 @@ mark {
      stacked full-width. Cards with longer copy (e.g. "Explore
      organizations...") will run a couple of lines taller than their
      row-mate — an acceptable trade-off for halving the row count. */
-  .start-here { margin: 0 0 10px; padding: 10px 12px 12px; }
+  .start-here { margin: 0 0 8px; padding: 8px 10px 10px; }
   .start-here-title { margin: 0 0 2px; font-size: 17px; }
-  .start-here-subtitle { margin: 0 auto 8px; font-size: 12.5px; }
-  .start-here-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .start-card { padding: 10px 11px; }
+  .start-here-subtitle { margin: 0 auto 6px; font-size: 12.5px; }
+  .start-here-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .start-card { padding: 9px 10px; }
 
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
@@ -1286,14 +1343,19 @@ footer.foot {
 
   <div class="filter-bar" id="filter-bar">
       <div class="match-row">
-        <div class="fgroup">
-          <span class="flabel" id="lbl-match">Match</span>
-          <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
-            <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
-            <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
-          </div>
+        <span class="flabel" id="lbl-match">Match</span>
+        <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
+          <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
+          <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
         </div>
-        <p class="matchmode-hint">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</p>
+        <button class="info-btn" id="match-info" type="button" aria-label="What do Match all and Match any mean?">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <span class="tooltip" role="tooltip">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</span>
+        </button>
       </div>
 
       <div class="filter-bar-lower">
@@ -2278,6 +2340,18 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       render();
     });
 
+    // Match-mode info tooltip: :hover/:focus-visible in CSS already
+    // reveal it for mouse and keyboard. Touch has no :hover, so a tap
+    // needs to explicitly open *and* close it — toggle a class here, and
+    // close it on any click elsewhere.
+    el.matchInfo.addEventListener("click", function (e) {
+      e.stopPropagation();
+      el.matchInfo.classList.toggle("info-open");
+    });
+    document.addEventListener("click", function () {
+      el.matchInfo.classList.remove("info-open");
+    });
+
     // Breadcrumbs (and the empty-state "clear all" button)
     document.addEventListener("click", function (e) {
       var c = e.target.closest("[data-crumb]");
@@ -2522,6 +2596,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       matchMode: $("match-mode"),
       matchAllBtn: $("match-all-btn"),
       matchAnyBtn: $("match-any-btn"),
+      matchInfo: $("match-info"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),

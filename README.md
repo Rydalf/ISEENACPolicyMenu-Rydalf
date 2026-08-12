@@ -145,7 +145,11 @@ the CSV (simplest) or the spreadsheet — and stick with it.
   **+N more** pill (styled like the others) sits at the end of that row —
   clicking it opens **Browse all filters**, same as the button
 - The **Match all / Match any** toggle is always visible (it's not part of
-  the collapse below) since it governs how every active facet combines
+  the collapse below) since it governs how every active facet combines.
+  Label and toggle share one compact line at every screen width; the
+  explanation of what "all" vs "any" means lives behind a small (i) button
+  next to it — hover, keyboard focus, or tap to reveal it, instead of a
+  permanent line of text
 - **Random resource** sits directly beside the search bar. Below that,
   tags on the left, a fixed action column on the right (**Browse all
   filters** on top, **Clear filters** below). Type+Subtype sit in one
@@ -164,10 +168,12 @@ the CSV (simplest) or the spreadsheet — and stick with it.
 
 **Hover interactions**
 - Hovering a card lifts it and expands the full description
-- Hovering reveals the Creator, keeping the resting card clean
 - Hovering any Type or Subtype tag — on a card *or* in the filter bar — dims
   everything except the other cards sharing that tag
 - A copy-link button appears on hover, so you can grab a URL without leaving
+
+The Organization (Creator) is always shown at the bottom of each card, not
+just on hover.
 
 **Other**
 - Each Type gets its own colour (stripe + tag), assigned deterministically so
