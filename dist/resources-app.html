@@ -224,6 +224,15 @@ body {
 
 /* ---------- Controls ---------- */
 
+/* .controls stays sticky at all times; only its inner row height
+   animates. A sticky element's reserved space in normal flow is based on
+   its own box size regardless of any transform applied to it — the
+   earlier transform:translateY(-100%) approach slid the bar out of view
+   but left its full height reserved, so the grid/results below sat
+   exactly where they always did, showing as a blank gap where the bar
+   used to be. Collapsing grid-template-rows (with padding living on
+   .controls-inner, inside the collapsing track) shrinks the box itself,
+   so content below shifts up to fill the space instead of leaving a gap. */
 .controls {
   position: sticky;
   top: 0;
@@ -232,28 +241,31 @@ body {
   backdrop-filter: saturate(1.6) blur(10px);
   -webkit-backdrop-filter: saturate(1.6) blur(10px);
   border-bottom: 1px solid transparent;
-  padding: 8px 0 6px;
   margin-bottom: 3px;
-  transition: transform 0.22s ease, opacity 0.22s ease,
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.22s ease, opacity 0.22s ease,
     border-color 0.2s ease, box-shadow 0.2s ease;
   /* Promotes the bar to its own GPU layer ahead of time so the
-     transform/opacity transition doesn't have to compete with
-     backdrop-filter's blur recompute during a fast scroll — without
-     this, fast flicks can skip the animation and snap straight in. */
-  will-change: transform, opacity;
+     transition doesn't have to compete with backdrop-filter's blur
+     recompute during a fast scroll — without this, fast flicks can skip
+     the animation and snap straight in. */
+  will-change: grid-template-rows, opacity;
 }
+
+.controls-inner { overflow: hidden; min-height: 0; padding: 8px 0 6px; }
 
 .controls.is-stuck {
   border-bottom-color: var(--border);
   box-shadow: 0 6px 18px -12px rgba(16, 24, 40, 0.5);
 }
 
-/* Scrolling down slides the whole filter bar (search, buttons, match
+/* Scrolling down collapses the whole filter bar (search, buttons, match
    toggle, and Type/Subtype pills) out of the way for more card space;
    scrolling back up brings it straight back. Purely visual — toggled
    independently of filter state and the "See more filters" state. */
 .controls.controls-hidden {
-  transform: translateY(-100%);
+  grid-template-rows: 0fr;
   opacity: 0;
   pointer-events: none;
 }
@@ -1250,6 +1262,7 @@ footer.foot {
   </section>
 
   <div class="controls" id="controls">
+    <div class="controls-inner">
     <div class="searchrow">
       <div class="searchbox" id="searchbox">
         <span id="search-icon"></span>
@@ -1329,6 +1342,7 @@ footer.foot {
         <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       </div>
       </div>
+    </div>
     </div>
   </div>
 
