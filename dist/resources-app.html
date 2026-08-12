@@ -63,6 +63,14 @@
 
 * { box-sizing: border-box; }
 
+/* The browser's own [hidden] { display: none } rule lives in the UA
+   stylesheet, which loses to *any* author rule setting display on the
+   same element regardless of specificity (e.g. .btn's display:inline-flex)
+   — origin beats specificity in the cascade. Without this, toggling the
+   hidden attribute via JS silently does nothing on anything that also
+   has a display-setting class, like #back-to-all (.btn). */
+[hidden] { display: none !important; }
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
