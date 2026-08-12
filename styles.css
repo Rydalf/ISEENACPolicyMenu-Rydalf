@@ -358,9 +358,6 @@ kbd {
   color: #fff;
 }
 
-/* "See more filters" — only used on narrow screens, see the mobile block below */
-#see-more-filters { display: none; }
-
 .badge {
   font-size: 11.5px;
   font-weight: 700;
@@ -1091,37 +1088,11 @@ mark {
     font-size: 13.5px;
   }
 
-  /* Once "Browse all filters" opens the panel, Type tags show first 10
-     A–Z (via --m-order); the rest plus every Subtype and Organization tag
-     stay collapsed behind the nested "See more filters" until tapped. */
-  #type-pills .pill { order: var(--m-order, 0); }
-  #type-pills .pill[data-mobile-more="true"] { display: none; }
-  .filter-bar.filters-expanded #type-pills .pill[data-mobile-more="true"] {
-    display: inline-flex;
-  }
-
-  #sub-fgroup, #org-fgroup { display: none; }
-  .filter-bar.filters-expanded #sub-fgroup,
-  .filter-bar.filters-expanded #org-fgroup {
-    display: grid;
-  }
-
   /* A "0" count means no matches given the *other* active filters — hide
-     the tag outright rather than showing it grayed out, and keep it hidden
-     even once "See more filters" reveals its group. Re-renders on every
-     filter change, so tags reappear the moment they're relevant again. */
+     the tag outright rather than showing it grayed out. Re-renders on
+     every filter change, so tags reappear the moment they're relevant
+     again. */
   .pill.is-empty { display: none; }
-  .filter-bar.filters-expanded #type-pills .pill[data-mobile-more="true"].is-empty {
-    display: none;
-  }
-
-  #see-more-filters {
-    display: inline-flex;
-    justify-content: center;
-    width: 100%;
-    padding: 11px 10px;
-    font-size: 13.5px;
-  }
 
   /* Comfortable tap targets (~40px) */
   .pill { padding: 9px 14px; font-size: 13.5px; }

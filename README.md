@@ -185,9 +185,9 @@ Nothing is hidden behind hover, because touch screens have none:
 
 - The full description, the Creator, and the copy-link button are all shown
   outright on cards rather than waiting for a hover
-- Once **Browse all filters** is open, Type pills show the first 10 (A–Z)
-  directly; the rest plus every Subtype pill stay behind a nested **See more
-  filters** tap so the panel doesn't swallow the screen
+- **Browse all filters** shows the complete Type/Subtype/Organization pill
+  lists in one tap — no further nested disclosure to dig through, so every
+  value in the data stays reachable in a single click
 - Tap targets are enlarged to roughly 40px, and the layout drops to one column
 - The search box uses 16px type, which stops iOS Safari zooming in when you tap it
 - The tag cross-highlighting effect is switched off on touch, since a tap would

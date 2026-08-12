@@ -354,14 +354,9 @@
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
   };
 
-  // mobileOrder/mobileMore only apply to Type pills: on narrow screens the
-  // first 10 show alphabetically (via the --m-order flex order) and the
-  // rest stay behind "See more filters" (via data-mobile-more).
-  function pillHTML(value, count, active, kind, mobileOrder, mobileMore) {
+  function pillHTML(value, count, active, kind) {
     var hue = kind === "type" ? typeHue[value] : null;
-    var styleParts = [];
-    if (hue != null) styleParts.push("--type-h:" + hue);
-    if (mobileOrder != null) styleParts.push("--m-order:" + mobileOrder);
+    var style = hue != null ? ' style="--type-h:' + hue + '"' : "";
     return (
       '<button class="pill' + (count === 0 ? " is-empty" : "") + '"' +
       ' type="button"' +
@@ -369,8 +364,7 @@
       ' data-filter="' + kind + '"' +
       ' data-value="' + esc(value) + '"' +
       ' data-tagkey="' + kind + ":" + esc(value) + '"' +
-      (mobileMore ? ' data-mobile-more="true"' : "") +
-      (styleParts.length ? ' style="' + styleParts.join(";") + '"' : "") +
+      style +
       ">" +
       (kind === "type" ? '<span class="dot"></span>' : "") +
       "<span>" + esc(value) + "</span>" +
@@ -422,29 +416,9 @@
       return (typeCounts[b] || 0) - (typeCounts[a] || 0) || a.localeCompare(b);
     });
 
-    // On mobile the Type pills are shown alphabetically, first 10 by
-    // default with the rest behind "See more filters" — independent of
-    // the count-based order above, which still drives the desktop layout.
-    var alphaRank = {};
-    types
-      .slice()
-      .sort(function (a, b) {
-        return a.localeCompare(b);
-      })
-      .forEach(function (t, i) {
-        alphaRank[t] = i;
-      });
-
     el.typePills.innerHTML = types
       .map(function (t) {
-        return pillHTML(
-          t,
-          typeCounts[t] || 0,
-          state.types.indexOf(t) !== -1,
-          "type",
-          alphaRank[t],
-          alphaRank[t] >= 10
-        );
+        return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
       })
       .join("");
 
@@ -880,16 +854,6 @@
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
 
-    // "See more filters" (mobile only): reveals the Type tags past the
-    // first 10 plus every Subtype tag, both hidden by default on narrow
-    // screens so the page opens without a wall of pills.
-    el.seeMoreFilters.addEventListener("click", function () {
-      var open = !el.filterBar.classList.contains("filters-expanded");
-      el.filterBar.classList.toggle("filters-expanded", open);
-      el.seeMoreFilters.setAttribute("aria-expanded", open ? "true" : "false");
-      el.seeMoreFilters.textContent = open ? "See fewer filters" : "See more filters";
-    });
-
     // Random resource
     el.random.addEventListener("click", function () {
       var results = currentResults();
@@ -1034,7 +998,6 @@
       clearFilters: $("clear-filters"),
       filterToggle: $("filter-toggle"),
       filterBadge: $("filter-badge"),
-      seeMoreFilters: $("see-more-filters"),
       matchMode: $("match-mode"),
       matchAllBtn: $("match-all-btn"),
       matchAnyBtn: $("match-any-btn"),
