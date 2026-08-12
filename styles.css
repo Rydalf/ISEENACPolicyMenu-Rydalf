@@ -1007,6 +1007,23 @@ mark {
   /* Horizontal padding stays governed by the fluid clamp() on .wrap so it
      keeps scaling smoothly instead of jumping at this one breakpoint. */
   .wrap { padding-top: 12px; padding-bottom: 72px; }
+
+  /* Smaller, tighter-lined intro so the tagline sentence and the
+     "New to..." line take less room before Start Here. */
+  .intro { margin: 0 0 8px; font-size: 13px; line-height: 1.35; }
+  .intro-lead { font-size: 15px; }
+
+  /* Start Here: tighter box padding/margins, and 2 cards per row instead
+     of 1 so the section takes roughly half the vertical space it did
+     stacked full-width. Cards with longer copy (e.g. "Explore
+     organizations...") will run a couple of lines taller than their
+     row-mate — an acceptable trade-off for halving the row count. */
+  .start-here { margin: 0 0 10px; padding: 10px 12px 12px; }
+  .start-here-title { margin: 0 0 2px; font-size: 17px; }
+  .start-here-subtitle { margin: 0 auto 8px; font-size: 12.5px; }
+  .start-here-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .start-card { padding: 10px 11px; }
+
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
@@ -1084,8 +1101,11 @@ mark {
   .card { padding: 16px 15px 14px; }
 
   .site-header-inner { padding: 14px 14px; }
+  .brand { gap: 10px; }
   .brand-logo { height: 38px; padding: 5px 9px; }
-  .brand-name { font-size: 18px; }
+  /* Small enough that the full title settles into 2 lines instead of
+     wrapping awkwardly across 3. */
+  .brand-name { font-size: 15px; line-height: 1.22; }
 
   /* Wrap the creator rather than truncating it — there's room in one column */
   .meta-item .v { white-space: normal; }
