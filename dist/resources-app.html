@@ -2252,8 +2252,10 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       el.search.focus();
     });
 
-    // Filter pills (delegated on the whole controls area)
-    el.controls.addEventListener("click", function (e) {
+    // Filter pills (delegated on the filter bar — the pills' actual
+    // container since it moved out of #controls to be a plain, never-
+    // sticky sibling; #controls now holds only the compact search row).
+    el.filterBar.addEventListener("click", function (e) {
       var p = e.target.closest(".pill");
       if (!p) return;
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
