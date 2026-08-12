@@ -68,10 +68,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 1600px keeps line length and card width readable on ultra-wide monitors
+   instead of stretching content edge-to-edge; the fluid side padding scales
+   continuously with viewport width rather than jumping at one breakpoint. */
 .wrap {
-  max-width: 1180px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 32px 20px 96px;
+  padding: 16px clamp(16px, 4vw, 40px) 96px;
 }
 
 /* ---------- Header / nav bar ---------- */
@@ -82,9 +85,11 @@ body {
 }
 
 .site-header-inner {
-  max-width: 1180px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 16px 20px;
+  /* Vertical padding upped to give the larger logo below room to breathe
+     without cramping the navy bar. */
+  padding: 22px clamp(16px, 4vw, 40px);
   display: flex;
   align-items: center;
 }
@@ -92,7 +97,7 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   min-width: 0;
 }
 
@@ -100,29 +105,113 @@ body {
    regardless of the source image's own background. Sized by height with
    width auto so it scales proportionally and never stretches. */
 .brand-logo {
-  height: 34px;
+  height: 52px;
   width: auto;
   flex: none;
   display: block;
   background: #fff;
-  border-radius: 6px;
-  padding: 4px 9px;
+  border-radius: 8px;
+  padding: 6px 12px;
   object-fit: contain;
 }
 
 .brand-name {
   margin: 0;
-  font-size: clamp(17px, 2.4vw, 21px);
+  font-size: clamp(19px, 3vw, 28px);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.25;
   color: #fff;
 }
 
+/* No max-width: spans the same full container width as .start-here and
+   .filter-bar below it, rather than sitting narrower and centered. */
+/* --accent equals the header's navy in light mode and swaps to a lighter
+   blue in dark mode, so this stays readable on a dark background instead
+   of the fixed --brand-navy going low-contrast there. */
 .intro {
-  margin: 0 0 22px;
+  margin: 0 0 10px;
+  color: var(--accent);
+  text-align: center;
+  font-size: 15.5px;
+}
+
+.intro-lead {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Start Here ---------- */
+
+.start-here {
+  margin: 0 0 12px;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-radius: calc(var(--radius) + 4px);
+  padding: 12px 16px 14px;
+}
+
+.start-here-title {
+  margin: 0 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  text-align: center;
+}
+
+.start-here-icon { display: inline-flex; flex: none; }
+
+.start-here-subtitle {
+  margin: 0 auto 8px;
+  max-width: 50ch;
+  font-size: 13.5px;
   color: var(--text-2);
-  max-width: 62ch;
+  text-align: center;
+}
+
+.start-here-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(8px, 1.2vw, 12px);
+}
+
+@media (min-width: 721px) {
+  .start-card { max-width: 340px; }
+}
+
+.start-card {
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.start-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--accent-2); }
+.start-card:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.start-card-title { font-size: 14.5px; font-weight: 640; letter-spacing: -0.005em; }
+.start-card-desc { font-size: 12.5px; color: var(--text-2); line-height: 1.5; }
+
+.start-card[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--accent);
 }
 
 /* ---------- Controls ---------- */
@@ -135,8 +224,8 @@ body {
   backdrop-filter: saturate(1.6) blur(10px);
   -webkit-backdrop-filter: saturate(1.6) blur(10px);
   border-bottom: 1px solid transparent;
-  padding: 14px 0 12px;
-  margin-bottom: 6px;
+  padding: 8px 0 6px;
+  margin-bottom: 3px;
   transition: transform 0.22s ease, opacity 0.22s ease,
     border-color 0.2s ease, box-shadow 0.2s ease;
   /* Promotes the bar to its own GPU layer ahead of time so the
@@ -277,10 +366,6 @@ kbd {
   color: #fff;
 }
 
-/* Filters disclosure — superseded by the inline mobile filters below,
-   kept in the DOM (hidden) so app.js's element wiring stays intact. */
-#filter-toggle { display: none; }
-
 /* "See more filters" — only used on narrow screens, see the mobile block below */
 #see-more-filters { display: none; }
 
@@ -312,11 +397,74 @@ kbd {
 
 /* ---------- Filter groups ---------- */
 
-.filters { margin-top: 14px; display: grid; gap: 11px; }
+/* Match toggle spans full width on its own row; the boxed tag groups and
+   the action column sit in a second row below it, so the buttons align
+   with the top of the boxes rather than the Match toggle above them. */
+.filter-bar {
+  margin-top: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+/* Match all/any is a persistent control, not part of the collapse — it
+   always applies across whichever facets are active, so it stays visible
+   regardless of whether the boxes below are showing their preview or the
+   full pill wall. */
+.match-row { display: grid; gap: 3px; }
+
+/* Tags on the left, a fixed action column on the right — the column's
+   height follows whichever side is taller (grid default), while its
+   buttons stay top-aligned rather than stretching to fill it. */
+.filter-bar-lower {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 16px;
+}
+
+/* The two boxed groups (Type+Subtype, Organization), stacked. */
+.filter-bar-tags {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.filter-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-actions .btn { justify-content: center; white-space: nowrap; }
+
+/* Type+Subtype and Organization each get their own bordered box so the
+   three filter categories read as two distinct groups rather than one
+   continuous wall of tags. */
+.filter-group-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  background: var(--surface);
+}
+
+/* A small always-visible preview of the top pills in a box (plus whatever's
+   already active) so first-time visitors see *something* without opening
+   the full wall. Swaps out for the full .filters panel — rather than
+   sitting above it — once "Browse all filters" is open, so the same pills
+   never render twice. */
+.filters-preview { display: grid; gap: 6px; }
+.controls.filters-open .filters-preview { display: none; }
+
+/* Collapsed by default so first-time visitors aren't hit with the full
+   pill wall — "Browse all filters" reveals it via filters-open. */
+.filters { display: none; gap: 6px; }
+.controls.filters-open .filters { display: grid; }
 
 .fgroup {
   display: grid;
-  grid-template-columns: 108px 1fr;
+  /* Wide enough for the uppercase, letter-spaced "ORGANIZATION" label
+     without wrapping or overflowing, same column as Type/Subtype/Match. */
+  grid-template-columns: 118px 1fr;
   gap: 10px;
   align-items: start;
 }
@@ -330,7 +478,9 @@ kbd {
   padding-top: 7px;
 }
 
-.pills { display: flex; flex-wrap: wrap; gap: 7px; }
+/* row-gap trimmed separately from column-gap: shrinks the vertical space
+   between wrapped pill lines without crowding pills within the same line. */
+.pills { display: flex; flex-wrap: wrap; row-gap: 4px; column-gap: 7px; }
 
 .pill {
   font: inherit;
@@ -390,6 +540,10 @@ kbd {
 /* ---------- Match-mode toggle (Type ↔ Subtype: all vs. any) ---------- */
 
 .segmented {
+  /* Without this, the grid item stretches to fill the .fgroup column on
+     wide screens, turning the pill into an oversized bar with a big empty
+     gap next to the two buttons. */
+  justify-self: start;
   display: inline-flex;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -421,7 +575,7 @@ kbd {
 
 .matchmode-hint {
   margin: -3px 0 0;
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-3);
 }
 
@@ -432,7 +586,7 @@ kbd {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 16px 0 18px;
+  margin: 8px 0 10px;
   min-height: 30px;
 }
 
@@ -480,10 +634,19 @@ kbd {
 
 /* ---------- Grid + cards ---------- */
 
+/* auto-fit (not auto-fill) so a sparse result set — e.g. after filtering
+   down to one or two cards on a wide screen — reflows into the freed
+   columns instead of leaving them as dead empty tracks. The upper bound
+   must stay a flexible 1fr, not a fixed length: auto-fit/auto-fill uses
+   that upper bound (when it's a definite length) to decide how many
+   columns fit at all, so a fixed cap there quietly collapses tablet/
+   laptop widths to fewer columns than the 288px minimum alone would
+   allow. The 420px cap on .card below does the "don't stretch edge to
+   edge" job instead, without touching the column count. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
+  gap: clamp(14px, 1.6vw, 20px);
   align-items: start;
 }
 
@@ -502,6 +665,14 @@ kbd {
   animation-delay: var(--d, 0ms);
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* Caps how wide a card can stretch when its grid track ends up unusually
+   wide (a sparse filtered result on a wide screen). Scoped above the
+   forced-single-column breakpoint so a lone phone-width card still fills
+   the full row instead of leaving a gap. */
+@media (min-width: 721px) {
+  .card { max-width: 420px; }
 }
 
 @keyframes fadeUp {
@@ -752,8 +923,8 @@ mark {
 
 .skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
+  gap: clamp(14px, 1.6vw, 20px);
 }
 
 .skel {
@@ -833,40 +1004,57 @@ mark {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 720px) {
-  .wrap { padding: 22px 14px 72px; }
+  /* Horizontal padding stays governed by the fluid clamp() on .wrap so it
+     keeps scaling smoothly instead of jumping at this one breakpoint. */
+  .wrap { padding-top: 12px; padding-bottom: 72px; }
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
-
-  .controls { padding-top: 10px; }
 
   /* 16px minimum stops iOS Safari zooming the page on focus */
   #search { font-size: 16px; padding: 12px 44px 12px 40px; }
 
   .searchbox { flex: 1 1 100%; }
 
-  /* Buttons share a second row evenly instead of overflowing */
-  #clear-filters, #random {
-    display: inline-flex;
+  /* Random resource drops to its own full-width row under the search box
+     instead of sitting cramped beside it. */
+  .searchrow #random {
+    flex: 1 1 100%;
     justify-content: center;
+  }
+
+  /* Limited width: tags stack above the action buttons instead of sitting
+     beside them, and the buttons share a row evenly instead of forming a
+     tall column. */
+  .filter-bar-lower { grid-template-columns: 1fr; }
+
+  .filter-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .filter-actions .btn {
     flex: 1 1 0;
     min-width: 0;
     padding: 11px 10px;
     font-size: 13.5px;
   }
 
-  /* Type tags sit directly on the page (first 10, A–Z, via --m-order)
-     instead of behind a tap-to-open toggle. Subtype tags and the rest of
-     the Type tags stay collapsed behind "See more filters" until tapped. */
+  /* Once "Browse all filters" opens the panel, Type tags show first 10
+     A–Z (via --m-order); the rest plus every Subtype and Organization tag
+     stay collapsed behind the nested "See more filters" until tapped. */
   #type-pills .pill { order: var(--m-order, 0); }
   #type-pills .pill[data-mobile-more="true"] { display: none; }
   .controls.filters-expanded #type-pills .pill[data-mobile-more="true"] {
     display: inline-flex;
   }
 
-  #sub-fgroup { display: none; }
-  .controls.filters-expanded #sub-fgroup { display: grid; }
+  #sub-fgroup, #org-fgroup { display: none; }
+  .controls.filters-expanded #sub-fgroup,
+  .controls.filters-expanded #org-fgroup {
+    display: grid;
+  }
 
   /* A "0" count means no matches given the *other* active filters — hide
      the tag outright rather than showing it grayed out, and keep it hidden
@@ -895,9 +1083,9 @@ mark {
 
   .card { padding: 16px 15px 14px; }
 
-  .site-header-inner { padding: 12px 14px; }
-  .brand-logo { height: 26px; padding: 3px 7px; }
-  .brand-name { font-size: 17px; }
+  .site-header-inner { padding: 14px 14px; }
+  .brand-logo { height: 38px; padding: 5px 9px; }
+  .brand-name { font-size: 18px; }
 
   /* Wrap the creator rather than truncating it — there's room in one column */
   .meta-item .v { white-space: normal; }

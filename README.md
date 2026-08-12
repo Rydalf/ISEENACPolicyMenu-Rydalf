@@ -91,8 +91,9 @@ clean columns:
 Resource, Creator, Type, Subtype, Description, STEM Yes/No, Link
 ```
 
-Currently: **65 resources · 16 types · 19 subtypes** (40 rows have a subtype; the
-other 25 have none, which is fine — those cards just show a Type tag).
+Currently: **65 resources · 16 types · 19 subtypes · 29 organizations** (40 rows
+have a subtype; the other 25 have none, which is fine — those cards just show a
+Type tag). "Organization" in the app is this Creator column, relabeled.
 
 The `STEM Yes/No` column is kept in the CSV but is no longer used anywhere in the
 app — it isn't a filter and isn't shown on the cards. It's preserved so the
@@ -115,18 +116,48 @@ the CSV (simplest) or the spreadsheet — and stick with it.
 
 ## What the app does
 
+**Start Here**
+- Four curated shortcut cards above the search bar for first-time visitors with
+  no policy background: *New to advocacy? Start here*, *Want to contact a
+  policymaker?*, *Looking for guides*, and *Explore organizations to get
+  involved with*
+- Each one pre-applies the relevant Type/Subtype filters — it's a shortcut into
+  the same filter system the pills use, not a separate feature. A card lights
+  up while its exact filter combination is active
+- Clicking a card replaces any current search/filters with that pathway's, so
+  the result is always a clean, guided set
+
 **Search & filter**
 - Search-as-you-type across Resource, Creator, and Description, with a live count
 - Matching text is highlighted in the results
 - Multi-word search narrows (all words must match)
-- Clickable pill filters for Type and Subtype — multi-select, with live counts
+- Clickable pill filters for Type, Subtype, and Organization (the
+  Creator column, relabeled in the UI) — multi-select, with live counts
   that update as you narrow (e.g. `Guide (14)`); pills that would return nothing
   fade out
+- By default you see a preview of the top pills in each of the three —
+  sized to roughly fill 3 rows apiece at a typical desktop width for Type
+  and Subtype (fewer Subtype pills fit per row since those labels run
+  longer); Organization's preview shows exactly the organizations with more
+  than one resource today — plus anything already active, even if it'd
+  otherwise fall outside that top slice, rather than the full wall or
+  nothing at all
+- The **Match all / Match any** toggle is always visible (it's not part of
+  the collapse below) since it governs how every active facet combines
+- **Random resource** sits directly beside the search bar. Below that,
+  tags on the left, a fixed action column on the right (**Browse all
+  filters** on top, **Clear filters** below). Type+Subtype sit in one
+  bordered box and Organization in its own, so the three categories read
+  as two visual groups rather than one continuous wall. **Browse all
+  filters** swaps each box's preview for its complete pill list; a badge
+  on the button shows how many filters are
+  active. On narrow screens the tags stack above the buttons, and the
+  buttons switch to a row instead of a column
 - Everything combines; active filters show as breadcrumbs you can remove one at a
   time
-- A **Clear filters** button next to the search bar drops the search and every
-  active filter at once. It stays greyed out until something is actually
-  filtering, so it never looks clickable when there's nothing to clear
+- A **Clear filters** button drops the search and every active filter at
+  once. It stays greyed out until something is actually filtering, so it
+  never looks clickable when there's nothing to clear
 - Press <kbd>/</kbd> anywhere to jump to the search box, <kbd>Esc</kbd> to clear
 
 **Hover interactions**
@@ -142,6 +173,11 @@ the CSV (simplest) or the spreadsheet — and stick with it.
 - "Random resource" jumps to and flashes a random card from the current results
 - Designed empty state and a shimmer loading state
 - Respects dark mode and reduced-motion settings
+- The card grid uses a fluid column count (CSS Grid `auto-fit`/`minmax`)
+  rather than fixed breakpoints — 1 column on phones, 2 on tablets, 3+ on
+  laptops, and more on wide monitors, scaling continuously in between. The
+  page container caps out at 1600px so text and cards stay readable instead
+  of stretching edge-to-edge on ultra-wide displays
 
 **On phones and tablets**
 
@@ -149,9 +185,9 @@ Nothing is hidden behind hover, because touch screens have none:
 
 - The full description, the Creator, and the copy-link button are all shown
   outright on cards rather than waiting for a hover
-- The 35 filter pills collapse behind a **Filters** button so they don't swallow
-  the screen. A badge on it shows how many are active while collapsed, and
-  breadcrumbs still show what's applied
+- Once **Browse all filters** is open, Type pills show the first 10 (A–Z)
+  directly; the rest plus every Subtype pill stay behind a nested **See more
+  filters** tap so the panel doesn't swallow the screen
 - Tap targets are enlarged to roughly 40px, and the layout drops to one column
 - The search box uses 16px type, which stops iOS Safari zooming in when you tap it
 - The tag cross-highlighting effect is switched off on touch, since a tap would

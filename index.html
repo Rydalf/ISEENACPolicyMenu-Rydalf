@@ -12,14 +12,40 @@
   <div class="site-header-inner">
     <div class="brand">
       <img class="brand-logo" src="img/isee-logo.png" alt="ISEE North America">
-      <h1 class="brand-name">Environmental Epidemiology Resource Menu</h1>
+      <h1 class="brand-name">Environmental Epidemiology Policy Engagement Resource Menu</h1>
     </div>
   </div>
 </header>
 
 <div class="wrap">
 
-  <p class="intro">Guides, databases, legal resources, and advocacy tools for translating environmental health science into policy and action.</p>
+  <p class="intro"><span class="intro-lead">A searchable library of guides, databases, legal resources, and advocacy tools for turning environmental health science into policy and action.</span><br><strong>New to environmental health advocacy?</strong> Use the shortcuts below to find a starting point — or search and filter the full library beneath them.</p>
+
+  <section class="start-here" aria-labelledby="start-here-heading">
+    <h2 id="start-here-heading" class="start-here-title">
+      <span class="start-here-icon" id="start-here-icon" aria-hidden="true"></span>
+      Start here
+    </h2>
+    <p class="start-here-subtitle">New here? Pick the option that matches what you're trying to do.</p>
+    <div class="start-here-grid" id="start-here">
+      <button class="start-card" type="button" data-pathway="new-to-advocacy" aria-pressed="false">
+        <span class="start-card-title">New to advocacy? Start here</span>
+        <span class="start-card-desc">Foundational guides and orientation for getting started.</span>
+      </button>
+      <button class="start-card" type="button" data-pathway="contact-policymaker" aria-pressed="false">
+        <span class="start-card-title">Want to contact a policymaker?</span>
+        <span class="start-card-desc">Tools and templates for reaching elected officials directly.</span>
+      </button>
+      <button class="start-card" type="button" data-pathway="guides" aria-pressed="false">
+        <span class="start-card-title">Looking for guides</span>
+        <span class="start-card-desc">Step-by-step how-tos on advocacy, communication, and civic engagement.</span>
+      </button>
+      <button class="start-card" type="button" data-pathway="organizations" aria-pressed="false">
+        <span class="start-card-title">Explore organizations to get involved with</span>
+        <span class="start-card-desc">Networks and programs where you can plug in and take part.</span>
+      </button>
+    </div>
+  </section>
 
   <div class="controls" id="controls">
     <div class="searchrow">
@@ -33,32 +59,73 @@
           <kbd>/</kbd>
         </span>
       </div>
-      <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters">
-        Filters<span class="badge" id="filter-badge"></span>
-      </button>
-      <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       <button class="btn" id="random" type="button">Random resource</button>
     </div>
 
-    <div class="filters" id="filters">
-      <div class="fgroup">
-        <span class="flabel" id="lbl-match">Match</span>
-        <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
-          <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
-          <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
+    <div class="filter-bar">
+      <div class="match-row">
+        <div class="fgroup">
+          <span class="flabel" id="lbl-match">Match</span>
+          <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
+            <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
+            <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
+          </div>
+        </div>
+        <p class="matchmode-hint">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</p>
+      </div>
+
+      <div class="filter-bar-lower">
+      <div class="filter-bar-tags">
+        <div class="filter-group-box">
+          <div class="filters-preview" id="filters-preview-typesub">
+            <div class="fgroup">
+              <span class="flabel" id="lbl-type-preview">Type</span>
+              <div class="pills" id="type-pills-preview" role="group" aria-labelledby="lbl-type-preview"></div>
+            </div>
+            <div class="fgroup">
+              <span class="flabel" id="lbl-sub-preview">Subtype</span>
+              <div class="pills" id="sub-pills-preview" role="group" aria-labelledby="lbl-sub-preview"></div>
+            </div>
+          </div>
+
+          <div class="filters" id="filters-typesub">
+            <div class="fgroup">
+              <span class="flabel" id="lbl-type">Type</span>
+              <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
+            </div>
+            <button class="btn" id="see-more-filters" type="button" aria-expanded="false" aria-controls="sub-fgroup org-fgroup">
+              See more filters
+            </button>
+            <div class="fgroup" id="sub-fgroup">
+              <span class="flabel" id="lbl-sub">Subtype</span>
+              <div class="pills" id="sub-pills" role="group" aria-labelledby="lbl-sub"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group-box">
+          <div class="filters-preview" id="filters-preview-org">
+            <div class="fgroup">
+              <span class="flabel" id="lbl-org-preview">Organization</span>
+              <div class="pills" id="org-pills-preview" role="group" aria-labelledby="lbl-org-preview"></div>
+            </div>
+          </div>
+
+          <div class="filters" id="filters-org">
+            <div class="fgroup" id="org-fgroup">
+              <span class="flabel" id="lbl-org">Organization</span>
+              <div class="pills" id="org-pills" role="group" aria-labelledby="lbl-org"></div>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="matchmode-hint">Match all: a resource needs both Type and Subtype · Match any: either one is enough</p>
-      <div class="fgroup">
-        <span class="flabel" id="lbl-type">Type</span>
-        <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
+
+      <div class="filter-actions">
+        <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
+          Browse all filters<span class="badge" id="filter-badge"></span>
+        </button>
+        <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       </div>
-      <button class="btn" id="see-more-filters" type="button" aria-expanded="false" aria-controls="sub-fgroup">
-        See more filters
-      </button>
-      <div class="fgroup" id="sub-fgroup">
-        <span class="flabel" id="lbl-sub">Subtype</span>
-        <div class="pills" id="sub-pills" role="group" aria-labelledby="lbl-sub"></div>
       </div>
     </div>
   </div>

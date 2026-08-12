@@ -183,12 +183,73 @@
 
   var ALL = [];
   var typeHue = {};
+
+  // "Start Here" pathways: curated shortcuts into the same Type/Subtype
+  // filters the pills use, aimed at first-time visitors with no policy
+  // background. matchMode "any" is only needed when a pathway mixes a Type
+  // and a Subtype that don't co-occur on the same rows (so AND would yield
+  // zero results) — see "new-to-advocacy" below.
+  var PATHWAYS = [
+    {
+      id: "new-to-advocacy",
+      types: ["Educational information"],
+      subs: ["Community based engagement"],
+      matchMode: "any",
+    },
+    {
+      id: "contact-policymaker",
+      types: [],
+      subs: ["Policy Maker Outreach and/or comment writing"],
+      matchMode: "all",
+    },
+    {
+      id: "guides",
+      types: ["Guide"],
+      subs: [],
+      matchMode: "all",
+    },
+    {
+      id: "organizations",
+      types: ["Network", "Advocacy", "Civic Engagement"],
+      subs: [],
+      matchMode: "all",
+    },
+  ];
+
+  function findPathway(id) {
+    for (var i = 0; i < PATHWAYS.length; i++) {
+      if (PATHWAYS[i].id === id) return PATHWAYS[i];
+    }
+    return null;
+  }
+
+  function sameSet(a, b) {
+    if (a.length !== b.length) return false;
+    var s = Object.create(null);
+    a.forEach(function (v) {
+      s[v] = true;
+    });
+    return b.every(function (v) {
+      return s[v];
+    });
+  }
+
+  function pathwayActive(p) {
+    return (
+      sameSet(p.types, state.types) &&
+      sameSet(p.subs, state.subs) &&
+      sameSet(p.orgs || [], state.orgs) &&
+      (p.matchMode || "all") === state.matchMode
+    );
+  }
+
   var state = {
     q: "",
     terms: [],
     types: [], // selected Type values (OR within group)
     subs: [],  // selected Subtype values (OR within group)
-    matchMode: "all", // "all" (Type AND Subtype) or "any" (Type OR Subtype)
+    orgs: [],  // selected Organization (Creator) values (OR within group)
+    matchMode: "all", // "all" (every active facet must match) or "any" (at least one does)
   };
 
   var el = {};
@@ -208,33 +269,50 @@
     });
   }
 
-  // `skip` lets us compute facet counts that ignore their own dimension —
-  // bypassing a dimension this way always leaves at most one of
-  // typeActive/subActive true, so matchMode (which only matters when both
-  // are active at once) never affects facet counts, only the actual grid.
+  // Type/Subtype/Organization are the three facets a resource is filtered
+  // on. `skip` lets us compute one facet's own pill counts as if its
+  // filter weren't applied, so a pill's count reflects the *other* active
+  // facets rather than itself. With three facets, two others can be active
+  // at once while computing the third's counts — so matchMode now can
+  // affect facet counts too, not just the final grid, which is the correct
+  // generalization of the old two-facet behavior.
+  var FACETS = [
+    { skipKey: "type", field: "type", list: "types" },
+    { skipKey: "sub", field: "subtype", list: "subs" },
+    { skipKey: "org", field: "creator", list: "orgs" },
+  ];
+
   function passes(r, skip) {
     if (skip !== "search" && !matchesSearch(r)) return false;
 
-    var typeActive = skip !== "type" && state.types.length > 0;
-    var subActive = skip !== "sub" && state.subs.length > 0;
-    var typeOk = !typeActive || state.types.indexOf(r.type) !== -1;
-    var subOk = !subActive || state.subs.indexOf(r.subtype) !== -1;
-
-    if (typeActive && subActive) {
-      return state.matchMode === "any" ? typeOk || subOk : typeOk && subOk;
+    var active = [];
+    for (var i = 0; i < FACETS.length; i++) {
+      var f = FACETS[i];
+      var values = state[f.list];
+      if (skip === f.skipKey || !values.length) continue;
+      active.push(values.indexOf(r[f.field]) !== -1);
     }
-    if (typeActive) return typeOk;
-    if (subActive) return subOk;
-    return true;
+
+    if (!active.length) return true;
+    if (state.matchMode === "any") {
+      return active.indexOf(true) !== -1;
+    }
+    return active.indexOf(false) === -1;
   }
 
   function hasActiveFilters() {
-    return !!(state.q.trim() || state.types.length || state.subs.length);
+    return !!(
+      state.q.trim() ||
+      state.types.length ||
+      state.subs.length ||
+      state.orgs.length
+    );
   }
 
   function clearAll() {
     state.types.length = 0;
     state.subs.length = 0;
+    state.orgs.length = 0;
     state.matchMode = "all";
     setSearch("");
     el.search.value = "";
@@ -272,6 +350,8 @@
       '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M8.5 11h5"/></svg>',
     dice:
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/></svg>',
+    compass:
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
   };
 
   // mobileOrder/mobileMore only apply to Type pills: on narrow screens the
@@ -299,9 +379,44 @@
     );
   }
 
+  // Default-visible pill preview: the top N by count, plus whatever's
+  // already active (even if it'd otherwise fall outside the top N) — so an
+  // active filter never silently drops out of view when the full wall is
+  // collapsed. `sorted` is filtered rather than resliced so the preview
+  // keeps the same count-based order as the full list.
+  //
+  // The two counts are sized to roughly fill 3 rows of wrapped pills at a
+  // typical desktop width, not a fixed row count — Subtype gets a lower
+  // count than Type because its labels run much longer (e.g. "Policy Maker
+  // Outreach and/or comment writing"), so fewer fit per row. Actual rows
+  // will still vary with viewport width and with how label text changes
+  // as the data grows.
+  var PREVIEW_TYPE_COUNT = 14;
+  var PREVIEW_SUB_COUNT = 13;
+  // Organization (Creator) labels run even longer on average than
+  // Subtype's, and there are 29 distinct ones today — 10 happens to be
+  // exactly how many currently have more than one resource, so the preview
+  // surfaces every organization with real weight and tucks the rest (all
+  // one-off contributors right now) behind "Browse all filters".
+  var PREVIEW_ORG_COUNT = 10;
+
+  function previewSubset(sorted, active, count) {
+    var keep = Object.create(null);
+    sorted.slice(0, count).forEach(function (v) {
+      keep[v] = true;
+    });
+    active.forEach(function (v) {
+      keep[v] = true;
+    });
+    return sorted.filter(function (v) {
+      return keep[v];
+    });
+  }
+
   function renderFilters() {
     var typeCounts = countBy("type", "type");
     var subCounts = countBy("subtype", "sub");
+    var orgCounts = countBy("creator", "org");
 
     var types = Object.keys(typeHue).sort(function (a, b) {
       return (typeCounts[b] || 0) - (typeCounts[a] || 0) || a.localeCompare(b);
@@ -333,6 +448,12 @@
       })
       .join("");
 
+    el.typePillsPreview.innerHTML = previewSubset(types, state.types, PREVIEW_TYPE_COUNT)
+      .map(function (t) {
+        return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
+      })
+      .join("");
+
     var allSubs = {};
     ALL.forEach(function (r) {
       if (r.subtype) allSubs[r.subtype] = true;
@@ -345,6 +466,45 @@
         return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
       })
       .join("");
+
+    el.subPillsPreview.innerHTML = previewSubset(subs, state.subs, PREVIEW_SUB_COUNT)
+      .map(function (s) {
+        return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
+      })
+      .join("");
+
+    // "Organization" in the UI is the Creator column underneath — same
+    // top-by-count sort, preview, zero-count, and Match all/any pattern as
+    // Type and Subtype.
+    var allOrgs = {};
+    ALL.forEach(function (r) {
+      if (r.creator) allOrgs[r.creator] = true;
+    });
+    var orgs = Object.keys(allOrgs).sort(function (a, b) {
+      return (orgCounts[b] || 0) - (orgCounts[a] || 0) || a.localeCompare(b);
+    });
+    el.orgPills.innerHTML = orgs
+      .map(function (o) {
+        return pillHTML(o, orgCounts[o] || 0, state.orgs.indexOf(o) !== -1, "org");
+      })
+      .join("");
+
+    el.orgPillsPreview.innerHTML = previewSubset(orgs, state.orgs, PREVIEW_ORG_COUNT)
+      .map(function (o) {
+        return pillHTML(o, orgCounts[o] || 0, state.orgs.indexOf(o) !== -1, "org");
+      })
+      .join("");
+  }
+
+  function renderStartHere() {
+    var cards = el.startHere.querySelectorAll(".start-card");
+    for (var i = 0; i < cards.length; i++) {
+      var pathway = findPathway(cards[i].getAttribute("data-pathway"));
+      cards[i].setAttribute(
+        "aria-pressed",
+        pathway && pathwayActive(pathway) ? "true" : "false"
+      );
+    }
   }
 
   function renderCrumbs() {
@@ -357,6 +517,9 @@
     });
     state.subs.forEach(function (v) {
       parts.push(crumb("sub", "Subtype", v));
+    });
+    state.orgs.forEach(function (v) {
+      parts.push(crumb("org", "Organization", v));
     });
     el.crumbs.innerHTML = parts.join("");
   }
@@ -410,6 +573,7 @@
     return (
       '<article class="card" style="--type-h:' + hue + ";--d:" + delay + 'ms"' +
       ' data-type="' + esc(r.type) + '" data-sub="' + esc(r.subtype) + '"' +
+      ' data-org="' + esc(r.creator) + '"' +
       (url ? ' data-url="' + esc(url) + '" tabindex="0"' : "") +
       ">" +
       '<div class="card-head"><h3>' + title + "</h3>" +
@@ -431,6 +595,7 @@
     el.matchAnyBtn.setAttribute("aria-pressed", state.matchMode === "any" ? "true" : "false");
 
     renderFilters();
+    renderStartHere();
     renderCrumbs();
 
     var results = currentResults();
@@ -441,7 +606,7 @@
     el.clearFilters.disabled = !hasActiveFilters();
 
     // Show how many pill filters are active, since they're collapsed on mobile
-    var activePills = state.types.length + state.subs.length;
+    var activePills = state.types.length + state.subs.length + state.orgs.length;
     el.filterBadge.textContent = activePills ? String(activePills) : "";
 
     if (!results.length) {
@@ -531,6 +696,7 @@
   function applyFilterClick(kind, value) {
     if (kind === "type") toggleIn(state.types, value);
     else if (kind === "sub") toggleIn(state.subs, value);
+    else if (kind === "org") toggleIn(state.orgs, value);
     render();
   }
 
@@ -544,7 +710,7 @@
     var sep = tagkey.indexOf(":");
     var kind = tagkey.slice(0, sep);
     var value = tagkey.slice(sep + 1);
-    var attr = kind === "type" ? "data-type" : "data-sub";
+    var attr = kind === "type" ? "data-type" : kind === "org" ? "data-org" : "data-sub";
     var cards = el.grid.querySelectorAll(".card");
     var any = false;
     for (var i = 0; i < cards.length; i++) {
@@ -588,6 +754,24 @@
       }
     });
 
+    // "Start Here" pathway cards: pre-apply Type/Subtype filters as a
+    // guided shortcut into the same filter system the pills use, replacing
+    // whatever filters/search were already active for a clean result.
+    el.startHere.addEventListener("click", function (e) {
+      var card = e.target.closest(".start-card");
+      if (!card) return;
+      var pathway = findPathway(card.getAttribute("data-pathway"));
+      if (!pathway) return;
+      state.types = pathway.types.slice();
+      state.subs = pathway.subs.slice();
+      state.orgs = (pathway.orgs || []).slice();
+      state.matchMode = pathway.matchMode || "all";
+      setSearch("");
+      el.search.value = "";
+      render();
+      el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
     // Clear-filters button (next to the search bar)
     el.clearFilters.addEventListener("click", function () {
       clearAll();
@@ -602,7 +786,7 @@
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
     });
 
-    // Match-mode toggle: how Type and Subtype selections combine
+    // Match-mode toggle: how Type/Subtype/Organization selections combine
     el.matchMode.addEventListener("click", function (e) {
       var b = e.target.closest(".seg-btn");
       if (!b) return;
@@ -627,6 +811,8 @@
         toggleIn(state.types, value);
       } else if (kind === "sub") {
         toggleIn(state.subs, value);
+      } else if (kind === "org") {
+        toggleIn(state.orgs, value);
       }
       render();
     });
@@ -807,11 +993,16 @@
   function boot() {
     el = {
       controls: $("controls"),
+      startHere: $("start-here"),
       search: $("search"),
       searchbox: $("searchbox"),
       clearSearch: $("clear-search"),
       typePills: $("type-pills"),
       subPills: $("sub-pills"),
+      orgPills: $("org-pills"),
+      typePillsPreview: $("type-pills-preview"),
+      subPillsPreview: $("sub-pills-preview"),
+      orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
       filterToggle: $("filter-toggle"),
       filterBadge: $("filter-badge"),
@@ -841,6 +1032,7 @@
     try {
       $("search-icon").innerHTML = ICON.search;
       el.random.insertAdjacentHTML("afterbegin", ICON.dice);
+      $("start-here-icon").innerHTML = ICON.compass;
     } catch (e) {
       /* icons are decorative — never block startup on them */
     }
