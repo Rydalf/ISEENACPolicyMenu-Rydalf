@@ -244,8 +244,14 @@ body {
   margin-bottom: 3px;
   display: grid;
   grid-template-rows: 1fr;
-  transition: grid-template-rows 0.22s ease, opacity 0.22s ease,
-    border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Revealing: the box grows for its full duration, but opacity waits a
+     beat (0.06s delay) before fading in over a shorter span — so there's
+     visibly more room before content appears, instead of text popping in
+     squished into a still-short box. See .controls-hidden below for the
+     reverse (collapsing) timing — an asymmetric fade is what keeps the
+     whole thing from reading as a ghosted, half-cut mid-transition mess. */
+  transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.18s ease 0.06s, border-color 0.2s ease, box-shadow 0.2s ease;
   /* Promotes the bar to its own GPU layer ahead of time so the
      transition doesn't have to compete with backdrop-filter's blur
      recompute during a fast scroll — without this, fast flicks can skip
@@ -273,11 +279,17 @@ body {
 /* Scrolling down collapses the whole filter bar (search, buttons, match
    toggle, and Type/Subtype pills) out of the way for more card space;
    scrolling back up brings it straight back. Purely visual — toggled
-   independently of filter state and the "See more filters" state. */
+   independently of filter state and the "See more filters" state.
+   Collapsing: opacity fades out fast with no delay, well before the box
+   finishes shrinking, so there's no ghosted/half-cut content visible
+   during the slower height collapse — the opposite ordering from the
+   reveal transition above. */
 .controls.controls-hidden {
   grid-template-rows: 0fr;
   opacity: 0;
   pointer-events: none;
+  transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchrow {
@@ -1069,7 +1081,11 @@ mark {
      pills are rendered; "Browse all filters" is still right there for
      the full list. */
   .filters-preview .pills {
-    max-height: 70px;
+    /* Measured: pills render 36px tall with a 4px row-gap at this width,
+       so two full rows end at 76px and the third starts at 80px — 78px
+       sits in that 4px gap, showing exactly 2 clean rows instead of
+       slicing into a third (70px was cutting mid-pill). */
+    max-height: 78px;
     overflow: hidden;
   }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
