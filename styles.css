@@ -1,71 +1,42 @@
 /* Resource Menu — environmental epidemiology policy & advocacy resources */
 
 :root {
-  /* This page is light-only by design — see the note below the palette
-     for why there's no dark-mode variant of it. Telling the browser that
-     explicitly also stops it from dark-moding form controls/scrollbars
-     on top of that. */
   color-scheme: light;
 
-  --bg: #f6f7f9;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f1f3f6;
+  --surface-2: #ffffff;
   --border: #e2e6ec;
   --border-strong: #cfd6e0;
   --text: #131720;
   --text-2: #5a6472;
   --text-3: #8a93a2;
 
-  /* Brand palette (ISEE-aligned) — fixed navy/slate, constant across themes */
-  --brand-navy: #1b3a5c;
-  --brand-navy-deep: #122a44;
+  --brand-navy: #074768;
+  --brand-green: #3b95a0;
   --brand-slate: #5b84a8;
 
-  /* Theme-adaptive accent: navy for primary/active/focus, slate for hover/highlight */
-  --accent: #1b3a5c;
+  --accent: #074768;
   --accent-2: #5b84a8;
   --accent-soft: color-mix(in srgb, var(--accent) 10%, white);
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
   --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 14px 34px rgba(16, 24, 40, 0.14);
-  --radius: 14px;
-  --radius-sm: 8px;
-  --ring: 0 0 0 3px rgba(27, 58, 92, 0.28);
+  --radius: 0px;
+  --radius-sm: 0px;
+  --ring: 0 0 0 3px rgba(27, 58, 92, .28);
   --type-s: 62%;
   --type-l: 42%;
   --type-tint-l: 96%;
-  /* Deliberately darker than --type-l: this one's specifically for white
-     text sitting directly on a solid hue fill (see .pill[data-filter=
-     "type"] below), which needs more headroom than a dot or a stripe
-     does. --type-l's 42% clears WCAG AA (4.5:1) for white text on most
-     of app.js's HUES but falls short on the lighter/warmer ones (e.g.
-     hue 70, a yellow-green, lands around 3.7:1) — 28% clears all of them
-     with room to spare. */
   --type-fill-l: 28%;
 
-  /* Dedicated accent for "Another random resource" (see .btn-random) —
-     the same pink/magenta hue used on some Type tags (hue 340 in app.js's
-     HUES list), so the playful random-pick feature has its own on-brand
-     color distinct from the navy used for primary/neutral actions
-     elsewhere. */
   --random-h: 340;
   --random-s: 68%;
   --random-l: 38%;
 }
 
-/* Deliberately no @media (prefers-color-scheme: dark) override anywhere
-   in this file — the design has only ever been built and tested in light
-   mode, so a visitor with a dark-mode OS/browser setting used to get an
-   unintended, untested mix of colors instead of it. */
-
 * { box-sizing: border-box; }
 
-/* The browser's own [hidden] { display: none } rule lives in the UA
-   stylesheet, which loses to *any* author rule setting display on the
-   same element regardless of specificity (e.g. .btn's display:inline-flex)
-   — origin beats specificity in the cascade. Without this, toggling the
-   hidden attribute via JS silently does nothing on anything that also
-   has a display-setting class, like #back-to-all (.btn). */
 [hidden] { display: none !important; }
 
 html { -webkit-text-size-adjust: 100%; }
@@ -81,9 +52,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 1600px keeps line length and card width readable on ultra-wide monitors
-   instead of stretching content edge-to-edge; the fluid side padding scales
-   continuously with viewport width rather than jumping at one breakpoint. */
 .wrap {
   max-width: 1600px;
   margin: 0 auto;
@@ -93,18 +61,17 @@ body {
 /* ---------- Header / nav bar ---------- */
 
 .site-header {
-  background: var(--brand-navy);
-  color: #fff;
+  background: #ffffff;
+  color: var(--brand-navy);
 }
 
 .site-header-inner {
   max-width: 1600px;
   margin: 0 auto;
-  /* Vertical padding upped to give the larger logo below room to breathe
-     without cramping the navy bar. */
   padding: 22px clamp(16px, 4vw, 40px);
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .brand {
@@ -114,11 +81,8 @@ body {
   min-width: 0;
 }
 
-/* Logo sits on its own white card so it reads cleanly against the navy bar
-   regardless of the source image's own background. Sized by height with
-   width auto so it scales proportionally and never stretches. */
 .brand-logo {
-  height: 52px;
+  height: 80px;
   width: auto;
   flex: none;
   display: block;
@@ -133,102 +97,110 @@ body {
   font-size: clamp(19px, 3vw, 28px);
   font-weight: 700;
   letter-spacing: -0.01em;
-  line-height: 1.25;
-  color: #fff;
+  line-height: 1.2;
+  color: var(--brand-navy);
 }
 
-/* No max-width: spans the same full container width as .start-here and
-   .filter-bar below it, rather than sitting narrower and centered. */
-/* --accent equals the header's navy in light mode and swaps to a lighter
-   blue in dark mode, so this stays readable on a dark background instead
-   of the fixed --brand-navy going low-contrast there. */
 .intro {
   margin: 0 0 8px;
-  color: var(--accent);
+  color: var(--brand-navy);
   text-align: center;
   font-size: 15.5px;
 }
 
 .intro-lead {
   display: inline-block;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 /* ---------- Start Here ---------- */
 
-/* Clickable line that reveals/hides the card grid below it. Collapsed by
-   default on every load (app.js sets no persisted state), so this is the
-   only way back into Start Here once dismissed — keeping first-paint
-   focus on search/filter rather than a wall of four cards. */
 .start-here-toggle {
   position: relative;
-  display: flex;
+  top: auto;
+  right: auto;
+  z-index: 50;
+
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  width: 100%;
-  margin: 0 0 10px;
-  padding: 11px 18px;
+  gap: 8px;
+
+  padding: 8px 12px;
   font: inherit;
-  font-size: 14px;
-  color: var(--accent);
+  font-size: 16px;
+  color: #ffffff;
   text-align: center;
-  /* Deeper tint than the plain accent-soft used elsewhere, so this reads
-     as its own inviting, clickable bar rather than blending into the
-     surrounding boxes. */
-  background: color-mix(in srgb, var(--accent) 13%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
-  border-radius: var(--radius);
+
+  background: var(--brand-green);
+  border: 1px solid var(--brand-green);
+  border-radius: 999px;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-md);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.12s ease;
 }
 
-.start-here-toggle strong { color: var(--accent); }
+.start-here-toggle strong {
+  color: #ffffff;
+}
 
 .start-here-toggle:hover,
 .start-here-toggle:focus-visible {
-  background: color-mix(in srgb, var(--accent) 20%, var(--surface));
-  border-color: var(--accent-2);
-  box-shadow: var(--shadow-md);
+  background: color-mix(in srgb, var(--brand-green) 85%, #000);
+  border-color: color-mix(in srgb, var(--brand-green) 90%, #000);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
 }
-.start-here-toggle:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.start-here-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--ring), var(--shadow-lg);
+}
 
 .start-here-toggle .chevron {
   flex: none;
   transition: transform 0.2s ease;
 }
 
-/* Reads the button's own aria-expanded (set in app.js alongside the
-   section's hidden attribute) rather than a separate class. */
 .start-here-toggle[aria-expanded="true"] .chevron {
   transform: rotate(180deg);
 }
 
 .start-here {
-  margin: 0 0 10px;
-  background: var(--accent-soft);
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
-  border-radius: calc(var(--radius) + 4px);
-  padding: 10px 14px 12px;
+  position: fixed;
+  top: 56px;
+  right: 18px;
+  z-index: 60;
+
+  max-width: 420px;
+  width: min(420px, 90vw);
+
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 12px 14px 14px;
+  box-shadow: var(--shadow-lg);
 }
 
 .start-here-title {
   margin: 0 0 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 9px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--accent);
-  text-align: center;
+  text-align: left;
 }
 
-.start-here-icon { display: inline-flex; flex: none; }
 
 .start-here-grid {
   display: grid;
@@ -270,15 +242,6 @@ body {
 
 /* ---------- Controls ---------- */
 
-/* Only the compact search row lives here — not the Type/Subtype/
-   Organization filter area (that's .filter-bar, a plain sibling below,
-   never sticky). Keeping .controls small like this is deliberate: a
-   sticky element reserves layout space equal to its own box size
-   regardless of any transform applied to it, so hiding a *tall* sticky
-   element via transform leaves its full height reserved as a blank gap
-   (that was the original bug). A compact search row's reserved height is
-   small enough that this is a non-issue, which is what makes a simple
-   transform-based hide safe here without resorting to animating height. */
 .controls {
   position: sticky;
   top: 0;
@@ -318,10 +281,6 @@ body {
   pointer-events: none;
 }
 
-/* Deliberately the most visually prominent control on the page — a
-   thicker accent-toned border plus a standing shadow (not just on focus)
-   so it reads as the primary way in, ahead of Match/filter categories
-   below it (see .filter-group-box, .segmented). */
 #search {
   width: 100%;
   padding: 12px 84px 12px 40px;
@@ -405,7 +364,6 @@ kbd {
   color: var(--text-3);
 }
 
-/* Primary CTA (Random resource) — solid brand navy, slate on hover */
 .btn-primary {
   color: #fff;
   background: var(--accent);
@@ -418,13 +376,6 @@ kbd {
   color: #fff;
 }
 
-/* "Another random resource" — the primary, repeatable action while a
-   pick is showing, styled distinctly from the neutral "Back to all
-   resources" beside it: pill-shaped rather than the standard rounded-
-   rectangle .btn, filled with a dedicated pink/magenta (--random-h, tied
-   to the same hue used on some Type tags) instead of the navy every
-   other primary action uses, so it reads as its own playful thing tied
-   to the random-pick feature specifically. */
 .btn-random {
   border-radius: 999px;
   color: #fff;
@@ -452,7 +403,6 @@ kbd {
 
 .badge:empty { display: none; }
 
-/* Clear-filters lights up once something is actually filtering */
 #clear-filters:not(:disabled) {
   border-color: var(--border-strong);
   color: var(--text);
@@ -466,53 +416,22 @@ kbd {
 
 /* ---------- Filter groups ---------- */
 
-/* .match-row, .filter-bar-tags, and .filter-actions are placed by name
-   (grid-area, declared with each of them below) rather than relying on
-   their order in index.html, so each can move independently per
-   breakpoint: desktop keeps Match spanning the top with tags and the
-   action column sharing the row below it (the action column's height
-   following whichever side is taller, per grid's default stretch, while
-   its buttons stay top-aligned rather than stretching to fill it);
-   mobile (see the media query) instead stacks Browse/Clear right under
-   Match, ahead of the tags — permanently reachable near the top instead
-   of trailing after a pill wall that can run much longer than one
-   screen. */
 .filter-bar {
   margin-top: 6px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "match match"
-    "tags actions";
-  align-items: start;
-  gap: 6px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Match all/any is a persistent control, not part of the collapse — it
-   always applies across whichever facets are active, so it stays visible
-   regardless of whether the boxes below are showing their preview or the
-   full pill wall. Toggle and info icon sit on one line at every width
-   (unlike .fgroup, which stacks on mobile) — there's nothing here that
-   needs the room a stacked layout buys, and staying inline keeps this
-   row's footprint minimal. */
 .match-row {
-  grid-area: match;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px 10px;
-  /* Positioning context for .info-btn .tooltip on mobile (see that
-     media-query override) — the row's own width is always safely within
-     the viewport, unlike the tiny 23px info-btn itself, which the tooltip
-     is anchored to at every other width. */
   position: relative;
 }
 
-/* "MATCH" spelled out is redundant with the pill labels themselves
-   ("Match all" / "Match any") right next to it, at every width — visually-
-   hidden rather than removed so .segmented's aria-labelledby (see
-   index.html) still has real text to announce. Matches .visually-hidden's
-   technique (see that rule). */
+/* Keep the label visually hidden; the segmented control itself reads as "Filters" */
 .match-row .flabel {
   position: absolute;
   width: 1px;
@@ -525,97 +444,25 @@ kbd {
   border: 0;
 }
 
-/* Small circular (i) button that reveals the Match all/any explanation
-   on hover, keyboard focus, or tap — replacing the always-visible
-   .matchmode-hint line this used to sit next to. */
-.info-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 23px;
-  height: 23px;
-  flex: none;
-  padding: 0;
-  border: 1.5px solid var(--accent-2);
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent-2);
-  cursor: pointer;
-}
-
-.info-btn:hover,
-.info-btn:focus-visible {
-  color: #fff;
-  background: var(--accent);
-  border-color: var(--accent);
-}
-.info-btn:focus-visible { outline: none; box-shadow: var(--ring); }
-
-.info-btn .tooltip {
-  position: absolute;
-  z-index: 40;
-  left: 0;
-  top: calc(100% + 8px);
-  width: max-content;
-  max-width: min(320px, 80vw);
-  background: var(--text);
-  color: var(--bg);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.45;
-  text-align: left;
-  padding: 8px 11px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  transform: translateY(-4px);
-  pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-/* Hover/focus cover mouse and keyboard; .info-open (toggled in app.js)
-   covers touch, where :hover can't be relied on to open *and* close it
-   again on a second tap. */
-.info-btn:hover .tooltip,
-.info-btn:focus-visible .tooltip,
-.info-btn.info-open .tooltip {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* The two boxed groups (Type+Subtype, Organization), stacked. */
 .filter-bar-tags {
-  grid-area: tags;
   min-width: 0;
   display: grid;
   gap: 6px;
 }
 
-.filter-actions {
-  grid-area: actions;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.filter-actions .btn { justify-content: center; white-space: nowrap; }
-
-/* Type+Subtype and Organization each get their own bordered box so the
-   three filter categories read as two distinct groups rather than one
-   continuous wall of tags. */
-/* Muted by default — blends toward the page background rather than
-   standing out as a bordered card — so it reads as a supporting section
-   next to the search bar above. Interacting with anything inside it
-   (hover or focus, e.g. tabbing to a pill) restores the clearer card
-   treatment, since at that point the user's attention is already there. */
 .filter-group-box {
   border: 1px solid transparent;
   border-radius: var(--radius);
-  padding: 6px 10px;
+  padding: 6px 10px;  /* was 8px 10px */
   background: color-mix(in srgb, var(--surface) 55%, var(--bg));
   transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  position: relative;  /* so overflow can be visible relative to this box */
+  overflow: visible;
+}
+
+.filter-group-box .pills {
+  margin-top: -2px;
+  margin-bottom: -2px;
 }
 
 .filter-group-box:hover,
@@ -625,41 +472,24 @@ kbd {
   box-shadow: var(--shadow-sm);
 }
 
-/* A small always-visible preview of the top pills in a box (plus whatever's
-   already active) so first-time visitors see *something* without opening
-   the full wall. Swaps out for the full .filters panel — rather than
-   sitting above it — once "Browse filters" is open, so the same pills
-   never render twice. */
 .filters-preview { display: grid; gap: 5px; }
 .filter-bar.filters-open .filters-preview { display: none; }
 
-/* TRYING: clamp each preview row to a single line, backstopping the
-   reduced PREVIEW_TYPE/SUB/ORG_COUNT constants in app.js in case a
-   viewport is narrow enough that even that trimmed count would still
-   wrap. Base .pill is 13px/1.2 line-height + 6px vertical padding + 1px
-   border each side ≈ 30px tall with a 4px row-gap, so row 2 would start
-   at 34px — 32px sits in that gap, showing exactly one clean row. */
 .filters-preview .pills {
-  max-height: 32px;
-  overflow: hidden;
+  max-height: 40px;
+  overflow: visible;
 }
 
-/* Collapsed by default so first-time visitors aren't hit with the full
-   pill wall — "Browse filters" reveals it via filters-open. */
 .filters { display: none; gap: 5px; }
 .filter-bar.filters-open .filters { display: grid; }
 
 .fgroup {
   display: grid;
-  /* Wide enough for the uppercase, letter-spaced "ORGANIZATION" label
-     without wrapping or overflowing, same column as Type/Subtype/Match. */
   grid-template-columns: 118px 1fr;
   gap: 10px;
   align-items: start;
 }
 
-/* Plain .flabel (not just .fgroup > .flabel) so the same label style
-   works in .match-row too, which isn't a .fgroup. */
 .flabel {
   font-size: 11px;
   font-weight: 700;
@@ -669,14 +499,9 @@ kbd {
 }
 
 .fgroup > .flabel {
-  /* Aligns the label's baseline with the first row of pills beside it,
-     which only matters for .fgroup's grid layout — .match-row centers
-     its items instead, so it needs no such offset. */
   padding-top: 7px;
 }
 
-/* row-gap trimmed separately from column-gap: shrinks the vertical space
-   between wrapped pill lines without crowding pills within the same line. */
 .pills { display: flex; flex-wrap: wrap; row-gap: 4px; column-gap: 7px; }
 
 .pill {
@@ -715,7 +540,10 @@ kbd {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.pill:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+.pill:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px); 
+}
 .pill:focus-visible { outline: none; box-shadow: var(--ring); }
 
 .pill[aria-pressed="true"] {
@@ -732,17 +560,6 @@ kbd {
 
 .pill[aria-pressed="true"] .dot { background: rgba(255, 255, 255, 0.85); }
 
-/* Subtype pills stay a lighter, thinner gray outline at regular weight —
-   no colored dot (it was never added for this kind — see pillHTML in
-   app.js), no hue-tinted fill, selected or not — so next to Type's
-   always-on solid fill below, Subtype reads as the quieter secondary
-   refinement rather than a second primary category. More specific than
-   the generic .pill[aria-pressed="true"] above, so it wins the cascade
-   for just this one property set; font-weight stays at the base .pill's
-   regular (unbolded) weight, since this rule doesn't touch it and Type's
-   bold-weight rule below is scoped to data-filter="type" only.
-   Organization pills are left as they were. Same selectors at every
-   width, so this holds on mobile too. */
 .pill[data-filter="sub"][aria-pressed="true"] {
   color: var(--text);
   background: var(--surface-2);
@@ -754,14 +571,6 @@ kbd {
   color: var(--text-2);
 }
 
-/* Type pills read as the primary category at a glance, before any
-   interaction — solid, per-value hue fill (same hue as the card stripe/
-   .tag.type) with bold white text, always on rather than only once
-   selected. Equal specificity to the generic .pill[aria-pressed="true"]
-   above, so source order (this comes after) is what makes this rule win
-   for pressed Type pills too, rather than the generic accent-colored
-   fill; unpressed Type pills need no such tie-break since the generic
-   rule doesn't apply to them at all. */
 .pill[data-filter="type"] {
   color: #fff;
   background: hsl(var(--type-h) var(--type-s) var(--type-fill-l));
@@ -776,59 +585,23 @@ kbd {
   color: #fff;
 }
 
-/* Hover's generic border-color (var(--border-strong), a neutral gray)
-   would otherwise sit oddly against a saturated fill — keep it on-hue,
-   just a touch darker. */
 .pill[data-filter="type"]:hover {
   border-color: hsl(var(--type-h) var(--type-s) calc(var(--type-fill-l) - 6%));
 }
 
-/* The fill above is now Type's permanent look, so it can no longer by
-   itself signal "this is the active filter" the way it used to when
-   pressed was the only thing that turned a pill solid. An inner ring —
-   same box-shadow: inset technique .tag[aria-pressed="true"] already
-   uses for card tags — layers "currently selected" on top without
-   touching the fill color, keeping the two signals (Type vs. Subtype,
-   and selected vs. not) independent of each other. */
 .pill[data-filter="type"][aria-pressed="true"] {
   box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.9);
 }
 
-/* box-shadow doesn't stack across separate rules — without this, tabbing
-   to an already-selected Type pill would win on specificity alone (0-3-0
-   beats .pill:focus-visible's 0-2-0) and silently swallow the focus
-   ring. Layer both explicitly so a keyboard user still sees where focus
-   is even on a pill that's already showing the selected-state ring. */
 .pill[data-filter="type"][aria-pressed="true"]:focus-visible {
   box-shadow: var(--ring), inset 0 0 0 1.5px rgba(255, 255, 255, 0.9);
 }
 
-/* Match-any-only emphasis (see pillHTML in app.js for exactly when this
-   class gets added): once a Type is active, mute the *other* Type pills'
-   color/opacity so the active selection reads clearly against the rest,
-   rather than sitting in a wall of equally-bold fills. Purely visual —
-   no change to layout, hit target, or the count/hide logic above; the
-   pill stays exactly as clickable as ever. filter (not just opacity)
-   pulls the saturation down too, since these pills are a solid hue fill
-   rather than plain text — opacity alone would just look translucent,
-   not "muted." */
 .pill[data-filter="type"].pill-type-muted {
   opacity: 0.45;
   filter: saturate(0.35);
 }
 
-/* Organization gets its own soft, muted light-blue identity — distinct
-   from Type's per-value hue coding and Subtype's neutral gray — built on
-   --accent/--accent-2 (the same navy/slate pair .seg-btn[aria-pressed=
-   "true"] already uses for a deliberately muted selected tone, rather
-   than a solid fill) so it reads as "on brand" instead of an arbitrary
-   new color. Text stays --accent (navy) in both states rather than the
-   lighter --accent-2 — against a background this pale, --accent-2 comes
-   in under 4:1 contrast, short of WCAG AA's 4.5:1 for this size text;
-   --accent clears it with comfortable room in both states. Selected just
-   deepens the tint and switches the border to --accent-2, rather than
-   any bold/saturated fill — a modest escalation to stay legible as
-   "this one's picked," not a different color language. */
 .pill[data-filter="org"] {
   color: var(--accent);
   background: var(--accent-soft);
@@ -855,9 +628,6 @@ kbd {
 .pill.is-empty { opacity: 0.34; }
 .pill.is-empty:hover { transform: none; }
 
-/* Trailing "+N more" pill in a preview row — same shape/size as a real
-   filter pill, but dashed and accent-colored so it reads as an action
-   ("there's more, tap to see it") rather than a selectable value. */
 .pill-more {
   color: var(--accent-2);
   border-style: dashed;
@@ -870,21 +640,13 @@ kbd {
   background: var(--accent-soft);
 }
 
-/* ---------- Match-mode toggle (Type ↔ Subtype: all vs. any) ---------- */
+/* ---------- Segmented control (Browse / Clear filters) ---------- */
 
 .segmented {
-  /* Without this, the grid item stretches to fill the .fgroup column on
-     wide screens, turning the pill into an oversized bar with a big empty
-     gap next to the two buttons. */
   justify-self: start;
   display: inline-flex;
   border: 1px solid var(--border);
   border-radius: 999px;
-  /* No padding/gap: the two buttons fill the pill edge-to-edge and meet
-     at a center divider (below), reading as one split pill rather than
-     two separate button shapes. */
-  /* Muted by default, same reasoning as .filter-group-box — a supporting
-     control, not competing with the search bar for attention. */
   background: color-mix(in srgb, var(--surface) 55%, var(--bg));
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -908,14 +670,9 @@ kbd {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* Radius only on the outer edge each button touches, so together the
-   pair still traces the container's single pill outline. */
 .seg-btn:first-child { border-radius: 999px 0 0 999px; }
-.seg-btn:last-child { border-radius: 0 999px 999px 0; }
+.seg-btn:last-child  { border-radius: 0 999px 999px 0; }
 
-/* Center divider — the "split down the middle" line the two halves meet
-   at. A plain border (not overflow:hidden clipping) so the focus ring on
-   either button still renders in full, uncut. */
 .seg-btn:last-child::before {
   content: "";
   position: absolute;
@@ -929,15 +686,21 @@ kbd {
 .seg-btn:hover { color: var(--text); }
 .seg-btn:focus-visible { outline: none; box-shadow: var(--ring); z-index: 1; }
 
-/* Muted selected tone (accent-soft + accent text) instead of a solid
-   navy fill — the old solid --accent/white combo visually outweighed
-   the search bar and everything else around it. */
 .seg-btn[aria-pressed="true"] {
   color: var(--accent);
   background: var(--accent-soft);
   font-weight: 640;
 }
 
+#clear-filters:disabled {
+  opacity: 0.45;
+  cursor: default;
+  color: var(--text-3);
+}
+#clear-filters:disabled:hover {
+  color: var(--text-3);
+  background: transparent;
+}
 
 /* ---------- Status bar / breadcrumbs ---------- */
 
@@ -994,23 +757,6 @@ kbd {
 
 /* ---------- Grid + cards ---------- */
 
-/* auto-fit (not auto-fill) so a sparse result set — e.g. after filtering
-   down to one or two cards on a wide screen — reflows into the freed
-   columns instead of leaving them as dead empty tracks. The upper bound
-   must stay a flexible 1fr, not a fixed length: auto-fit/auto-fill uses
-   that upper bound (when it's a definite length) to decide how many
-   columns fit at all, so a fixed cap there quietly collapses tablet/
-   laptop widths to fewer columns than the 288px minimum alone would
-   allow. The 420px cap on .card below does the "don't stretch edge to
-   edge" job instead, without touching the column count. */
-/* stretch (the grid default) rather than start: every card in a row
-   fills that row's height to match its tallest member, instead of
-   sizing to its own content and leaving a ragged bottom edge. .meta's
-   margin-top:auto (below) then anchors Organization to the bottom of
-   that stretched box, so the leftover space collapses into the gap
-   between the description and Organization rather than trailing empty
-   space after everything. No-op on mobile: the grid is forced to a
-   single column there, so each "row" only ever has one card to match. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
@@ -1035,10 +781,6 @@ kbd {
     box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
-/* Caps how wide a card can stretch when its grid track ends up unusually
-   wide (a sparse filtered result on a wide screen). Scoped above the
-   forced-single-column breakpoint so a lone phone-width card still fills
-   the full row instead of leaving a gap. */
 @media (min-width: 721px) {
   .card { max-width: 420px; }
 }
@@ -1048,15 +790,16 @@ kbd {
   to { opacity: 1; transform: none; }
 }
 
-/* Type colour stripe */
 .card::before {
   content: "";
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
   background: hsl(var(--type-h) var(--type-s) var(--type-l));
   opacity: 0.9;
-  transition: width 0.2s ease;
+  transition: height 0.2s ease;
 }
 
 .card:hover,
@@ -1067,7 +810,7 @@ kbd {
   z-index: 2;
 }
 
-.card:hover::before { width: 6px; }
+.card:hover::before { height: 6px; }
 .card:focus-visible { outline: none; box-shadow: var(--ring), var(--shadow-lg); }
 
 .card-head {
@@ -1151,21 +894,8 @@ kbd {
   overflow: hidden;
 }
 
-/* Uncapped-height growth here would feed back into row sizing: with
-   .grid's align-items:stretch, every card's height is now driven by the
-   tallest card in its row, so an unbounded reveal on one hover (some
-   descriptions run 4-6x the 3-line clamp) would drag every sibling in
-   that row taller along with it — a jarring "everyone changed size
-   because I hovered one card" flicker. Capping at ~7 lines with its own
-   scroll keeps growth modest and predictable, while still fully
-   revealing the large majority of descriptions with no scrolling at all
-   (13.5px font x 1.58 line-height x 7 lines ≈ 150px). */
 .card:hover .desc,
 .card:focus-within .desc {
-  /* display:block fully exits the -webkit-box clamp model (same reset
-     the touch media query below already uses) rather than layering
-     max-height/overflow-y:auto on top of it, which is safer than relying
-     on scroll behavior within the legacy -webkit-box display mode. */
   display: block;
   -webkit-line-clamp: unset;
   line-clamp: unset;
@@ -1173,11 +903,6 @@ kbd {
   overflow-y: auto;
 }
 
-/* Secondary metadata (Organization) — always visible, not just on hover;
-   same spot and style at the bottom of the card. margin-top:auto (rather
-   than a fixed value) anchors it to the bottom of the card's box, so on
-   a row-stretched card (see .grid) any leftover space collapses into the
-   gap above it instead of trailing empty space below it. */
 .meta {
   padding-left: 6px;
   margin-top: auto;
@@ -1199,7 +924,6 @@ kbd {
 .meta-item svg { flex: none; opacity: 0.75; }
 .meta-item .v { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Copy-link button — appears on hover */
 .copy {
   flex: none;
   border: 1px solid var(--border);
@@ -1227,16 +951,12 @@ kbd {
 .copy:focus-visible { outline: none; box-shadow: var(--ring); }
 .copy.copied { color: #0a7d55; border-color: #a9e3cb; background: #e3f7ee; }
 
-/* Touch devices have no hover, so nothing may hide behind it: show the copy
-   button and the full description outright (.meta is always visible now,
-   on every input type, so it needs no override here). */
 @media (hover: none) {
   .copy { opacity: 1; transform: none; }
   .desc { -webkit-line-clamp: unset; line-clamp: unset; display: block; overflow: visible; }
   .card:active { transform: scale(0.985); box-shadow: var(--shadow-md); }
 }
 
-/* Search-match highlight */
 mark {
   background: #fff2a8;
   color: inherit;
@@ -1245,7 +965,6 @@ mark {
   font-weight: 620;
 }
 
-/* Tag-hover cross-highlighting */
 .grid.dimming .card { opacity: 0.32; filter: saturate(0.5); }
 .grid.dimming .card.tag-match {
   opacity: 1;
@@ -1254,17 +973,10 @@ mark {
   box-shadow: var(--shadow-md);
 }
 
-/* Random-pick flicker: each intermediate candidate is a brand-new DOM
-   node (render() replaces the grid's innerHTML every tick — see
-   pickRandom() in app.js), so it only exists for ~90ms. Suppressing the
-   base .card entrance animation on it is what makes the swap read as a
-   crisp strobe instead of a blur of overlapping fade-ins. */
 .card.cycling {
   animation: none;
 }
 
-/* The final landed pick: a quick scale/fade-in distinct from the plain
-   .card entrance the rest of the grid uses, plus the glow pulse below. */
 .card.settle-in {
   animation: settleIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both, flash 1.5s ease 0.05s;
 }
@@ -1378,33 +1090,20 @@ mark {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 720px) {
-  /* Belt-and-suspenders against horizontal scroll/pan on mobile: any
-     descendant that's even a little wider than the viewport (the
-     .info-btn tooltip below was one concrete case) would otherwise let
-     the whole page shift sideways on a diagonal touch-scroll. overflow-x
-     only — overflow-y is left at its default (visible/auto) so normal
-     vertical scrolling, and pinch-to-zoom (governed by the viewport meta
-     tag, untouched here), both keep working exactly as before. Set on
-     both html and body since iOS Safari and Chrome don't agree on which
-     of the two is "the" scrolling element. */
   html, body { overflow-x: hidden; }
 
-  /* Horizontal padding stays governed by the fluid clamp() on .wrap so it
-     keeps scaling smoothly instead of jumping at this one breakpoint. */
   .wrap { padding-top: 10px; padding-bottom: 72px; }
 
-  /* Smaller, tighter-lined intro so the tagline sentence takes less room
-     before the Start Here toggle. */
   .intro { margin: 0 0 6px; font-size: 13px; line-height: 1.35; }
   .intro-lead { font-size: 15px; }
 
-  .start-here-toggle { font-size: 12.5px; padding: 8px 12px; margin: 0 0 8px; }
+  .start-here-toggle {
+    top: 12px;
+    right: 12px;
+    font-size: 12.5px;
+    padding: 7px 10px;
+  }
 
-  /* Start Here: tighter box padding/margins, and 2 cards per row instead
-     of 1 so the section takes roughly half the vertical space it did
-     stacked full-width. Cards with longer copy (e.g. "Explore
-     organizations...") will run a couple of lines taller than their
-     row-mate — an acceptable trade-off for halving the row count. */
   .start-here { margin: 0 0 8px; padding: 8px 10px 10px; }
   .start-here-title { margin: 0 0 6px; font-size: 17px; }
   .start-here-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -1413,67 +1112,23 @@ mark {
   .fgroup { grid-template-columns: 1fr; gap: 6px; }
   .fgroup > .flabel { padding-top: 0; }
 
-  /* The desktop tooltip anchors to .info-btn itself (23px wide) and
-     extends up to 320px rightward from whatever x-position the icon
-     lands at — on a full-width desktop row that's harmless, but on a
-     narrow phone the icon usually sits two-thirds of the way across the
-     row (after "Match all"/"Match any"), so the tooltip would run far
-     past the right edge of the viewport, forcing a horizontal scrollbar
-     even while the tooltip itself is invisible (opacity:0, but still
-     part of layout). Re-anchoring to .match-row instead of .info-btn —
-     and centering rather than left-aligning — keeps it within a box
-     that's already guaranteed to fit the viewport, regardless of where
-     the icon itself falls inside that row. */
-  .info-btn { position: static; }
-  .info-btn .tooltip {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%) translateY(-4px);
-    max-width: min(300px, calc(100% - 24px));
-  }
-  .info-btn:hover .tooltip,
-  .info-btn:focus-visible .tooltip,
-  .info-btn.info-open .tooltip {
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* Two rows on mobile, not one (matches fitPreviewRow's maxRows in
-     app.js, which measures against this same budget) — a single long
-     top-ranked label (some Subtype/Organization values run 40+
-     characters) can already fill an entire narrow-phone row alone,
-     which meant capping at 1 row often left those two categories with
-     zero visible pills before "+N more" while Type, whose top labels
-     are shorter, still showed one. Mobile's own .pill override further
-     down renders pills at 36px tall (vs. 30px on desktop) with the same
-     4px row-gap: row 2 runs 40-76px, row 3 would start at 80px; 78px
-     sits in that gap, showing exactly two clean rows. */
   .filters-preview .pills {
     max-height: 78px;
     overflow: hidden;
   }
+
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
   .slash-hint kbd { display: none; }
 
-  /* 16px minimum stops iOS Safari zooming the page on focus */
   #search { font-size: 16px; padding: 12px 44px 12px 40px; }
 
   .searchbox { flex: 1 1 100%; }
 
-  /* Random resource drops to its own full-width row under the search box
-     instead of sitting cramped beside it. */
   .searchrow #random {
     flex: 1 1 100%;
     justify-content: center;
   }
 
-  /* Hide the (small, compact) search bar on scroll-down, reveal it on
-     scroll-up — mobile only, gated by this media query rather than a JS
-     width check, so no amount of class-toggling in app.js has any visual
-     effect above 720px. Transform + opacity only, never height/padding:
-     a pure compositor animation with no layout recalculation, which is
-     what keeps it smooth. app.js throttles + thresholds the scroll
-     listener so this class only flips on a real directional scroll, not
-     on every pixel of jitter. */
   .controls {
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1487,43 +1142,8 @@ mark {
     pointer-events: none;
   }
 
-  /* Single column, and Browse/Clear filters move up to sit right under
-     Match — permanently reachable near the top on every load, collapsed
-     or expanded, rather than trailing after a pill wall that can run
-     much longer than one screen (their .filter-actions styling itself,
-     row direction and button sizing, comes from the rule further down —
-     this only changes where the row sits). */
-  .filter-bar {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "match"
-      "actions"
-      "tags";
-  }
-
-  .filter-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .filter-actions .btn {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 11px 10px;
-    font-size: 13.5px;
-  }
-
-  /* A "0" count means no matches given the *other* active filters —
-     hide the tag outright rather than showing it grayed out, EXCEPT
-     for Subtype/Organization tags while Match all is active (see
-     pillHTML in app.js for the full reasoning: those need the
-     .pill-may-hide class present too, which app.js only adds there in
-     Match any, or for Type in either mode). Re-renders on every filter
-     or match-mode change, so which tags are eligible to hide updates
-     live right along with everything else. */
   .pill.is-empty.pill-may-hide { display: none; }
 
-  /* Comfortable tap targets (~40px) */
   .pill { padding: 9px 14px; font-size: 13.5px; }
   .tag { padding: 6.5px 12px; font-size: 12px; }
   .crumb { padding: 7px 8px 7px 13px; font-size: 13px; }
@@ -1536,11 +1156,8 @@ mark {
   .site-header-inner { padding: 14px 14px; }
   .brand { gap: 10px; }
   .brand-logo { height: 38px; padding: 5px 9px; }
-  /* Small enough that the full title settles into 2 lines instead of
-     wrapping awkwardly across 3. */
   .brand-name { font-size: 15px; line-height: 1.22; }
 
-  /* Wrap the creator rather than truncating it — there's room in one column */
   .meta-item .v { white-space: normal; }
 }
 
@@ -1599,7 +1216,6 @@ mark {
   line-height: 1.55;
 }
 
-/* Long titles must never push the layout sideways */
 .card h3, .desc { overflow-wrap: anywhere; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1630,4 +1246,11 @@ footer.foot {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+/* Hide all Random-resource UI */
+#random,
+#back-to-all,
+#another-random {
+  display: none !important;
 }

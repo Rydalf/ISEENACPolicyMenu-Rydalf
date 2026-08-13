@@ -3,49 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Resource Menu · Environmental Epidemiology</title>
+<title>ISEE NAC EH Policy Resource Dashboard</title>
 <meta name="description" content="A searchable menu of policy, advocacy, and civic-engagement resources for environmental epidemiologists.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
 <header class="site-header">
   <div class="site-header-inner">
     <div class="brand">
-      <img class="brand-logo" src="img/isee-logo.png" alt="ISEE North America">
-      <h1 class="brand-name">Environmental Epidemiology Policy Engagement Resource Menu</h1>
+      <img class="brand-logo" src="img/isee-logo-2.png" alt="ISEE North America">
+      <h1 class="brand-name">Environmental Health Local Policy Resource Dashboard</h1>
     </div>
+
+    <button class="start-here-toggle" id="start-here-toggle" type="button"
+            aria-expanded="false" aria-controls="start-here-section">
+      <span class="start-here-toggle-text">
+        <strong>New to environmental health advocacy?</strong>
+      </span>
+      <svg class="chevron" width="30" height="30" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.4"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
   </div>
 </header>
 
 <div class="wrap">
-
-  <p class="intro"><span class="intro-lead">A searchable library of guides, databases, legal resources, and advocacy tools for turning environmental health science into policy and action.</span></p>
-
-  <button class="start-here-toggle" id="start-here-toggle" type="button" aria-expanded="false" aria-controls="start-here-section">
-    <span class="start-here-toggle-text"><strong>New to environmental health advocacy?</strong> Click here to use the shortcuts below to find a starting point.</span>
-    <svg class="chevron" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-  </button>
+  <p class="intro">
+    <span class="intro-lead">
+      A searchable database of guides, legal resources, and advocacy tools for
+      turning environmental health science into policy and action.
+    </span>
+  </p>
 
   <section class="start-here" id="start-here-section" aria-labelledby="start-here-heading" hidden>
     <h2 id="start-here-heading" class="start-here-title">
       <span class="start-here-icon" id="start-here-icon" aria-hidden="true"></span>
-      Start here
+      Try some pre-selected resources!
     </h2>
     <div class="start-here-grid" id="start-here">
       <button class="start-card" type="button" data-pathway="new-to-advocacy" aria-pressed="false">
-        <span class="start-card-title">New to advocacy? Start here</span>
-        <span class="start-card-desc">Foundational guides and orientation for getting started.</span>
+        <span class="start-card-title">New to advocacy? Start here:</span>
+        <span class="start-card-desc">Foundational guides and orientations for getting started.</span>
       </button>
       <button class="start-card" type="button" data-pathway="contact-policymaker" aria-pressed="false">
         <span class="start-card-title">Want to contact a policymaker?</span>
         <span class="start-card-desc">Tools and templates for reaching elected officials directly.</span>
       </button>
       <button class="start-card" type="button" data-pathway="guides" aria-pressed="false">
-        <span class="start-card-title">Looking for guides</span>
+        <span class="start-card-title">Looking for detailed guides?</span>
         <span class="start-card-desc">Step-by-step how-tos on advocacy, communication, and civic engagement.</span>
       </button>
       <button class="start-card" type="button" data-pathway="organizations" aria-pressed="false">
-        <span class="start-card-title">Explore organizations to get involved with</span>
+        <span class="start-card-title">Get involved with other organizations:</span>
         <span class="start-card-desc">Networks and programs where you can plug in and take part.</span>
       </button>
     </div>
@@ -60,85 +72,86 @@
                placeholder="Search resources, creators, descriptions…">
         <span class="slash-hint">
           <button class="clear-search" id="clear-search" type="button" aria-label="Clear search">×</button>
-          <kbd>/</kbd>
         </span>
       </div>
       <button class="btn" id="random" type="button">Random resource</button>
     </div>
   </div>
 
-  <!-- .match-row, .filter-actions, and .filter-bar-tags are all direct
-       children of this single grid (see .filter-bar in styles.css) so
-       they can be freely repositioned per breakpoint via grid-area,
-       independent of their source order below. Source order itself is
-       chosen for tab order: actions right after Match, ahead of the
-       (often much longer) tags, so keyboard users reach Browse/Clear
-       filters early on every screen size, not just visually on mobile. -->
   <div class="filter-bar" id="filter-bar">
-      <div class="match-row">
-        <span class="flabel" id="lbl-match">Match</span>
-        <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
-          <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
-          <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
-        </div>
-        <button class="info-btn" id="match-info" type="button" aria-label="What do Match all and Match any mean?">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="11" x2="12" y2="16"></line>
-            <circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"></circle>
-          </svg>
-          <span class="tooltip" role="tooltip">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</span>
+    <div class="match-row">
+      <span class="flabel" id="lbl-match">Filters</span>
+
+      <div class="segmented" id="filter-actions" role="group" aria-labelledby="lbl-match">
+        <button
+          class="seg-btn"
+          id="filter-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="filters-typesub filters-org"
+        >
+          <span id="filter-toggle-label">Browse filters</span>
+          <span class="badge" id="filter-badge"></span>
+        </button>
+
+        <button
+          class="seg-btn"
+          id="clear-filters"
+          type="button"
+          disabled
+        >
+          Clear filters
         </button>
       </div>
+    </div>
 
-      <div class="filter-actions">
-        <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
-          <span id="filter-toggle-label">Browse filters</span><span class="badge" id="filter-badge"></span>
-        </button>
-        <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
-      </div>
-
-      <div class="filter-bar-tags">
-        <div class="filter-group-box">
-          <div class="filters-preview" id="filters-preview-typesub">
-            <div class="fgroup">
-              <span class="flabel" id="lbl-type-preview">Type</span>
-              <div class="pills" id="type-pills-preview" role="group" aria-labelledby="lbl-type-preview"></div>
-            </div>
-            <div class="fgroup" id="sub-fgroup-preview">
-              <span class="flabel" id="lbl-sub-preview">Subtype</span>
-              <div class="pills" id="sub-pills-preview" role="group" aria-labelledby="lbl-sub-preview"></div>
-            </div>
+    <div class="filter-bar-tags">
+      <div class="filter-group-box">
+        <div class="filters-preview" id="filters-preview-typesub">
+          <div class="fgroup">
+            <span class="flabel" id="lbl-type-preview">Type</span>
+            <div class="pills" id="type-pills-preview" role="group"
+                 aria-labelledby="lbl-type-preview"></div>
           </div>
-
-          <div class="filters" id="filters-typesub">
-            <div class="fgroup">
-              <span class="flabel" id="lbl-type">Type</span>
-              <div class="pills" id="type-pills" role="group" aria-labelledby="lbl-type"></div>
-            </div>
-            <div class="fgroup" id="sub-fgroup">
-              <span class="flabel" id="lbl-sub">Subtype</span>
-              <div class="pills" id="sub-pills" role="group" aria-labelledby="lbl-sub"></div>
-            </div>
+          <div class="fgroup" id="sub-fgroup-preview">
+            <span class="flabel" id="lbl-sub-preview">Subtype</span>
+            <div class="pills" id="sub-pills-preview" role="group"
+                 aria-labelledby="lbl-sub-preview"></div>
           </div>
         </div>
 
-        <div class="filter-group-box">
-          <div class="filters-preview" id="filters-preview-org">
-            <div class="fgroup">
-              <span class="flabel" id="lbl-org-preview">Organization</span>
-              <div class="pills" id="org-pills-preview" role="group" aria-labelledby="lbl-org-preview"></div>
-            </div>
+        <div class="filters" id="filters-typesub">
+          <div class="fgroup">
+            <span class="flabel" id="lbl-type">Type</span>
+            <div class="pills" id="type-pills" role="group"
+                 aria-labelledby="lbl-type"></div>
           </div>
-
-          <div class="filters" id="filters-org">
-            <div class="fgroup" id="org-fgroup">
-              <span class="flabel" id="lbl-org">Organization</span>
-              <div class="pills" id="org-pills" role="group" aria-labelledby="lbl-org"></div>
-            </div>
+          <div class="fgroup" id="sub-fgroup">
+            <span class="flabel" id="lbl-sub">Subtype</span>
+            <div class="pills" id="sub-pills" role="group"
+                 aria-labelledby="lbl-sub"></div>
           </div>
         </div>
       </div>
+
+      <div class="filter-group-box">
+        <div class="filters-preview" id="filters-preview-org">
+          <div class="fgroup">
+            <span class="flabel" id="lbl-org-preview">Organization</span>
+            <div class="pills" id="org-pills-preview" role="group"
+                 aria-labelledby="lbl-org-preview"></div>
+          </div>
+        </div>
+
+        <div class="filters" id="filters-org">
+          <div class="fgroup" id="org-fgroup">
+            <span class="flabel" id="lbl-org">Organization</span>
+            <div class="pills" id="org-pills" role="group"
+                 aria-labelledby="lbl-org"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="statusbar">

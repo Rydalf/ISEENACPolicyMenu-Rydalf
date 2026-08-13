@@ -342,22 +342,7 @@
   // would pass if that value were included in state[listKey] — added to
   // whatever's already selected there, never replacing it — combined
   // with the *other* facets' current selections under the current
-  // matchMode. This is what makes every tag's count answer "how many
-  // results if I picked this too," live, including tags in the same
-  // facet the count belongs to (Type tags updating as other Types are
-  // (de)selected, not just as Subtype/Organization change) — unlike a
-  // simpler "skip this facet entirely" approach, which would show what
-  // swapping to just this value alone would give, ignoring whatever
-  // else is already picked in the same facet.
-  //
-  // A value already selected needs no such simulation — since it's
-  // already included, "if it were included" is just the current,
-  // unmodified result count. Computed up front, before any of the loop
-  // below's temporary mutations, and reused for every already-selected
-  // value in the facet (matching how they're all already contributing
-  // to that same number) — computing it lazily on first use inside the
-  // loop instead would risk grabbing it *after* some other value's
-  // temporary state.types/subs/orgs mutation was already in place.
+  // matchMode.
   function countIncluding(listKey, field) {
     var counts = Object.create(null);
     var original = state[listKey];
@@ -403,33 +388,7 @@
 
   function pillHTML(value, count, active, kind) {
     var isEmpty = count === 0;
-    // On mobile, a 0-count tag is otherwise hidden entirely (see
-    // .pill.is-empty.pill-may-hide in styles.css) rather than just grayed
-    // out, to keep the wall shorter to scroll. But in Match all, a
-    // Subtype/Organization tag routinely hits 0 simply because it
-    // doesn't overlap with whatever Type/Org is currently selected —
-    // hiding it would erase the only visible cue that the combination is
-    // unsatisfiable, leaving "Clear filters" as the only way back rather
-    // than picking a different value. Match any doesn't have that
-    // problem: adding filters there only ever adds matches, never
-    // removes them, so a 0-count tag genuinely has zero matches across
-    // the *entire* dataset — hiding stays the right default there, and
-    // for Type in either mode (narrowing into a Type is the primary,
-    // broader move, so its own 0-count case isn't given the same
-    // "always visible" treatment as the finer-grained facets).
     var mayHide = isEmpty && (kind === "type" || state.matchMode === "any");
-    // Purely a visual emphasis, not a hide/count change (see mayHide
-    // above for that): in Match any, once at least one Type is active,
-    // the *un*selected Type pills get muted so the active one(s) read as
-    // the current selection at a glance instead of blending into a wall
-    // of equally-bold color. Only kicks in for Match any — active is
-    // meaningful there without narrowing anything else out (Match any
-    // just adds matches), whereas in Match all every active Type is
-    // already the sole determinant of which Types even have results, so
-    // there's no "which one did I pick" ambiguity to resolve. Never
-    // applies to the active pill(s) themselves, and never touches
-    // clickability — still a plain opacity/saturation style on an
-    // otherwise fully interactive button.
     var typeMuted =
       kind === "type" &&
       !active &&
@@ -457,11 +416,6 @@
     );
   }
 
-  // Trailing "+N more" pill appended to a preview row whenever it's
-  // hiding real values — styled like the other pills (via the shared
-  // .pill class) so it reads as part of the same row, but it isn't a
-  // filter itself: clicking it just opens "Browse filters" (see the
-  // el.filterBar delegated click handler below), same as the button.
   function moreTagHTML(hiddenCount, label) {
     if (hiddenCount <= 0) return "";
     return (
@@ -473,51 +427,10 @@
     );
   }
 
-  // Default-visible pill preview: the top N by count, plus whatever's
-  // already active (even if it'd otherwise fall outside the top N) — so an
-  // active filter never silently drops out of view when the full wall is
-  // collapsed. `sorted` is filtered rather than resliced so the preview
-  // keeps the same count-based order as the full list.
-  //
-  // TRYING: counts sized to roughly fill a single row at a typical desktop
-  // width instead of ~3 rows, paired with a matching CSS max-height clamp
-  // on .filters-preview .pills as a backstop against spilling into a
-  // partial second row. This is an approximation, not an exact fit — it
-  // depends on viewport width and label lengths, and doesn't (yet) measure
-  // actual layout to size the "+N more" count precisely. Subtype and
-  // Organization get lower counts than Type because their labels run
-  // longer (e.g. "Policy Maker Outreach and/or comment writing"), so fewer
-  // fit per row.
   var PREVIEW_TYPE_COUNT = 6;
   var PREVIEW_SUB_COUNT = 4;
   var PREVIEW_ORG_COUNT = 3;
 
-  // Corrects the guess above against the real, laid-out DOM: walks the
-  // preview row that was just rendered and drops real pills from the end
-  // (skipping any that are an active filter — those stay put even if it
-  // means tolerating a wrap, same rule as previewSubset above) until the
-  // trailing "+N more" pill actually lands within the allowed row budget
-  // instead of being wrapped past it and clipped out of view by the
-  // .filters-preview .pills max-height rule in styles.css. This is what
-  // makes "+N more" show up reliably on mobile — a narrower viewport plus
-  // bigger touch-target pill padding means the desktop-tuned counts above
-  // often don't fit — without having to hardcode a second set of guessed
-  // mobile counts (which would still break for the small number of
-  // Subtype/Organization values, e.g. "Policy Maker Outreach and/or
-  // comment writing", whose labels alone can approach a phone's full
-  // width). Desktop stays visually unchanged: the guessed counts already
-  // fit within its 1-row budget today, so this pass has nothing to trim.
-  //
-  // Mobile gets a 2-row budget (matching the taller max-height in that
-  // media query in styles.css), not 1: a single long top-ranked label —
-  // "Policy Maker Outreach and/or comment writing" is a real Subtype
-  // value — can already fill an entire narrow-phone row by itself, and
-  // capping at 1 row there meant Subtype/Organization often collapsed to
-  // zero visible pills (just "+N more" alone) while Type, whose top
-  // labels happen to be shorter, still showed one — an inconsistent
-  // preview across the three categories for no reason a visitor could
-  // see. A second row gives every category "however many top pills
-  // actually fit in 1-2 lines" instead of hard-capping at 1.
   function fitPreviewRow(container, totalCount, label, isActiveFn) {
     var maxRows =
       window.matchMedia && window.matchMedia("(max-width: 720px)").matches ? 2 : 1;
@@ -525,20 +438,13 @@
     var pills = Array.prototype.slice
       .call(container.querySelectorAll(".pill:not(.pill-more)"))
       .filter(function (p) {
-        return p.offsetParent !== null; // skip CSS-hidden (zero-count) pills
+        return p.offsetParent !== null;
       });
     if (!pills.length) return;
 
     var hidden = totalCount - pills.length;
     var moreEl = container.querySelector(".pill-more");
 
-    // The offsetTop where row (maxRows + 1) begins — anything at or past
-    // it has spilled outside the allowed budget. Rows are a uniform
-    // height (.pills doesn't override flexbox's default align-items:
-    // stretch), so every pill sharing a visual row reports the same
-    // offsetTop; the (maxRows + 1)-th distinct value marks the cutoff.
-    // Recomputed after each removal since the remaining pills can reflow
-    // to fill the freed slot, shifting later rows up.
     function cutoffTop() {
       var rows = [];
       for (var i = 0; i < pills.length; i++) {
@@ -574,9 +480,6 @@
       return;
     }
 
-    // Re-render "+N more" with the corrected count, then re-check: its
-    // width can shift slightly (e.g. "+3 more" -> "+14 more"), rarely
-    // enough to itself tip past the row budget.
     var guard = pills.length + 1;
     while (guard-- > 0) {
       if (moreEl) moreEl.parentNode.removeChild(moreEl);
@@ -600,11 +503,6 @@
     });
   }
 
-  // Selected values sort first (in click order doesn't matter — just
-  // "selected" as a group, then alphabetical within it isn't needed
-  // since there's rarely more than a couple), then everything else by
-  // live count desc, alpha tiebreak — same ordering rule reused for
-  // Type, Subtype, and Organization below.
   function bySelectionThenCount(counts, activeList) {
     return function (a, b) {
       var aActive = activeList.indexOf(a) !== -1;
@@ -638,16 +536,6 @@
       return state.types.indexOf(v) !== -1;
     });
 
-    // Subtype only makes sense once a Type has narrowed things down —
-    // with none selected, "every Subtype in the whole dataset" is a
-    // wall with little relation to what's actually being browsed, so
-    // the section stays hidden entirely rather than showing it empty
-    // or full. Once at least one Type is active, only Subtypes that
-    // literally co-occur with one of the selected Type(s) *somewhere*
-    // in the raw data are shown — a structural fact independent of
-    // Match mode, search, or Organization, unlike subCounts (which
-    // *does* respect all of those, and still drives the number on each
-    // surviving tag).
     var typeIsActive = state.types.length > 0;
     el.subFgroup.hidden = !typeIsActive;
     el.subFgroupPreview.hidden = !typeIsActive;
@@ -682,9 +570,6 @@
       return state.subs.indexOf(v) !== -1;
     });
 
-    // "Organization" in the UI is the Creator column underneath — same
-    // sort, preview, zero-count, and Match all/any pattern as Type and
-    // Subtype (though it has no Type-style gating of its own).
     var allOrgs = {};
     ALL.forEach(function (r) {
       if (r.creator) allOrgs[r.creator] = true;
@@ -803,9 +688,6 @@
   }
 
   function render() {
-    el.matchAllBtn.setAttribute("aria-pressed", state.matchMode === "all" ? "true" : "false");
-    el.matchAnyBtn.setAttribute("aria-pressed", state.matchMode === "any" ? "true" : "false");
-
     renderFilters();
     renderStartHere();
     renderCrumbs();
@@ -825,16 +707,9 @@
     }
     el.backToAll.hidden = !randomPick;
     el.anotherRandom.hidden = !randomPick;
-    // Re-roll needs at least one match in the filtered set, regardless of
-    // whether we're currently narrowed to a single random pick.
     el.random.disabled = filtered.length === 0;
-    // While viewing a random pick, Clear filters exits that view even if
-    // there's otherwise nothing to clear (see its handler below) — so it
-    // must stay enabled in that case too, not just when a real filter is
-    // active.
     el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
 
-    // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
     el.filterBadge.textContent = activePills ? String(activePills) : "";
 
@@ -897,7 +772,6 @@
       }
       toast("Link copied");
     }
-    // Clipboard API needs a secure context; fall back for file:// use.
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(ok, function () {
         legacyCopy(text) ? ok() : toast("Couldn't copy — press ⌘C");
@@ -985,19 +859,14 @@
       }
     });
 
-    // Start Here disclosure: collapsed on every load, for every visitor —
-    // no persistence, so this line is the only way back in once dismissed.
-    // hidden is the source of truth; aria-expanded just mirrors it for
-    // assistive tech, and the CSS chevron rotation reads that same attribute.
+    // Start Here disclosure
     el.startHereToggle.addEventListener("click", function () {
       var willOpen = el.startHereSection.hidden;
       el.startHereSection.hidden = !willOpen;
       el.startHereToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
     });
 
-    // "Start Here" pathway cards: pre-apply Type/Subtype filters as a
-    // guided shortcut into the same filter system the pills use, replacing
-    // whatever filters/search were already active for a clean result.
+    // "Start Here" pathway cards
     el.startHere.addEventListener("click", function (e) {
       var card = e.target.closest(".start-card");
       if (!card) return;
@@ -1013,10 +882,7 @@
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar). While viewing a
-    // random pick, this exits that view only — same as "Back to all
-    // resources" — rather than also clearing search/filters the pick
-    // itself doesn't touch; otherwise it's the normal full clear.
+    // Clear-filters button
     el.clearFilters.addEventListener("click", function () {
       if (randomPick) {
         exitRandomPick();
@@ -1027,9 +893,7 @@
       el.search.focus();
     });
 
-    // Filter pills (delegated on the filter bar — the pills' actual
-    // container since it moved out of #controls to be a plain, never-
-    // sticky sibling; #controls now holds only the compact search row).
+    // Filter pills (delegated)
     el.filterBar.addEventListener("click", function (e) {
       var more = e.target.closest(".pill-more");
       if (more) {
@@ -1039,29 +903,6 @@
       var p = e.target.closest(".pill");
       if (!p) return;
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
-    });
-
-    // Match-mode toggle: how Type/Subtype/Organization selections combine
-    el.matchMode.addEventListener("click", function (e) {
-      var b = e.target.closest(".seg-btn");
-      if (!b) return;
-      var mode = b.getAttribute("data-mode");
-      if (mode === state.matchMode) return;
-      state.matchMode = mode;
-      exitRandomPick();
-      render();
-    });
-
-    // Match-mode info tooltip: :hover/:focus-visible in CSS already
-    // reveal it for mouse and keyboard. Touch has no :hover, so a tap
-    // needs to explicitly open *and* close it — toggle a class here, and
-    // close it on any click elsewhere.
-    el.matchInfo.addEventListener("click", function (e) {
-      e.stopPropagation();
-      el.matchInfo.classList.toggle("info-open");
-    });
-    document.addEventListener("click", function () {
-      el.matchInfo.classList.remove("info-open");
     });
 
     // Breadcrumbs (and the empty-state "clear all" button)
@@ -1103,7 +944,7 @@
         applyFilterClick(tag.getAttribute("data-filter"), tag.getAttribute("data-value"));
         return;
       }
-      if (e.target.closest("a")) return; // let the title link work normally
+      if (e.target.closest("a")) return;
       var card = e.target.closest(".card[data-url]");
       if (card) window.open(card.getAttribute("data-url"), "_blank", "noopener");
     });
@@ -1114,9 +955,7 @@
       if (card && e.target === card) window.open(card.getAttribute("data-url"), "_blank", "noopener");
     });
 
-    // Hovering any Type/Subtype tag highlights every card sharing it.
-    // Skipped on touch devices: tapping there synthesises a mouseover and would
-    // leave the grid dimmed with no way to un-hover.
+    // Tag hover highlight (non-touch only)
     var canHover =
       !window.matchMedia || window.matchMedia("(hover: hover)").matches;
 
@@ -1136,11 +975,7 @@
       });
     }
 
-    // Filters disclosure (visible on narrow screens only). .filter-bar is
-    // plain in-flow content (never sticky, unlike the compact search bar
-    // in #controls), so expanding it to its full, possibly-viewport-
-    // exceeding height needs no special-casing here — it just pushes
-    // page content down and scrolls normally.
+    // Filters disclosure (narrow screens)
     el.filterToggle.addEventListener("click", function () {
       var open = !el.filterBar.classList.contains("filters-open");
       el.filterBar.classList.toggle("filters-open", open);
@@ -1148,41 +983,21 @@
       el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
-    // Random resource: narrows the grid to a single pick drawn from the
-    // *currently filtered* results, not always all 65 — so it stays
-    // relevant to whatever search/filters are already active rather than
-    // potentially handing back something outside the current narrowing.
-    // Shared by the main button and "Another random resource" (shown only
-    // while a pick is already up), so re-rolling works the same from
-    // either place — currentResults() ignores randomPick, so this always
-    // draws from the full filtered pool even while narrowed to one card.
-    //
-    // Before landing on the final pick, it flickers through a handful of
-    // quick candidate frames (a plain rapid swap — each is a fresh DOM
-    // node from render(), so there's no time for a per-frame transition to
-    // play, which is what keeps it feeling like a strobe rather than a
-    // series of slow fades). rollId lets an interruption (typing in
-    // search, clearing filters, clicking Back to all, etc. — anything that
-    // calls exitRandomPick) cancel an in-flight flicker instead of having
-    // it clobber whatever that action just rendered a moment later.
+    // Random resource
     function pickRandom() {
       var results = currentResults();
       if (!results.length) return;
 
-      // A rapid strobe of swapping content is itself a motion/flash
-      // concern independent of CSS animation, so it's skipped outright
-      // (not just slowed) for prefers-reduced-motion — landing on the
-      // final pick immediately, same as before this feature existed.
       var reduced =
         window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       var myRoll = ++rollId;
-      var flickers = reduced ? 0 : 5 + Math.floor(Math.random() * 3); // 5-7 frames, ~450-630ms
+      var flickers = reduced ? 0 : 5 + Math.floor(Math.random() * 3);
       var delay = 90;
       var count = 0;
 
       function tick() {
-        if (myRoll !== rollId) return; // superseded — abort this chain
+        if (myRoll !== rollId) return;
         count++;
         var landing = count > flickers;
         randomPick = results[Math.floor(Math.random() * results.length)];
@@ -1190,7 +1005,7 @@
         var card = el.grid.children[0];
         if (card) {
           if (landing) {
-            void card.offsetWidth; // restart the animation
+            void card.offsetWidth;
             card.classList.add("settle-in");
           } else {
             card.classList.add("cycling");
@@ -1210,28 +1025,12 @@
     el.random.addEventListener("click", pickRandom);
     el.anotherRandom.addEventListener("click", pickRandom);
 
-    // Leaves the single-pick view without touching search/filter state.
     el.backToAll.addEventListener("click", function () {
       exitRandomPick();
       render();
     });
 
-    // Sticky-header shadow, plus (mobile only — see the matching
-    // max-width:720px media query in styles.css) hiding the compact
-    // search bar on scroll-down and revealing it on scroll-up. This class
-    // toggle runs unconditionally on every screen size, but only has any
-    // visual effect where that media query applies, so "mobile only" is
-    // guaranteed by CSS rather than by a JS width check here.
-    //
-    // Threshold + throttle, deliberately not a per-frame/per-pixel
-    // handler: we only look at scroll position on a timer (every
-    // SCROLL_CHECK_MS), and only act once the position has moved more
-    // than SCROLL_THRESHOLD px since the last time we acted. Small
-    // jitter — trackpad micro-movements, momentum-scroll deceleration —
-    // never touches the class at all, which is what earlier per-pixel/
-    // tiny-delta attempts got wrong and caused visible flicker. A slow
-    // steady scroll still accumulates past the threshold and triggers
-    // normally; it just takes a couple of checks to get there.
+    // Sticky controls behavior
     var SCROLL_CHECK_MS = 120;
     var SCROLL_THRESHOLD = 24;
     var sentinel = el.controls.offsetTop;
@@ -1258,8 +1057,6 @@
         el.controls.classList.remove("controls-hidden");
         lastActedY = y;
       }
-      // Otherwise: within the threshold, keep accumulating — lastActedY
-      // stays put so small back-and-forth movement never fires either.
     }
 
     window.addEventListener(
@@ -1271,11 +1068,6 @@
       { passive: true }
     );
 
-    // Re-render the filter preview rows on resize — fitPreviewRow (see
-    // above) measures actual pixel layout, so any width change (a phone
-    // rotating, a desktop window being dragged narrower) can change how
-    // many preview pills fit on one line, not just crossing the 720px
-    // breakpoint.
     var resizeCheckTimer = null;
     window.addEventListener(
       "resize",
@@ -1292,8 +1084,6 @@
 
   /* ---------------- boot ---------------- */
 
-  // Deliberately reaches for the DOM directly rather than the cached `el`, so it
-  // still works if boot() failed before those lookups happened.
   function showError(msg, detail) {
     var grid = document.getElementById("grid");
     var count = document.getElementById("count");
@@ -1311,7 +1101,6 @@
     return esc((e && (e.message || e.name)) || String(e));
   }
 
-  // Last resort: never leave the user staring at "Loading…" with no explanation.
   if (typeof window !== "undefined" && window.addEventListener) {
     window.addEventListener("error", function (ev) {
       var count = document.getElementById("count");
@@ -1332,7 +1121,6 @@
     )
       .sort()
       .forEach(function (t, i) {
-        // Offset each wrap so new Types stay visually distinct past 16.
         var shift = 13 * Math.floor(i / HUES.length);
         typeHue[t] = (HUES[i % HUES.length] + shift) % 360;
       });
@@ -1368,10 +1156,6 @@
       filterToggle: $("filter-toggle"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
-      matchMode: $("match-mode"),
-      matchAllBtn: $("match-all-btn"),
-      matchAnyBtn: $("match-any-btn"),
-      matchInfo: $("match-info"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),
@@ -1383,7 +1167,8 @@
 
     var missing = [];
     for (var k in el) {
-      if (Object.prototype.hasOwnProperty.call(el, k) && !el[k]) missing.push(k);
+      if (!Object.prototype.hasOwnProperty.call(el, k)) continue;
+      if (!el[k]) missing.push(k);
     }
     if (missing.length) {
       showError(
@@ -1396,17 +1181,11 @@
     try {
       $("search-icon").innerHTML = ICON.search;
       el.random.insertAdjacentHTML("afterbegin", ICON.dice);
-      // Same dice icon as "Random resource" — visually ties the two
-      // random-pick actions together now that "Another random resource"
-      // has its own distinct pink/magenta styling (see .btn-random).
       el.anotherRandom.insertAdjacentHTML("afterbegin", ICON.dice);
-      $("start-here-icon").innerHTML = ICON.compass;
     } catch (e) {
       /* icons are decorative — never block startup on them */
     }
 
-    // Standalone build: the data is already here, so render synchronously.
-    // No promises, no network, nothing that can leave the page hanging.
     var embedded = typeof window !== "undefined" && window.__RESOURCES__;
     if (embedded && embedded.length) {
       try {
@@ -1417,7 +1196,6 @@
       return;
     }
 
-    // Dev preview only: read the CSV over HTTP.
     var devHint = function (err) {
       var viaFile =
         typeof location !== "undefined" && location.protocol === "file:";
@@ -1443,8 +1221,6 @@
         .then(function (text) {
           start(rowsToRecords(parseCSV(text)));
         })
-        // A single .catch also covers anything start() throws, so a render
-        // error surfaces instead of vanishing into an unhandled rejection.
         .catch(function (err) {
           showError("Couldn't load the resource data.", devHint(err));
         });
@@ -1458,4 +1234,52 @@
   } else {
     boot();
   }
+})();
+
+// --- Auto-close Start Here panel on mouse leave (desktop-ish pointers) ---
+(function () {
+  const toggle = document.getElementById('start-here-toggle');
+  const panel  = document.getElementById('start-here-section');
+
+  if (!toggle || !panel) return;
+
+  const supportsHover = window.matchMedia('(hover: hover)').matches;
+  if (!supportsHover) return;
+
+  let inside = false;
+  let hideTimer = null;
+
+  function setExpanded(expanded) {
+    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    if (expanded) {
+      panel.removeAttribute('hidden');
+    } else {
+      panel.setAttribute('hidden', '');
+    }
+  }
+
+  function scheduleHide() {
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (!inside) setExpanded(false);
+    }, 120);
+  }
+
+  function onEnter() {
+    inside = true;
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
+  function onLeave() {
+    inside = false;
+    scheduleHide();
+  }
+
+  toggle.addEventListener('mouseenter', onEnter);
+  toggle.addEventListener('mouseleave', onLeave);
+  panel.addEventListener('mouseenter', onEnter);
+  panel.addEventListener('mouseleave', onLeave);
 })();
