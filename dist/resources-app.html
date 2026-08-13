@@ -491,10 +491,10 @@ kbd {
 /* Match all/any is a persistent control, not part of the collapse — it
    always applies across whichever facets are active, so it stays visible
    regardless of whether the boxes below are showing their preview or the
-   full pill wall. Label, toggle, and info icon sit on one line at every
-   width (unlike .fgroup, which stacks on mobile) — there's nothing here
-   that needs the room a stacked layout buys, and staying inline keeps
-   this row's footprint minimal. */
+   full pill wall. Toggle and info icon sit on one line at every width
+   (unlike .fgroup, which stacks on mobile) — there's nothing here that
+   needs the room a stacked layout buys, and staying inline keeps this
+   row's footprint minimal. */
 .match-row {
   grid-area: match;
   display: flex;
@@ -506,6 +506,23 @@ kbd {
      the viewport, unlike the tiny 23px info-btn itself, which the tooltip
      is anchored to at every other width. */
   position: relative;
+}
+
+/* "MATCH" spelled out is redundant with the pill labels themselves
+   ("Match all" / "Match any") right next to it, at every width — visually-
+   hidden rather than removed so .segmented's aria-labelledby (see
+   index.html) still has real text to announce. Matches .visually-hidden's
+   technique (see that rule). */
+.match-row .flabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Small circular (i) button that reveals the Match all/any explanation
@@ -1361,23 +1378,6 @@ mark {
       "match"
       "actions"
       "tags";
-  }
-
-  /* "MATCH" spelled out is redundant with the pill labels themselves
-     ("Match all" / "Match any") and just eats into a row that's already
-     tight next to the info icon — visually-hidden rather than removed so
-     .segmented's aria-labelledby (see index.html) still has real text to
-     announce. Matches .visually-hidden's technique (see that rule). */
-  .match-row .flabel {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
   }
 
   .filter-actions {
