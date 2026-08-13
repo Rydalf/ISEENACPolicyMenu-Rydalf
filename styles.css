@@ -860,11 +860,19 @@ kbd {
    laptop widths to fewer columns than the 288px minimum alone would
    allow. The 420px cap on .card below does the "don't stretch edge to
    edge" job instead, without touching the column count. */
+/* stretch (the grid default) rather than start: every card in a row
+   fills that row's height to match its tallest member, instead of
+   sizing to its own content and leaving a ragged bottom edge. .meta's
+   margin-top:auto (below) then anchors Organization to the bottom of
+   that stretched box, so the leftover space collapses into the gap
+   between the description and Organization rather than trailing empty
+   space after everything. No-op on mobile: the grid is forced to a
+   single column there, so each "row" only ever has one card to match. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
   gap: clamp(14px, 1.6vw, 20px);
-  align-items: start;
+  align-items: stretch;
 }
 
 .card {
@@ -1004,17 +1012,37 @@ kbd {
   overflow: hidden;
 }
 
+/* Uncapped-height growth here would feed back into row sizing: with
+   .grid's align-items:stretch, every card's height is now driven by the
+   tallest card in its row, so an unbounded reveal on one hover (some
+   descriptions run 4-6x the 3-line clamp) would drag every sibling in
+   that row taller along with it — a jarring "everyone changed size
+   because I hovered one card" flicker. Capping at ~7 lines with its own
+   scroll keeps growth modest and predictable, while still fully
+   revealing the large majority of descriptions with no scrolling at all
+   (13.5px font x 1.58 line-height x 7 lines ≈ 150px). */
 .card:hover .desc,
 .card:focus-within .desc {
-  -webkit-line-clamp: 30;
-  line-clamp: 30;
+  /* display:block fully exits the -webkit-box clamp model (same reset
+     the touch media query below already uses) rather than layering
+     max-height/overflow-y:auto on top of it, which is safer than relying
+     on scroll behavior within the legacy -webkit-box display mode. */
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  max-height: 150px;
+  overflow-y: auto;
 }
 
 /* Secondary metadata (Organization) — always visible, not just on hover;
-   same spot and style at the bottom of the card as before. */
+   same spot and style at the bottom of the card. margin-top:auto (rather
+   than a fixed value) anchors it to the bottom of the card's box, so on
+   a row-stretched card (see .grid) any leftover space collapses into the
+   gap above it instead of trailing empty space below it. */
 .meta {
   padding-left: 6px;
-  margin-top: 11px;
+  margin-top: auto;
+  padding-top: 11px;
 }
 
 .meta-inner {
