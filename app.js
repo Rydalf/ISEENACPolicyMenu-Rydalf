@@ -431,8 +431,8 @@
   // preview row that was just rendered and drops real pills from the end
   // (skipping any that are an active filter — those stay put even if it
   // means tolerating a wrap, same rule as previewSubset above) until the
-  // trailing "+N more" pill actually lands on the first line instead of
-  // being wrapped to a second line and clipped out of view by the
+  // trailing "+N more" pill actually lands within the allowed row budget
+  // instead of being wrapped past it and clipped out of view by the
   // .filters-preview .pills max-height rule in styles.css. This is what
   // makes "+N more" show up reliably on mobile — a narrower viewport plus
   // bigger touch-target pill padding means the desktop-tuned counts above
@@ -441,8 +441,22 @@
   // Subtype/Organization values, e.g. "Policy Maker Outreach and/or
   // comment writing", whose labels alone can approach a phone's full
   // width). Desktop stays visually unchanged: the guessed counts already
-  // fit there today, so this pass has nothing to trim.
+  // fit within its 1-row budget today, so this pass has nothing to trim.
+  //
+  // Mobile gets a 2-row budget (matching the taller max-height in that
+  // media query in styles.css), not 1: a single long top-ranked label —
+  // "Policy Maker Outreach and/or comment writing" is a real Subtype
+  // value — can already fill an entire narrow-phone row by itself, and
+  // capping at 1 row there meant Subtype/Organization often collapsed to
+  // zero visible pills (just "+N more" alone) while Type, whose top
+  // labels happen to be shorter, still showed one — an inconsistent
+  // preview across the three categories for no reason a visitor could
+  // see. A second row gives every category "however many top pills
+  // actually fit in 1-2 lines" instead of hard-capping at 1.
   function fitPreviewRow(container, totalCount, label, isActiveFn) {
+    var maxRows =
+      window.matchMedia && window.matchMedia("(max-width: 720px)").matches ? 2 : 1;
+
     var pills = Array.prototype.slice
       .call(container.querySelectorAll(".pill:not(.pill-more)"))
       .filter(function (p) {
@@ -450,9 +464,31 @@
       });
     if (!pills.length) return;
 
-    var rowTop = pills[0].offsetTop;
     var hidden = totalCount - pills.length;
     var moreEl = container.querySelector(".pill-more");
+
+    // The offsetTop where row (maxRows + 1) begins — anything at or past
+    // it has spilled outside the allowed budget. Rows are a uniform
+    // height (.pills doesn't override flexbox's default align-items:
+    // stretch), so every pill sharing a visual row reports the same
+    // offsetTop; the (maxRows + 1)-th distinct value marks the cutoff.
+    // Recomputed after each removal since the remaining pills can reflow
+    // to fill the freed slot, shifting later rows up.
+    function cutoffTop() {
+      var rows = [];
+      for (var i = 0; i < pills.length; i++) {
+        if (rows.indexOf(pills[i].offsetTop) === -1) rows.push(pills[i].offsetTop);
+      }
+      if (moreEl && rows.indexOf(moreEl.offsetTop) === -1) rows.push(moreEl.offsetTop);
+      rows.sort(function (a, b) {
+        return a - b;
+      });
+      return rows.length > maxRows ? rows[maxRows] : Infinity;
+    }
+
+    function tailOffsetTop() {
+      return moreEl ? moreEl.offsetTop : pills[pills.length - 1].offsetTop;
+    }
 
     function dropOneRealPill() {
       var idx = pills.length - 1;
@@ -464,7 +500,7 @@
       return true;
     }
 
-    while (pills.length && (moreEl || pills[pills.length - 1]).offsetTop > rowTop) {
+    while (pills.length && tailOffsetTop() >= cutoffTop()) {
       if (!dropOneRealPill()) break;
     }
 
@@ -475,13 +511,13 @@
 
     // Re-render "+N more" with the corrected count, then re-check: its
     // width can shift slightly (e.g. "+3 more" -> "+14 more"), rarely
-    // enough to itself tip onto a second line.
+    // enough to itself tip past the row budget.
     var guard = pills.length + 1;
     while (guard-- > 0) {
       if (moreEl) moreEl.parentNode.removeChild(moreEl);
       container.insertAdjacentHTML("beforeend", moreTagHTML(hidden, label));
       moreEl = container.querySelector(".pill-more");
-      if (!moreEl || moreEl.offsetTop <= rowTop) break;
+      if (!moreEl || moreEl.offsetTop < cutoffTop()) break;
       if (!dropOneRealPill()) break;
     }
   }
@@ -702,6 +738,7 @@
     // must stay enabled in that case too, not just when a real filter is
     // active.
     el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
+    el.clearFiltersTop.disabled = el.clearFilters.disabled;
 
     // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
@@ -882,11 +919,13 @@
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar). While viewing a
-    // random pick, this exits that view only — same as "Back to all
-    // resources" — rather than also clearing search/filters the pick
+    // Clear-filters button (next to the search bar), plus its mobile-only
+    // duplicate near the top of the expanded filter wall (see
+    // .clear-filters-top in styles.css) — same handler for both. While
+    // viewing a random pick, this exits that view only — same as "Back to
+    // all resources" — rather than also clearing search/filters the pick
     // itself doesn't touch; otherwise it's the normal full clear.
-    el.clearFilters.addEventListener("click", function () {
+    function handleClearFilters() {
       if (randomPick) {
         exitRandomPick();
       } else {
@@ -894,7 +933,9 @@
       }
       render();
       el.search.focus();
-    });
+    }
+    el.clearFilters.addEventListener("click", handleClearFilters);
+    el.clearFiltersTop.addEventListener("click", handleClearFilters);
 
     // Filter pills (delegated on the filter bar — the pills' actual
     // container since it moved out of #controls to be a plain, never-
@@ -1232,6 +1273,7 @@
       subPillsPreview: $("sub-pills-preview"),
       orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
+      clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),

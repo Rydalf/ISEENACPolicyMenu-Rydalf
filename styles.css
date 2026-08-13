@@ -1,6 +1,12 @@
 /* Resource Menu — environmental epidemiology policy & advocacy resources */
 
 :root {
+  /* This page is light-only by design — see the note below the palette
+     for why there's no dark-mode variant of it. Telling the browser that
+     explicitly also stops it from dark-moding form controls/scrollbars
+     on top of that. */
+  color-scheme: light;
+
   --bg: #f6f7f9;
   --surface: #ffffff;
   --surface-2: #f1f3f6;
@@ -39,30 +45,10 @@
   --random-l: 38%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1116;
-    --surface: #171b22;
-    --surface-2: #1e242d;
-    --border: #272e39;
-    --border-strong: #38414f;
-    --text: #e8ecf2;
-    --text-2: #a3adbb;
-    --text-3: #78828f;
-    --accent: #7fa8c9;
-    --accent-2: #a9c6de;
-    --accent-soft: color-mix(in srgb, var(--accent) 22%, var(--surface));
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.6);
-    --ring: 0 0 0 3px rgba(127, 168, 201, 0.35);
-    --type-s: 55%;
-    --type-l: 66%;
-    --type-tint-l: 20%;
-    --random-s: 62%;
-    --random-l: 54%;
-  }
-}
+/* Deliberately no @media (prefers-color-scheme: dark) override anywhere
+   in this file — the design has only ever been built and tested in light
+   mode, so a visitor with a dark-mode OS/browser setting used to get an
+   unintended, untested mix of colors instead of it. */
 
 * { box-sizing: border-box; }
 
@@ -560,6 +546,12 @@ kbd {
   pointer-events: auto;
 }
 
+/* Hidden by default everywhere — only shown (see the mobile media query
+   below) on narrow screens while the full pill wall is expanded, as a
+   second, higher-up copy of #clear-filters for when that wall runs long
+   enough to push the original below the fold. */
+.clear-filters-top { display: none; }
+
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
    buttons stay top-aligned rather than stretching to fill it. */
@@ -990,10 +982,6 @@ kbd {
   border-color: hsl(var(--type-h) var(--type-s) var(--type-l) / 0.28);
 }
 
-@media (prefers-color-scheme: dark) {
-  .tag.type { color: hsl(var(--type-h) var(--type-s) calc(var(--type-l) + 12%)); }
-}
-
 .tag.sub {
   color: var(--text-2);
   background: var(--surface-2);
@@ -1111,10 +1099,6 @@ mark {
   font-weight: 620;
 }
 
-@media (prefers-color-scheme: dark) {
-  mark { background: #6a5a12; color: #ffeeb0; }
-}
-
 /* Tag-hover cross-highlighting */
 .grid.dimming .card { opacity: 0.32; filter: saturate(0.5); }
 .grid.dimming .card.tag-match {
@@ -1224,10 +1208,6 @@ mark {
   border-radius: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .error-box { border-color: #5e2626; background: #2a1414; color: #ff9d9d; }
-}
-
 /* Toast */
 .toast {
   position: fixed;
@@ -1248,10 +1228,6 @@ mark {
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-@media (prefers-color-scheme: dark) {
-  .toast { background: #e8ecf2; color: #131720; }
-}
 
 /* ---------- Responsive ---------- */
 
@@ -1315,13 +1291,18 @@ mark {
     transform: translateX(-50%) translateY(0);
   }
 
-  /* TRYING (matches the base rule): clamp each preview category to a
-     single row on mobile too, using mobile's own pill height — the
-     mobile-only .pill override further down renders pills at 36px tall
-     (vs. 30px on desktop) with the same 4px row-gap, so row 2 would start
-     at 40px; 38px sits in that gap, showing exactly one clean row. */
+  /* Two rows on mobile, not one (matches fitPreviewRow's maxRows in
+     app.js, which measures against this same budget) — a single long
+     top-ranked label (some Subtype/Organization values run 40+
+     characters) can already fill an entire narrow-phone row alone,
+     which meant capping at 1 row often left those two categories with
+     zero visible pills before "+N more" while Type, whose top labels
+     are shorter, still showed one. Mobile's own .pill override further
+     down renders pills at 36px tall (vs. 30px on desktop) with the same
+     4px row-gap: row 2 runs 40-76px, row 3 would start at 80px; 78px
+     sits in that gap, showing exactly two clean rows. */
   .filters-preview .pills {
-    max-height: 38px;
+    max-height: 78px;
     overflow: hidden;
   }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
@@ -1364,6 +1345,17 @@ mark {
      beside them, and the buttons share a row evenly instead of forming a
      tall column. */
   .filter-bar-lower { grid-template-columns: 1fr; }
+
+  /* Only earns its place once the wall it's meant to shortcut past is
+     actually showing — collapsed, #clear-filters right below "Browse
+     filters" is already close enough that a duplicate would just be
+     clutter. */
+  .filter-bar.filters-open .clear-filters-top {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    margin: 8px 0 2px;
+  }
 
   .filter-actions {
     flex-direction: row;

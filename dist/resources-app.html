@@ -9,6 +9,12 @@
 /* Resource Menu — environmental epidemiology policy & advocacy resources */
 
 :root {
+  /* This page is light-only by design — see the note below the palette
+     for why there's no dark-mode variant of it. Telling the browser that
+     explicitly also stops it from dark-moding form controls/scrollbars
+     on top of that. */
+  color-scheme: light;
+
   --bg: #f6f7f9;
   --surface: #ffffff;
   --surface-2: #f1f3f6;
@@ -47,30 +53,10 @@
   --random-l: 38%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1116;
-    --surface: #171b22;
-    --surface-2: #1e242d;
-    --border: #272e39;
-    --border-strong: #38414f;
-    --text: #e8ecf2;
-    --text-2: #a3adbb;
-    --text-3: #78828f;
-    --accent: #7fa8c9;
-    --accent-2: #a9c6de;
-    --accent-soft: color-mix(in srgb, var(--accent) 22%, var(--surface));
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.6);
-    --ring: 0 0 0 3px rgba(127, 168, 201, 0.35);
-    --type-s: 55%;
-    --type-l: 66%;
-    --type-tint-l: 20%;
-    --random-s: 62%;
-    --random-l: 54%;
-  }
-}
+/* Deliberately no @media (prefers-color-scheme: dark) override anywhere
+   in this file — the design has only ever been built and tested in light
+   mode, so a visitor with a dark-mode OS/browser setting used to get an
+   unintended, untested mix of colors instead of it. */
 
 * { box-sizing: border-box; }
 
@@ -568,6 +554,12 @@ kbd {
   pointer-events: auto;
 }
 
+/* Hidden by default everywhere — only shown (see the mobile media query
+   below) on narrow screens while the full pill wall is expanded, as a
+   second, higher-up copy of #clear-filters for when that wall runs long
+   enough to push the original below the fold. */
+.clear-filters-top { display: none; }
+
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
    buttons stay top-aligned rather than stretching to fill it. */
@@ -998,10 +990,6 @@ kbd {
   border-color: hsl(var(--type-h) var(--type-s) var(--type-l) / 0.28);
 }
 
-@media (prefers-color-scheme: dark) {
-  .tag.type { color: hsl(var(--type-h) var(--type-s) calc(var(--type-l) + 12%)); }
-}
-
 .tag.sub {
   color: var(--text-2);
   background: var(--surface-2);
@@ -1119,10 +1107,6 @@ mark {
   font-weight: 620;
 }
 
-@media (prefers-color-scheme: dark) {
-  mark { background: #6a5a12; color: #ffeeb0; }
-}
-
 /* Tag-hover cross-highlighting */
 .grid.dimming .card { opacity: 0.32; filter: saturate(0.5); }
 .grid.dimming .card.tag-match {
@@ -1232,10 +1216,6 @@ mark {
   border-radius: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .error-box { border-color: #5e2626; background: #2a1414; color: #ff9d9d; }
-}
-
 /* Toast */
 .toast {
   position: fixed;
@@ -1256,10 +1236,6 @@ mark {
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-@media (prefers-color-scheme: dark) {
-  .toast { background: #e8ecf2; color: #131720; }
-}
 
 /* ---------- Responsive ---------- */
 
@@ -1323,13 +1299,18 @@ mark {
     transform: translateX(-50%) translateY(0);
   }
 
-  /* TRYING (matches the base rule): clamp each preview category to a
-     single row on mobile too, using mobile's own pill height — the
-     mobile-only .pill override further down renders pills at 36px tall
-     (vs. 30px on desktop) with the same 4px row-gap, so row 2 would start
-     at 40px; 38px sits in that gap, showing exactly one clean row. */
+  /* Two rows on mobile, not one (matches fitPreviewRow's maxRows in
+     app.js, which measures against this same budget) — a single long
+     top-ranked label (some Subtype/Organization values run 40+
+     characters) can already fill an entire narrow-phone row alone,
+     which meant capping at 1 row often left those two categories with
+     zero visible pills before "+N more" while Type, whose top labels
+     are shorter, still showed one. Mobile's own .pill override further
+     down renders pills at 36px tall (vs. 30px on desktop) with the same
+     4px row-gap: row 2 runs 40-76px, row 3 would start at 80px; 78px
+     sits in that gap, showing exactly two clean rows. */
   .filters-preview .pills {
-    max-height: 38px;
+    max-height: 78px;
     overflow: hidden;
   }
   .grid, .skeleton-grid { grid-template-columns: 1fr; }
@@ -1372,6 +1353,17 @@ mark {
      beside them, and the buttons share a row evenly instead of forming a
      tall column. */
   .filter-bar-lower { grid-template-columns: 1fr; }
+
+  /* Only earns its place once the wall it's meant to shortcut past is
+     actually showing — collapsed, #clear-filters right below "Browse
+     filters" is already close enough that a duplicate would just be
+     clutter. */
+  .filter-bar.filters-open .clear-filters-top {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    margin: 8px 0 2px;
+  }
 
   .filter-actions {
     flex-direction: row;
@@ -1578,6 +1570,12 @@ footer.foot {
           <span class="tooltip" role="tooltip">Match all: a resource needs every active filter (Type, Subtype, Organization) · Match any: any one is enough</span>
         </button>
       </div>
+
+      <!-- Mobile-only, and only while the full pill wall is expanded (see
+           .clear-filters-top in styles.css) — a second, reachable-without-
+           scrolling copy of #clear-filters below, for when that wall runs
+           long enough to push the original one off-screen. -->
+      <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
 
       <div class="filter-bar-lower">
       <div class="filter-bar-tags">
@@ -2172,8 +2170,8 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   // preview row that was just rendered and drops real pills from the end
   // (skipping any that are an active filter — those stay put even if it
   // means tolerating a wrap, same rule as previewSubset above) until the
-  // trailing "+N more" pill actually lands on the first line instead of
-  // being wrapped to a second line and clipped out of view by the
+  // trailing "+N more" pill actually lands within the allowed row budget
+  // instead of being wrapped past it and clipped out of view by the
   // .filters-preview .pills max-height rule in styles.css. This is what
   // makes "+N more" show up reliably on mobile — a narrower viewport plus
   // bigger touch-target pill padding means the desktop-tuned counts above
@@ -2182,8 +2180,22 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   // Subtype/Organization values, e.g. "Policy Maker Outreach and/or
   // comment writing", whose labels alone can approach a phone's full
   // width). Desktop stays visually unchanged: the guessed counts already
-  // fit there today, so this pass has nothing to trim.
+  // fit within its 1-row budget today, so this pass has nothing to trim.
+  //
+  // Mobile gets a 2-row budget (matching the taller max-height in that
+  // media query in styles.css), not 1: a single long top-ranked label —
+  // "Policy Maker Outreach and/or comment writing" is a real Subtype
+  // value — can already fill an entire narrow-phone row by itself, and
+  // capping at 1 row there meant Subtype/Organization often collapsed to
+  // zero visible pills (just "+N more" alone) while Type, whose top
+  // labels happen to be shorter, still showed one — an inconsistent
+  // preview across the three categories for no reason a visitor could
+  // see. A second row gives every category "however many top pills
+  // actually fit in 1-2 lines" instead of hard-capping at 1.
   function fitPreviewRow(container, totalCount, label, isActiveFn) {
+    var maxRows =
+      window.matchMedia && window.matchMedia("(max-width: 720px)").matches ? 2 : 1;
+
     var pills = Array.prototype.slice
       .call(container.querySelectorAll(".pill:not(.pill-more)"))
       .filter(function (p) {
@@ -2191,9 +2203,31 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       });
     if (!pills.length) return;
 
-    var rowTop = pills[0].offsetTop;
     var hidden = totalCount - pills.length;
     var moreEl = container.querySelector(".pill-more");
+
+    // The offsetTop where row (maxRows + 1) begins — anything at or past
+    // it has spilled outside the allowed budget. Rows are a uniform
+    // height (.pills doesn't override flexbox's default align-items:
+    // stretch), so every pill sharing a visual row reports the same
+    // offsetTop; the (maxRows + 1)-th distinct value marks the cutoff.
+    // Recomputed after each removal since the remaining pills can reflow
+    // to fill the freed slot, shifting later rows up.
+    function cutoffTop() {
+      var rows = [];
+      for (var i = 0; i < pills.length; i++) {
+        if (rows.indexOf(pills[i].offsetTop) === -1) rows.push(pills[i].offsetTop);
+      }
+      if (moreEl && rows.indexOf(moreEl.offsetTop) === -1) rows.push(moreEl.offsetTop);
+      rows.sort(function (a, b) {
+        return a - b;
+      });
+      return rows.length > maxRows ? rows[maxRows] : Infinity;
+    }
+
+    function tailOffsetTop() {
+      return moreEl ? moreEl.offsetTop : pills[pills.length - 1].offsetTop;
+    }
 
     function dropOneRealPill() {
       var idx = pills.length - 1;
@@ -2205,7 +2239,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       return true;
     }
 
-    while (pills.length && (moreEl || pills[pills.length - 1]).offsetTop > rowTop) {
+    while (pills.length && tailOffsetTop() >= cutoffTop()) {
       if (!dropOneRealPill()) break;
     }
 
@@ -2216,13 +2250,13 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
 
     // Re-render "+N more" with the corrected count, then re-check: its
     // width can shift slightly (e.g. "+3 more" -> "+14 more"), rarely
-    // enough to itself tip onto a second line.
+    // enough to itself tip past the row budget.
     var guard = pills.length + 1;
     while (guard-- > 0) {
       if (moreEl) moreEl.parentNode.removeChild(moreEl);
       container.insertAdjacentHTML("beforeend", moreTagHTML(hidden, label));
       moreEl = container.querySelector(".pill-more");
-      if (!moreEl || moreEl.offsetTop <= rowTop) break;
+      if (!moreEl || moreEl.offsetTop < cutoffTop()) break;
       if (!dropOneRealPill()) break;
     }
   }
@@ -2443,6 +2477,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     // must stay enabled in that case too, not just when a real filter is
     // active.
     el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
+    el.clearFiltersTop.disabled = el.clearFilters.disabled;
 
     // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
@@ -2623,11 +2658,13 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar). While viewing a
-    // random pick, this exits that view only — same as "Back to all
-    // resources" — rather than also clearing search/filters the pick
+    // Clear-filters button (next to the search bar), plus its mobile-only
+    // duplicate near the top of the expanded filter wall (see
+    // .clear-filters-top in styles.css) — same handler for both. While
+    // viewing a random pick, this exits that view only — same as "Back to
+    // all resources" — rather than also clearing search/filters the pick
     // itself doesn't touch; otherwise it's the normal full clear.
-    el.clearFilters.addEventListener("click", function () {
+    function handleClearFilters() {
       if (randomPick) {
         exitRandomPick();
       } else {
@@ -2635,7 +2672,9 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       }
       render();
       el.search.focus();
-    });
+    }
+    el.clearFilters.addEventListener("click", handleClearFilters);
+    el.clearFiltersTop.addEventListener("click", handleClearFilters);
 
     // Filter pills (delegated on the filter bar — the pills' actual
     // container since it moved out of #controls to be a plain, never-
@@ -2973,6 +3012,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       subPillsPreview: $("sub-pills-preview"),
       orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
+      clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
