@@ -427,6 +427,65 @@
   var PREVIEW_SUB_COUNT = 4;
   var PREVIEW_ORG_COUNT = 3;
 
+  // Corrects the guess above against the real, laid-out DOM: walks the
+  // preview row that was just rendered and drops real pills from the end
+  // (skipping any that are an active filter — those stay put even if it
+  // means tolerating a wrap, same rule as previewSubset above) until the
+  // trailing "+N more" pill actually lands on the first line instead of
+  // being wrapped to a second line and clipped out of view by the
+  // .filters-preview .pills max-height rule in styles.css. This is what
+  // makes "+N more" show up reliably on mobile — a narrower viewport plus
+  // bigger touch-target pill padding means the desktop-tuned counts above
+  // often don't fit — without having to hardcode a second set of guessed
+  // mobile counts (which would still break for the small number of
+  // Subtype/Organization values, e.g. "Policy Maker Outreach and/or
+  // comment writing", whose labels alone can approach a phone's full
+  // width). Desktop stays visually unchanged: the guessed counts already
+  // fit there today, so this pass has nothing to trim.
+  function fitPreviewRow(container, totalCount, label, isActiveFn) {
+    var pills = Array.prototype.slice
+      .call(container.querySelectorAll(".pill:not(.pill-more)"))
+      .filter(function (p) {
+        return p.offsetParent !== null; // skip CSS-hidden (zero-count) pills
+      });
+    if (!pills.length) return;
+
+    var rowTop = pills[0].offsetTop;
+    var hidden = totalCount - pills.length;
+    var moreEl = container.querySelector(".pill-more");
+
+    function dropOneRealPill() {
+      var idx = pills.length - 1;
+      while (idx >= 0 && isActiveFn(pills[idx].getAttribute("data-value"))) idx--;
+      if (idx < 0) return false;
+      pills[idx].parentNode.removeChild(pills[idx]);
+      pills.splice(idx, 1);
+      hidden++;
+      return true;
+    }
+
+    while (pills.length && (moreEl || pills[pills.length - 1]).offsetTop > rowTop) {
+      if (!dropOneRealPill()) break;
+    }
+
+    if (hidden <= 0) {
+      if (moreEl) moreEl.parentNode.removeChild(moreEl);
+      return;
+    }
+
+    // Re-render "+N more" with the corrected count, then re-check: its
+    // width can shift slightly (e.g. "+3 more" -> "+14 more"), rarely
+    // enough to itself tip onto a second line.
+    var guard = pills.length + 1;
+    while (guard-- > 0) {
+      if (moreEl) moreEl.parentNode.removeChild(moreEl);
+      container.insertAdjacentHTML("beforeend", moreTagHTML(hidden, label));
+      moreEl = container.querySelector(".pill-more");
+      if (!moreEl || moreEl.offsetTop <= rowTop) break;
+      if (!dropOneRealPill()) break;
+    }
+  }
+
   function previewSubset(sorted, active, count) {
     var keep = Object.create(null);
     sorted.slice(0, count).forEach(function (v) {
@@ -462,6 +521,9 @@
           return pillHTML(t, typeCounts[t] || 0, state.types.indexOf(t) !== -1, "type");
         })
         .join("") + moreTagHTML(types.length - typePreview.length, "Type");
+    fitPreviewRow(el.typePillsPreview, types.length, "Type", function (v) {
+      return state.types.indexOf(v) !== -1;
+    });
 
     var allSubs = {};
     ALL.forEach(function (r) {
@@ -483,6 +545,9 @@
           return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
         })
         .join("") + moreTagHTML(subs.length - subPreview.length, "Subtype");
+    fitPreviewRow(el.subPillsPreview, subs.length, "Subtype", function (v) {
+      return state.subs.indexOf(v) !== -1;
+    });
 
     // "Organization" in the UI is the Creator column underneath — same
     // top-by-count sort, preview, zero-count, and Match all/any pattern as
@@ -507,6 +572,9 @@
           return pillHTML(o, orgCounts[o] || 0, state.orgs.indexOf(o) !== -1, "org");
         })
         .join("") + moreTagHTML(orgs.length - orgPreview.length, "Organization");
+    fitPreviewRow(el.orgPillsPreview, orgs.length, "Organization", function (v) {
+      return state.orgs.indexOf(v) !== -1;
+    });
   }
 
   function renderStartHere() {
@@ -1068,6 +1136,24 @@
       function () {
         if (scrollCheckTimer) return;
         scrollCheckTimer = setTimeout(checkScroll, SCROLL_CHECK_MS);
+      },
+      { passive: true }
+    );
+
+    // Re-render the filter preview rows on resize — fitPreviewRow (see
+    // above) measures actual pixel layout, so any width change (a phone
+    // rotating, a desktop window being dragged narrower) can change how
+    // many preview pills fit on one line, not just crossing the 720px
+    // breakpoint.
+    var resizeCheckTimer = null;
+    window.addEventListener(
+      "resize",
+      function () {
+        if (resizeCheckTimer) return;
+        resizeCheckTimer = setTimeout(function () {
+          resizeCheckTimer = null;
+          renderFilters();
+        }, SCROLL_CHECK_MS);
       },
       { passive: true }
     );
