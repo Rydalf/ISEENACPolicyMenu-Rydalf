@@ -74,37 +74,57 @@
           <button class="clear-search" id="clear-search" type="button" aria-label="Clear search">×</button>
         </span>
       </div>
-      <button class="btn" id="random" type="button">Random resource</button>
     </div>
   </div>
 
   <div class="filter-bar" id="filter-bar">
-    <div class="match-row">
+    <div class="filter-controls-row">
       <span class="flabel" id="lbl-match">Filters</span>
-
-      <div class="segmented" id="filter-actions" role="group" aria-labelledby="lbl-match">
-        <button
-          class="seg-btn"
-          id="filter-toggle"
-          type="button"
-          aria-expanded="false"
-          aria-controls="filters-typesub filters-org"
-        >
-          <span id="filter-toggle-label">Browse filters</span>
-          <span class="badge" id="filter-badge"></span>
-        </button>
-
-        <button
-          class="seg-btn"
-          id="clear-filters"
-          type="button"
-          disabled
-        >
-          Clear filters
-        </button>
+  
+      <!-- Match all / any segmented control -->
+      <div class="segmented" id="match-mode" role="group" aria-labelledby="lbl-match">
+        <button class="seg-btn" id="match-all-btn" type="button" data-mode="all" aria-pressed="true">Match all</button>
+        <button class="seg-btn" id="match-any-btn" type="button" data-mode="any" aria-pressed="false">Match any</button>
       </div>
+  
+      <!-- Browse / Clear / Random as segmented-style buttons -->
+      <button
+        class="seg-btn seg-action"
+        id="filter-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="filters-typesub filters-org"
+      >
+        <span id="filter-toggle-label">Browse filters</span>
+        <span class="badge" id="filter-badge"></span>
+      </button>
+  
+      <button
+        class="seg-btn seg-action"
+        id="clear-filters"
+        type="button"
+        disabled
+      >
+        Clear filters
+      </button>
+  
+      <button class="seg-btn seg-action" id="random" type="button">
+        Random resource
+      </button>
+  
+      <!-- Info tooltip stays at the end of the row -->
+      <button class="info-btn" id="match-info" type="button" aria-label="What do Match all and Match any mean?">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="11" x2="12" y2="16"></line>
+          <circle cx="12" cy="7.6" r="0.6" fill="currentColor" stroke="none"></circle>
+        </svg>
+        <span class="tooltip" role="tooltip">
+          Match all: a resource must satisfy every filter category that has an active selection (Type, Subtype, and Organization — only when more than one is active) · Match any: satisfying just one active category is enough
+        </span>
+      </button>
     </div>
-
+  
     <div class="filter-bar-tags">
       <div class="filter-group-box">
         <div class="filters-preview" id="filters-preview-typesub">
@@ -119,7 +139,7 @@
                  aria-labelledby="lbl-sub-preview"></div>
           </div>
         </div>
-
+  
         <div class="filters" id="filters-typesub">
           <div class="fgroup">
             <span class="flabel" id="lbl-type">Type</span>
@@ -133,7 +153,7 @@
           </div>
         </div>
       </div>
-
+  
       <div class="filter-group-box">
         <div class="filters-preview" id="filters-preview-org">
           <div class="fgroup">
@@ -142,7 +162,7 @@
                  aria-labelledby="lbl-org-preview"></div>
           </div>
         </div>
-
+  
         <div class="filters" id="filters-org">
           <div class="fgroup" id="org-fgroup">
             <span class="flabel" id="lbl-org">Organization</span>
@@ -186,6 +206,18 @@
     <span>Click a card to open the resource · hover for full details · press <kbd>/</kbd> to search</span>
     <span id="stamp"></span>
   </footer>
+</div>
+
+<!-- Feedback modal (popup) -->
+<div class="feedback-modal-backdrop" id="feedback-modal-backdrop" hidden>
+  <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+    <button class="feedback-modal-close" id="feedback-modal-close" type="button" aria-label="Close">
+      <span id="feedback-modal-close-icon"></span>
+    </button>
+    <h2 class="feedback-modal-title" id="feedback-modal-title">Got a minute?</h2>
+    <p class="feedback-modal-text">We'd love your feedback or a resource suggestion to add to this menu.</p>
+    <a class="btn feedback-modal-btn" id="feedback-modal-link" href="https://forms.cloud.microsoft/r/tTeDeizsYL" target="_blank" rel="noopener noreferrer">Share feedback</a>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

@@ -184,11 +184,7 @@
   var ALL = [];
   var typeHue = {};
 
-  // "Start Here" pathways: curated shortcuts into the same Type/Subtype
-  // filters the pills use, aimed at first-time visitors with no policy
-  // background. matchMode "any" is only needed when a pathway mixes a Type
-  // and a Subtype that don't co-occur on the same rows (so AND would yield
-  // zero results) — see "new-to-advocacy" below.
+  // "Start Here" pathways
   var PATHWAYS = [
     {
       id: "new-to-advocacy",
@@ -255,18 +251,8 @@
   var el = {};
   var toastTimer = null;
 
-  // Set by "Random resource" to narrow the grid to that single pick; null
-  // means show the normal filtered results. Any actual filter/search
-  // change (not the random/back actions themselves) clears this — see
-  // exitRandomPick, used by setSearch, applyFilterClick, and the
-  // match-mode/crumb handlers below — so a stale single-card view never
-  // survives a real state change.
+  // Random pick state
   var randomPick = null;
-
-  // Bumped by exitRandomPick() so pickRandom()'s in-flight flicker chain
-  // (a run of setTimeout ticks — see wire()) can tell it's been superseded
-  // and stop, instead of clobbering whatever the interrupting action just
-  // rendered a moment later.
   var rollId = 0;
 
   function exitRandomPick() {
@@ -288,10 +274,6 @@
     });
   }
 
-  // Type/Subtype/Organization are the three facets a resource is filtered
-  // on. matchMode governs how the three combine; within a single facet,
-  // multiple selected values are always OR'd together (see `passes`
-  // below) regardless of matchMode.
   var FACETS = [
     { field: "type", list: "types" },
     { field: "subtype", list: "subs" },
@@ -338,11 +320,6 @@
     return ALL.filter(passes);
   }
 
-  // For every distinct value in `field`, how many of ALL the records
-  // would pass if that value were included in state[listKey] — added to
-  // whatever's already selected there, never replacing it — combined
-  // with the *other* facets' current selections under the current
-  // matchMode.
   function countIncluding(listKey, field) {
     var counts = Object.create(null);
     var original = state[listKey];
@@ -384,6 +361,8 @@
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/></svg>',
     compass:
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+    close:
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
   };
 
   function pillHTML(value, count, active, kind) {
@@ -688,6 +667,12 @@
   }
 
   function render() {
+    // sync match-mode buttons
+    if (el.matchAllBtn && el.matchAnyBtn) {
+      el.matchAllBtn.setAttribute("aria-pressed", state.matchMode === "all" ? "true" : "false");
+      el.matchAnyBtn.setAttribute("aria-pressed", state.matchMode === "any" ? "true" : "false");
+    }
+
     renderFilters();
     renderStartHere();
     renderCrumbs();
@@ -905,7 +890,31 @@
       applyFilterClick(p.getAttribute("data-filter"), p.getAttribute("data-value"));
     });
 
-    // Breadcrumbs (and the empty-state "clear all" button)
+    // Match-mode toggle
+    if (el.matchMode) {
+      el.matchMode.addEventListener("click", function (e) {
+        var b = e.target.closest(".seg-btn");
+        if (!b) return;
+        var mode = b.getAttribute("data-mode");
+        if (!mode || mode === state.matchMode) return;
+        state.matchMode = mode;
+        exitRandomPick();
+        render();
+      });
+    }
+
+    // Match-mode info tooltip (for touch)
+    if (el.matchInfo) {
+      el.matchInfo.addEventListener("click", function (e) {
+        e.stopPropagation();
+        el.matchInfo.classList.toggle("info-open");
+      });
+      document.addEventListener("click", function () {
+        el.matchInfo.classList.remove("info-open");
+      });
+    }
+
+    // Breadcrumbs (and empty-state clear-all)
     document.addEventListener("click", function (e) {
       var c = e.target.closest("[data-crumb]");
       if (!c) return;
@@ -983,7 +992,7 @@
       el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
-    // Random resource
+    // Random resource (uses existing logic)
     function pickRandom() {
       var results = currentResults();
       if (!results.length) return;
@@ -1082,6 +1091,69 @@
     );
   }
 
+  /* ---------------- Feedback modal ---------------- */
+
+  function setupFeedbackModal() {
+    try {
+      var STORAGE_KEY = "feedbackModalDismissed";
+      if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+      var backdrop = document.getElementById("feedback-modal-backdrop");
+      var closeBtn = document.getElementById("feedback-modal-close");
+      var closeIcon = document.getElementById("feedback-modal-close-icon");
+      var link = document.getElementById("feedback-modal-link");
+      if (!backdrop || !closeBtn || !link) return;
+
+      if (closeIcon) closeIcon.innerHTML = ICON.close;
+
+      var dismissed = false;
+      var lastFocused = null;
+
+      function onKeydown(e) {
+        if (e.key === "Escape") dismiss();
+      }
+
+      function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
+        try {
+          sessionStorage.setItem(STORAGE_KEY, "1");
+        } catch (e) {
+          /* ignore */
+        }
+        backdrop.classList.remove("show");
+        setTimeout(function () {
+          backdrop.hidden = true;
+        }, 220);
+        document.removeEventListener("keydown", onKeydown);
+        if (lastFocused && typeof lastFocused.focus === "function") {
+          lastFocused.focus();
+        }
+      }
+
+      closeBtn.addEventListener("click", dismiss);
+      link.addEventListener("click", dismiss);
+      backdrop.addEventListener("click", function (e) {
+        if (e.target === backdrop) dismiss();
+      });
+
+      setTimeout(function () {
+        if (dismissed || sessionStorage.getItem(STORAGE_KEY)) return;
+        lastFocused = document.activeElement;
+        backdrop.hidden = false;
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            backdrop.classList.add("show");
+          });
+        });
+        document.addEventListener("keydown", onKeydown);
+        closeBtn.focus();
+      }, 60000);
+    } catch (e) {
+      /* never let popup break the app */
+    }
+  }
+
   /* ---------------- boot ---------------- */
 
   function showError(msg, detail) {
@@ -1156,6 +1228,10 @@
       filterToggle: $("filter-toggle"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
+      matchMode: $("match-mode"),
+      matchAllBtn: $("match-all-btn"),
+      matchAnyBtn: $("match-any-btn"),
+      matchInfo: $("match-info"),
       crumbs: $("crumbs"),
       count: $("count"),
       grid: $("grid"),
@@ -1182,9 +1258,13 @@
       $("search-icon").innerHTML = ICON.search;
       el.random.insertAdjacentHTML("afterbegin", ICON.dice);
       el.anotherRandom.insertAdjacentHTML("afterbegin", ICON.dice);
+      var shi = $("start-here-icon");
+      if (shi) shi.innerHTML = ICON.compass;
     } catch (e) {
       /* icons are decorative — never block startup on them */
     }
+
+    setupFeedbackModal();
 
     var embedded = typeof window !== "undefined" && window.__RESOURCES__;
     if (embedded && embedded.length) {

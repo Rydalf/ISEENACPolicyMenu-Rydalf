@@ -423,16 +423,17 @@ kbd {
   gap: 8px;
 }
 
-.match-row {
+/* Unified top row: match mode + browse + clear + random + info */
+.filter-controls-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px 10px;
+  gap: 8px;
   position: relative;
 }
 
-/* Keep the label visually hidden; the segmented control itself reads as "Filters" */
-.match-row .flabel {
+/* Visually hide the "Filters" label; keep it for a11y */
+.filter-controls-row .flabel {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -444,6 +445,70 @@ kbd {
   border: 0;
 }
 
+/* Info icon next to match mode */
+.info-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 23px;
+  height: 23px;
+  flex: none;
+  padding: 0;
+  border: 1.5px solid var(--accent-2);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-2);
+  cursor: pointer;
+}
+
+.info-btn:hover,
+.info-btn:focus-visible {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.info-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.info-btn .tooltip {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  top: calc(100% + 8px);
+  width: max-content;
+  max-width: min(320px, 80vw);
+  background: var(--text);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  padding: 8px 11px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.info-btn:hover .tooltip,
+.info-btn:focus-visible .tooltip,
+.info-btn.info-open .tooltip {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Actions row for browse / clear / random */
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Type/Subtype/Org groups */
+
 .filter-bar-tags {
   min-width: 0;
   display: grid;
@@ -453,10 +518,10 @@ kbd {
 .filter-group-box {
   border: 1px solid transparent;
   border-radius: var(--radius);
-  padding: 6px 10px;  /* was 8px 10px */
+  padding: 6px 10px;
   background: color-mix(in srgb, var(--surface) 55%, var(--bg));
   transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-  position: relative;  /* so overflow can be visible relative to this box */
+  position: relative;
   overflow: visible;
 }
 
@@ -640,7 +705,7 @@ kbd {
   background: var(--accent-soft);
 }
 
-/* ---------- Segmented control (Browse / Clear filters) ---------- */
+/* ---------- Segmented control (Match all / Match any) ---------- */
 
 .segmented {
   justify-self: start;
@@ -692,6 +757,7 @@ kbd {
   font-weight: 640;
 }
 
+/* Clear filters disabled state (unchanged) */
 #clear-filters:disabled {
   opacity: 0.45;
   cursor: default;
@@ -1087,6 +1153,81 @@ mark {
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* Feedback modal popup */
+
+.feedback-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 23, 32, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.feedback-modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.feedback-modal {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 30px 24px 24px;
+  text-align: center;
+  transform: translateY(10px) scale(0.98);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.feedback-modal-backdrop.show .feedback-modal { transform: none; }
+
+.feedback-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.feedback-modal-close:hover { background: var(--border-strong); color: var(--text); }
+.feedback-modal-close:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.feedback-modal-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.feedback-modal-text {
+  margin: 0 0 20px;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.feedback-modal-btn { width: 100%; justify-content: center; }
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 720px) {
@@ -1124,11 +1265,6 @@ mark {
 
   .searchbox { flex: 1 1 100%; }
 
-  .searchrow #random {
-    flex: 1 1 100%;
-    justify-content: center;
-  }
-
   .controls {
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1159,6 +1295,9 @@ mark {
   .brand-name { font-size: 15px; line-height: 1.22; }
 
   .meta-item .v { white-space: normal; }
+
+  .feedback-modal-backdrop { padding: 14px; }
+  .feedback-modal { padding: 26px 20px 20px; }
 }
 
 /* ---------- No-JavaScript fallback ---------- */
@@ -1246,11 +1385,4 @@ footer.foot {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-/* Hide all Random-resource UI */
-#random,
-#back-to-all,
-#another-random {
-  display: none !important;
 }
