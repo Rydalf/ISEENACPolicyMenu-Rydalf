@@ -36,6 +36,15 @@
   --type-s: 62%;
   --type-l: 42%;
   --type-tint-l: 96%;
+
+  /* Dedicated accent for "Another random resource" (see .btn-random) —
+     the same pink/magenta hue used on some Type tags (hue 340 in app.js's
+     HUES list), so the playful random-pick feature has its own on-brand
+     color distinct from the navy used for primary/neutral actions
+     elsewhere. */
+  --random-h: 340;
+  --random-s: 68%;
+  --random-l: 38%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -58,6 +67,8 @@
     --type-s: 55%;
     --type-l: 66%;
     --type-tint-l: 20%;
+    --random-s: 62%;
+    --random-l: 54%;
   }
 }
 
@@ -418,6 +429,26 @@ kbd {
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-2);
   border-color: var(--accent-2);
+  color: #fff;
+}
+
+/* "Another random resource" — the primary, repeatable action while a
+   pick is showing, styled distinctly from the neutral "Back to all
+   resources" beside it: pill-shaped rather than the standard rounded-
+   rectangle .btn, filled with a dedicated pink/magenta (--random-h, tied
+   to the same hue used on some Type tags) instead of the navy every
+   other primary action uses, so it reads as its own playful thing tied
+   to the random-pick feature specifically. */
+.btn-random {
+  border-radius: 999px;
+  color: #fff;
+  background: hsl(var(--random-h) var(--random-s) var(--random-l));
+  border-color: hsl(var(--random-h) var(--random-s) var(--random-l));
+}
+
+.btn-random:hover:not(:disabled) {
+  background: hsl(var(--random-h) var(--random-s) calc(var(--random-l) - 7%));
+  border-color: hsl(var(--random-h) var(--random-s) calc(var(--random-l) - 7%));
   color: #fff;
 }
 
@@ -1534,8 +1565,8 @@ footer.foot {
 
   <div class="statusbar">
     <span class="count" id="count" aria-live="polite">Loading…</span>
-    <button class="btn btn-primary" id="another-random" type="button" hidden>Another random resource</button>
-    <button class="btn btn-primary" id="back-to-all" type="button" hidden>← Back to all resources</button>
+    <button class="btn" id="back-to-all" type="button" hidden>← Back to all resources</button>
+    <button class="btn btn-random" id="another-random" type="button" hidden>Another random resource</button>
     <span class="crumbs" id="crumbs"></span>
   </div>
 
@@ -2817,6 +2848,10 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     try {
       $("search-icon").innerHTML = ICON.search;
       el.random.insertAdjacentHTML("afterbegin", ICON.dice);
+      // Same dice icon as "Random resource" — visually ties the two
+      // random-pick actions together now that "Another random resource"
+      // has its own distinct pink/magenta styling (see .btn-random).
+      el.anotherRandom.insertAdjacentHTML("afterbegin", ICON.dice);
       $("start-here-icon").innerHTML = ICON.compass;
     } catch (e) {
       /* icons are decorative — never block startup on them */

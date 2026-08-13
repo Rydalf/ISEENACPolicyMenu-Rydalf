@@ -1175,6 +1175,10 @@
     try {
       $("search-icon").innerHTML = ICON.search;
       el.random.insertAdjacentHTML("afterbegin", ICON.dice);
+      // Same dice icon as "Random resource" — visually ties the two
+      // random-pick actions together now that "Another random resource"
+      // has its own distinct pink/magenta styling (see .btn-random).
+      el.anotherRandom.insertAdjacentHTML("afterbegin", ICON.dice);
       $("start-here-icon").innerHTML = ICON.compass;
     } catch (e) {
       /* icons are decorative — never block startup on them */
