@@ -1060,9 +1060,24 @@ mark {
   box-shadow: var(--shadow-md);
 }
 
-/* Random-pick flash */
-.card.flash {
-  animation: fadeUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) both, flash 1.5s ease 0.1s;
+/* Random-pick flicker: each intermediate candidate is a brand-new DOM
+   node (render() replaces the grid's innerHTML every tick — see
+   pickRandom() in app.js), so it only exists for ~90ms. Suppressing the
+   base .card entrance animation on it is what makes the swap read as a
+   crisp strobe instead of a blur of overlapping fade-ins. */
+.card.cycling {
+  animation: none;
+}
+
+/* The final landed pick: a quick scale/fade-in distinct from the plain
+   .card entrance the rest of the grid uses, plus the glow pulse below. */
+.card.settle-in {
+  animation: settleIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both, flash 1.5s ease 0.05s;
+}
+
+@keyframes settleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes flash {

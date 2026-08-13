@@ -258,9 +258,21 @@
   // Set by "Random resource" to narrow the grid to that single pick; null
   // means show the normal filtered results. Any actual filter/search
   // change (not the random/back actions themselves) clears this — see
-  // setSearch, applyFilterClick, and the match-mode/crumb handlers below —
-  // so a stale single-card view never survives a real state change.
+  // exitRandomPick, used by setSearch, applyFilterClick, and the
+  // match-mode/crumb handlers below — so a stale single-card view never
+  // survives a real state change.
   var randomPick = null;
+
+  // Bumped by exitRandomPick() so pickRandom()'s in-flight flicker chain
+  // (a run of setTimeout ticks — see wire()) can tell it's been superseded
+  // and stop, instead of clobbering whatever the interrupting action just
+  // rendered a moment later.
+  var rollId = 0;
+
+  function exitRandomPick() {
+    randomPick = null;
+    rollId++;
+  }
 
   function $(id) {
     return document.getElementById(id);
@@ -662,7 +674,7 @@
     state.q = v;
     state.terms = norm(v).split(/\s+/).filter(Boolean);
     el.searchbox.classList.toggle("has-value", v.length > 0);
-    randomPick = null;
+    exitRandomPick();
   }
 
   function toast(msg) {
@@ -716,7 +728,7 @@
     if (kind === "type") toggleIn(state.types, value);
     else if (kind === "sub") toggleIn(state.subs, value);
     else if (kind === "org") toggleIn(state.orgs, value);
-    randomPick = null;
+    exitRandomPick();
     render();
   }
 
@@ -808,7 +820,7 @@
     // itself doesn't touch; otherwise it's the normal full clear.
     el.clearFilters.addEventListener("click", function () {
       if (randomPick) {
-        randomPick = null;
+        exitRandomPick();
       } else {
         clearAll();
       }
@@ -837,7 +849,7 @@
       var mode = b.getAttribute("data-mode");
       if (mode === state.matchMode) return;
       state.matchMode = mode;
-      randomPick = null;
+      exitRandomPick();
       render();
     });
 
@@ -859,7 +871,7 @@
       if (!c) return;
       var kind = c.getAttribute("data-crumb");
       var value = c.getAttribute("data-value");
-      randomPick = null;
+      exitRandomPick();
       if (kind === "all") {
         clearAll();
       } else if (kind === "search") {
@@ -944,19 +956,55 @@
     // while a pick is already up), so re-rolling works the same from
     // either place — currentResults() ignores randomPick, so this always
     // draws from the full filtered pool even while narrowed to one card.
+    //
+    // Before landing on the final pick, it flickers through a handful of
+    // quick candidate frames (a plain rapid swap — each is a fresh DOM
+    // node from render(), so there's no time for a per-frame transition to
+    // play, which is what keeps it feeling like a strobe rather than a
+    // series of slow fades). rollId lets an interruption (typing in
+    // search, clearing filters, clicking Back to all, etc. — anything that
+    // calls exitRandomPick) cancel an in-flight flicker instead of having
+    // it clobber whatever that action just rendered a moment later.
     function pickRandom() {
       var results = currentResults();
       if (!results.length) return;
-      var n = Math.floor(Math.random() * results.length);
-      randomPick = results[n];
-      render();
-      el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
-      var card = el.grid.children[0];
-      if (card) {
-        void card.offsetWidth; // restart the animation
-        card.classList.add("flash");
+
+      // A rapid strobe of swapping content is itself a motion/flash
+      // concern independent of CSS animation, so it's skipped outright
+      // (not just slowed) for prefers-reduced-motion — landing on the
+      // final pick immediately, same as before this feature existed.
+      var reduced =
+        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      var myRoll = ++rollId;
+      var flickers = reduced ? 0 : 5 + Math.floor(Math.random() * 3); // 5-7 frames, ~450-630ms
+      var delay = 90;
+      var count = 0;
+
+      function tick() {
+        if (myRoll !== rollId) return; // superseded — abort this chain
+        count++;
+        var landing = count > flickers;
+        randomPick = results[Math.floor(Math.random() * results.length)];
+        render();
+        var card = el.grid.children[0];
+        if (card) {
+          if (landing) {
+            void card.offsetWidth; // restart the animation
+            card.classList.add("settle-in");
+          } else {
+            card.classList.add("cycling");
+          }
+        }
+        if (landing) {
+          toast("Random pick: " + randomPick.resource);
+        } else {
+          setTimeout(tick, delay);
+        }
       }
-      toast("Random pick: " + randomPick.resource);
+
+      tick();
+      el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     el.random.addEventListener("click", pickRandom);
@@ -964,7 +1012,7 @@
 
     // Leaves the single-pick view without touching search/filter state.
     el.backToAll.addEventListener("click", function () {
-      randomPick = null;
+      exitRandomPick();
       render();
     });
 
