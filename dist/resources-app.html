@@ -173,32 +173,20 @@ body {
   gap: 10px;
   width: 100%;
   margin: 0 0 10px;
-  padding: 11px 18px 11px 22px;
+  padding: 11px 18px;
   font: inherit;
   font-size: 14px;
   color: var(--accent);
   text-align: center;
-  /* Deeper tint than the plain accent-soft used elsewhere, plus the
-     card-style left stripe below, so this reads as its own inviting,
-     clickable bar rather than blending into the surrounding boxes. */
+  /* Deeper tint than the plain accent-soft used elsewhere, so this reads
+     as its own inviting, clickable bar rather than blending into the
+     surrounding boxes. */
   background: color-mix(in srgb, var(--accent) 13%, var(--surface));
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
   border-radius: var(--radius);
   cursor: pointer;
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-/* Left accent stripe, same treatment as the resource cards' type-color
-   stripe (.card::before), so this toggle visually ties back to the card
-   language elsewhere on the page. */
-.start-here-toggle::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--accent);
 }
 
 .start-here-toggle strong { color: var(--accent); }
@@ -1206,7 +1194,7 @@ mark {
   .intro { margin: 0 0 6px; font-size: 13px; line-height: 1.35; }
   .intro-lead { font-size: 15px; }
 
-  .start-here-toggle { font-size: 12.5px; padding: 8px 12px 8px 16px; margin: 0 0 8px; }
+  .start-here-toggle { font-size: 12.5px; padding: 8px 12px; margin: 0 0 8px; }
 
   /* Start Here: tighter box padding/margins, and 2 cards per row instead
      of 1 so the section takes roughly half the vertical space it did
