@@ -2140,26 +2140,23 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   }
 
   // Type/Subtype/Organization are the three facets a resource is filtered
-  // on. `skip` lets us compute one facet's own pill counts as if its
-  // filter weren't applied, so a pill's count reflects the *other* active
-  // facets rather than itself. With three facets, two others can be active
-  // at once while computing the third's counts — so matchMode now can
-  // affect facet counts too, not just the final grid, which is the correct
-  // generalization of the old two-facet behavior.
+  // on. matchMode governs how the three combine; within a single facet,
+  // multiple selected values are always OR'd together (see `passes`
+  // below) regardless of matchMode.
   var FACETS = [
-    { skipKey: "type", field: "type", list: "types" },
-    { skipKey: "sub", field: "subtype", list: "subs" },
-    { skipKey: "org", field: "creator", list: "orgs" },
+    { field: "type", list: "types" },
+    { field: "subtype", list: "subs" },
+    { field: "creator", list: "orgs" },
   ];
 
-  function passes(r, skip) {
-    if (skip !== "search" && !matchesSearch(r)) return false;
+  function passes(r) {
+    if (!matchesSearch(r)) return false;
 
     var active = [];
     for (var i = 0; i < FACETS.length; i++) {
       var f = FACETS[i];
       var values = state[f.list];
-      if (skip === f.skipKey || !values.length) continue;
+      if (!values.length) continue;
       active.push(values.indexOf(r[f.field]) !== -1);
     }
 
@@ -2189,19 +2186,50 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   }
 
   function currentResults() {
-    return ALL.filter(function (r) {
-      return passes(r, null);
-    });
+    return ALL.filter(passes);
   }
 
-  function countBy(field, skip) {
+  // For every distinct value in `field`, how many of ALL the records
+  // would pass if that value were included in state[listKey] — added to
+  // whatever's already selected there, never replacing it — combined
+  // with the *other* facets' current selections under the current
+  // matchMode. This is what makes every tag's count answer "how many
+  // results if I picked this too," live, including tags in the same
+  // facet the count belongs to (Type tags updating as other Types are
+  // (de)selected, not just as Subtype/Organization change) — unlike a
+  // simpler "skip this facet entirely" approach, which would show what
+  // swapping to just this value alone would give, ignoring whatever
+  // else is already picked in the same facet.
+  //
+  // A value already selected needs no such simulation — since it's
+  // already included, "if it were included" is just the current,
+  // unmodified result count. Computed up front, before any of the loop
+  // below's temporary mutations, and reused for every already-selected
+  // value in the facet (matching how they're all already contributing
+  // to that same number) — computing it lazily on first use inside the
+  // loop instead would risk grabbing it *after* some other value's
+  // temporary state.types/subs/orgs mutation was already in place.
+  function countIncluding(listKey, field) {
     var counts = Object.create(null);
-    ALL.forEach(function (r) {
-      if (!passes(r, skip)) return;
-      var v = r[field];
-      if (!v) return;
-      counts[v] = (counts[v] || 0) + 1;
+    var original = state[listKey];
+    var alreadyOn = Object.create(null);
+    original.forEach(function (v) {
+      alreadyOn[v] = true;
     });
+    var currentCount = currentResults().length;
+
+    ALL.forEach(function (r) {
+      var v = r[field];
+      if (!v || counts[v] !== undefined) return;
+      if (alreadyOn[v]) {
+        counts[v] = currentCount;
+        return;
+      }
+      state[listKey] = original.concat([v]);
+      counts[v] = currentResults().length;
+      state[listKey] = original;
+    });
+
     return counts;
   }
 
@@ -2424,9 +2452,9 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   }
 
   function renderFilters() {
-    var typeCounts = countBy("type", "type");
-    var subCounts = countBy("subtype", "sub");
-    var orgCounts = countBy("creator", "org");
+    var typeCounts = countIncluding("types", "type");
+    var subCounts = countIncluding("subs", "subtype");
+    var orgCounts = countIncluding("orgs", "creator");
 
     var types = Object.keys(typeHue).sort(function (a, b) {
       return (typeCounts[b] || 0) - (typeCounts[a] || 0) || a.localeCompare(b);
