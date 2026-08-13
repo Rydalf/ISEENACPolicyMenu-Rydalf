@@ -600,14 +600,26 @@
     });
   }
 
+  // Selected values sort first (in click order doesn't matter — just
+  // "selected" as a group, then alphabetical within it isn't needed
+  // since there's rarely more than a couple), then everything else by
+  // live count desc, alpha tiebreak — same ordering rule reused for
+  // Type, Subtype, and Organization below.
+  function bySelectionThenCount(counts, activeList) {
+    return function (a, b) {
+      var aActive = activeList.indexOf(a) !== -1;
+      var bActive = activeList.indexOf(b) !== -1;
+      if (aActive !== bActive) return aActive ? -1 : 1;
+      return (counts[b] || 0) - (counts[a] || 0) || a.localeCompare(b);
+    };
+  }
+
   function renderFilters() {
     var typeCounts = countIncluding("types", "type");
     var subCounts = countIncluding("subs", "subtype");
     var orgCounts = countIncluding("orgs", "creator");
 
-    var types = Object.keys(typeHue).sort(function (a, b) {
-      return (typeCounts[b] || 0) - (typeCounts[a] || 0) || a.localeCompare(b);
-    });
+    var types = Object.keys(typeHue).sort(bySelectionThenCount(typeCounts, state.types));
 
     el.typePills.innerHTML = types
       .map(function (t) {
@@ -626,13 +638,33 @@
       return state.types.indexOf(v) !== -1;
     });
 
-    var allSubs = {};
-    ALL.forEach(function (r) {
-      if (r.subtype) allSubs[r.subtype] = true;
-    });
-    var subs = Object.keys(allSubs).sort(function (a, b) {
-      return (subCounts[b] || 0) - (subCounts[a] || 0) || a.localeCompare(b);
-    });
+    // Subtype only makes sense once a Type has narrowed things down —
+    // with none selected, "every Subtype in the whole dataset" is a
+    // wall with little relation to what's actually being browsed, so
+    // the section stays hidden entirely rather than showing it empty
+    // or full. Once at least one Type is active, only Subtypes that
+    // literally co-occur with one of the selected Type(s) *somewhere*
+    // in the raw data are shown — a structural fact independent of
+    // Match mode, search, or Organization, unlike subCounts (which
+    // *does* respect all of those, and still drives the number on each
+    // surviving tag).
+    var typeIsActive = state.types.length > 0;
+    el.subFgroup.hidden = !typeIsActive;
+    el.subFgroupPreview.hidden = !typeIsActive;
+
+    var subs = [];
+    if (typeIsActive) {
+      var subsForActiveTypes = Object.create(null);
+      ALL.forEach(function (r) {
+        if (r.subtype && state.types.indexOf(r.type) !== -1) {
+          subsForActiveTypes[r.subtype] = true;
+        }
+      });
+      subs = Object.keys(subsForActiveTypes).sort(
+        bySelectionThenCount(subCounts, state.subs)
+      );
+    }
+
     el.subPills.innerHTML = subs
       .map(function (s) {
         return pillHTML(s, subCounts[s] || 0, state.subs.indexOf(s) !== -1, "sub");
@@ -651,15 +683,13 @@
     });
 
     // "Organization" in the UI is the Creator column underneath — same
-    // top-by-count sort, preview, zero-count, and Match all/any pattern as
-    // Type and Subtype.
+    // sort, preview, zero-count, and Match all/any pattern as Type and
+    // Subtype (though it has no Type-style gating of its own).
     var allOrgs = {};
     ALL.forEach(function (r) {
       if (r.creator) allOrgs[r.creator] = true;
     });
-    var orgs = Object.keys(allOrgs).sort(function (a, b) {
-      return (orgCounts[b] || 0) - (orgCounts[a] || 0) || a.localeCompare(b);
-    });
+    var orgs = Object.keys(allOrgs).sort(bySelectionThenCount(orgCounts, state.orgs));
     el.orgPills.innerHTML = orgs
       .map(function (o) {
         return pillHTML(o, orgCounts[o] || 0, state.orgs.indexOf(o) !== -1, "org");
@@ -1332,6 +1362,8 @@
       typePillsPreview: $("type-pills-preview"),
       subPillsPreview: $("sub-pills-preview"),
       orgPillsPreview: $("org-pills-preview"),
+      subFgroup: $("sub-fgroup"),
+      subFgroupPreview: $("sub-fgroup-preview"),
       clearFilters: $("clear-filters"),
       filterToggle: $("filter-toggle"),
       filterToggleLabel: $("filter-toggle-label"),
