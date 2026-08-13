@@ -1463,11 +1463,15 @@ mark {
     font-size: 13.5px;
   }
 
-  /* A "0" count means no matches given the *other* active filters — hide
-     the tag outright rather than showing it grayed out. Re-renders on
-     every filter change, so tags reappear the moment they're relevant
-     again. */
-  .pill.is-empty { display: none; }
+  /* A "0" count means no matches given the *other* active filters —
+     hide the tag outright rather than showing it grayed out, EXCEPT
+     for Subtype/Organization tags while Match all is active (see
+     pillHTML in app.js for the full reasoning: those need the
+     .pill-may-hide class present too, which app.js only adds there in
+     Match any, or for Type in either mode). Re-renders on every filter
+     or match-mode change, so which tags are eligible to hide updates
+     live right along with everything else. */
+  .pill.is-empty.pill-may-hide { display: none; }
 
   /* Comfortable tap targets (~40px) */
   .pill { padding: 9px 14px; font-size: 13.5px; }

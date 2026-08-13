@@ -1471,11 +1471,15 @@ mark {
     font-size: 13.5px;
   }
 
-  /* A "0" count means no matches given the *other* active filters — hide
-     the tag outright rather than showing it grayed out. Re-renders on
-     every filter change, so tags reappear the moment they're relevant
-     again. */
-  .pill.is-empty { display: none; }
+  /* A "0" count means no matches given the *other* active filters —
+     hide the tag outright rather than showing it grayed out, EXCEPT
+     for Subtype/Organization tags while Match all is active (see
+     pillHTML in app.js for the full reasoning: those need the
+     .pill-may-hide class present too, which app.js only adds there in
+     Match any, or for Type in either mode). Re-renders on every filter
+     or match-mode change, so which tags are eligible to hide updates
+     live right along with everything else. */
+  .pill.is-empty.pill-may-hide { display: none; }
 
   /* Comfortable tap targets (~40px) */
   .pill { padding: 9px 14px; font-size: 13.5px; }
@@ -2206,10 +2210,29 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   };
 
   function pillHTML(value, count, active, kind) {
+    var isEmpty = count === 0;
+    // On mobile, a 0-count tag is otherwise hidden entirely (see
+    // .pill.is-empty.pill-may-hide in styles.css) rather than just grayed
+    // out, to keep the wall shorter to scroll. But in Match all, a
+    // Subtype/Organization tag routinely hits 0 simply because it
+    // doesn't overlap with whatever Type/Org is currently selected —
+    // hiding it would erase the only visible cue that the combination is
+    // unsatisfiable, leaving "Clear filters" as the only way back rather
+    // than picking a different value. Match any doesn't have that
+    // problem: adding filters there only ever adds matches, never
+    // removes them, so a 0-count tag genuinely has zero matches across
+    // the *entire* dataset — hiding stays the right default there, and
+    // for Type in either mode (narrowing into a Type is the primary,
+    // broader move, so its own 0-count case isn't given the same
+    // "always visible" treatment as the finer-grained facets).
+    var mayHide = isEmpty && (kind === "type" || state.matchMode === "any");
     var hue = kind === "type" ? typeHue[value] : null;
     var style = hue != null ? ' style="--type-h:' + hue + '"' : "";
     return (
-      '<button class="pill' + (count === 0 ? " is-empty" : "") + '"' +
+      '<button class="pill' +
+        (isEmpty ? " is-empty" : "") +
+        (mayHide ? " pill-may-hide" : "") +
+        '"' +
       ' type="button"' +
       ' aria-pressed="' + (active ? "true" : "false") + '"' +
       ' data-filter="' + kind + '"' +

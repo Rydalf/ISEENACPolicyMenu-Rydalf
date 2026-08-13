@@ -374,10 +374,29 @@
   };
 
   function pillHTML(value, count, active, kind) {
+    var isEmpty = count === 0;
+    // On mobile, a 0-count tag is otherwise hidden entirely (see
+    // .pill.is-empty.pill-may-hide in styles.css) rather than just grayed
+    // out, to keep the wall shorter to scroll. But in Match all, a
+    // Subtype/Organization tag routinely hits 0 simply because it
+    // doesn't overlap with whatever Type/Org is currently selected —
+    // hiding it would erase the only visible cue that the combination is
+    // unsatisfiable, leaving "Clear filters" as the only way back rather
+    // than picking a different value. Match any doesn't have that
+    // problem: adding filters there only ever adds matches, never
+    // removes them, so a 0-count tag genuinely has zero matches across
+    // the *entire* dataset — hiding stays the right default there, and
+    // for Type in either mode (narrowing into a Type is the primary,
+    // broader move, so its own 0-count case isn't given the same
+    // "always visible" treatment as the finer-grained facets).
+    var mayHide = isEmpty && (kind === "type" || state.matchMode === "any");
     var hue = kind === "type" ? typeHue[value] : null;
     var style = hue != null ? ' style="--type-h:' + hue + '"' : "";
     return (
-      '<button class="pill' + (count === 0 ? " is-empty" : "") + '"' +
+      '<button class="pill' +
+        (isEmpty ? " is-empty" : "") +
+        (mayHide ? " pill-may-hide" : "") +
+        '"' +
       ' type="button"' +
       ' aria-pressed="' + (active ? "true" : "false") + '"' +
       ' data-filter="' + kind + '"' +
