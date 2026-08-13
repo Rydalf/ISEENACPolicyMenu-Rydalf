@@ -147,7 +147,7 @@ the CSV (simplest) or the spreadsheet — and stick with it.
   fall outside that top slice, rather than the full wall or nothing at
   all. Whenever a preview is hiding real values, a trailing **+N more**
   pill (styled like the others) sits at the end of that row — clicking it
-  opens **Browse all filters**, same as the button
+  opens **Browse filters**, same as the button
 - The **Match all / Match any** toggle is always visible (it's not part of
   the collapse below) since it governs how every active facet combines.
   Label and toggle share one compact line at every screen width; the
@@ -155,12 +155,13 @@ the CSV (simplest) or the spreadsheet — and stick with it.
   next to it — hover, keyboard focus, or tap to reveal it, instead of a
   permanent line of text
 - **Random resource** sits directly beside the search bar. Below that,
-  tags on the left, a fixed action column on the right (**Browse all
+  tags on the left, a fixed action column on the right (**Browse
   filters** on top, **Clear filters** below). Type+Subtype sit in one
   bordered box and Organization in its own, so the three categories read
-  as two visual groups rather than one continuous wall. **Browse all
-  filters** swaps each box's preview for its complete pill list; a badge
-  on the button shows how many filters are
+  as two visual groups rather than one continuous wall. **Browse
+  filters** swaps each box's preview for its complete pill list and
+  relabels itself **Hide filters**; clicking it again collapses back to
+  the preview. A badge on the button shows how many filters are
   active. On narrow screens the tags stack above the buttons, and the
   buttons switch to a row instead of a column
 - Everything combines; active filters show as breadcrumbs you can remove one at a
@@ -204,7 +205,7 @@ Nothing is hidden behind hover, because touch screens have none:
 
 - The full description, the Creator, and the copy-link button are all shown
   outright on cards rather than waiting for a hover
-- **Browse all filters** shows the complete Type/Subtype/Organization pill
+- **Browse filters** shows the complete Type/Subtype/Organization pill
   lists in one tap — no further nested disclosure to dig through, so every
   value in the data stays reachable in a single click
 - Tap targets are enlarged to roughly 40px, and the layout drops to one column

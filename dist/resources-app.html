@@ -614,7 +614,7 @@ kbd {
 /* A small always-visible preview of the top pills in a box (plus whatever's
    already active) so first-time visitors see *something* without opening
    the full wall. Swaps out for the full .filters panel — rather than
-   sitting above it — once "Browse all filters" is open, so the same pills
+   sitting above it — once "Browse filters" is open, so the same pills
    never render twice. */
 .filters-preview { display: grid; gap: 5px; }
 .filter-bar.filters-open .filters-preview { display: none; }
@@ -631,7 +631,7 @@ kbd {
 }
 
 /* Collapsed by default so first-time visitors aren't hit with the full
-   pill wall — "Browse all filters" reveals it via filters-open. */
+   pill wall — "Browse filters" reveals it via filters-open. */
 .filters { display: none; gap: 5px; }
 .filter-bar.filters-open .filters { display: grid; }
 
@@ -1584,7 +1584,7 @@ footer.foot {
 
       <div class="filter-actions">
         <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
-          Browse all filters<span class="badge" id="filter-badge"></span>
+          <span id="filter-toggle-label">Browse filters</span><span class="badge" id="filter-badge"></span>
         </button>
         <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       </div>
@@ -2096,7 +2096,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
   // Trailing "+N more" pill appended to a preview row whenever it's
   // hiding real values — styled like the other pills (via the shared
   // .pill class) so it reads as part of the same row, but it isn't a
-  // filter itself: clicking it just opens "Browse all filters" (see the
+  // filter itself: clicking it just opens "Browse filters" (see the
   // el.filterBar delegated click handler below), same as the button.
   function moreTagHTML(hiddenCount, label) {
     if (hiddenCount <= 0) return "";
@@ -2647,6 +2647,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       var open = !el.filterBar.classList.contains("filters-open");
       el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
     // Random resource: narrows the grid to a single pick drawn from the
@@ -2847,6 +2848,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
       filterToggle: $("filter-toggle"),
+      filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),
       matchAllBtn: $("match-all-btn"),

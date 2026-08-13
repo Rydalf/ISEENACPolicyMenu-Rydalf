@@ -606,7 +606,7 @@ kbd {
 /* A small always-visible preview of the top pills in a box (plus whatever's
    already active) so first-time visitors see *something* without opening
    the full wall. Swaps out for the full .filters panel — rather than
-   sitting above it — once "Browse all filters" is open, so the same pills
+   sitting above it — once "Browse filters" is open, so the same pills
    never render twice. */
 .filters-preview { display: grid; gap: 5px; }
 .filter-bar.filters-open .filters-preview { display: none; }
@@ -623,7 +623,7 @@ kbd {
 }
 
 /* Collapsed by default so first-time visitors aren't hit with the full
-   pill wall — "Browse all filters" reveals it via filters-open. */
+   pill wall — "Browse filters" reveals it via filters-open. */
 .filters { display: none; gap: 5px; }
 .filter-bar.filters-open .filters { display: grid; }
 

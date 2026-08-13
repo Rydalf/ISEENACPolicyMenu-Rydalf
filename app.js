@@ -395,7 +395,7 @@
   // Trailing "+N more" pill appended to a preview row whenever it's
   // hiding real values — styled like the other pills (via the shared
   // .pill class) so it reads as part of the same row, but it isn't a
-  // filter itself: clicking it just opens "Browse all filters" (see the
+  // filter itself: clicking it just opens "Browse filters" (see the
   // el.filterBar delegated click handler below), same as the button.
   function moreTagHTML(hiddenCount, label) {
     if (hiddenCount <= 0) return "";
@@ -946,6 +946,7 @@
       var open = !el.filterBar.classList.contains("filters-open");
       el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
     // Random resource: narrows the grid to a single pick drawn from the
@@ -1146,6 +1147,7 @@
       orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
       filterToggle: $("filter-toggle"),
+      filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),
       matchAllBtn: $("match-all-btn"),
