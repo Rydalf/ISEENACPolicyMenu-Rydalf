@@ -390,12 +390,30 @@
     // broader move, so its own 0-count case isn't given the same
     // "always visible" treatment as the finer-grained facets).
     var mayHide = isEmpty && (kind === "type" || state.matchMode === "any");
+    // Purely a visual emphasis, not a hide/count change (see mayHide
+    // above for that): in Match any, once at least one Type is active,
+    // the *un*selected Type pills get muted so the active one(s) read as
+    // the current selection at a glance instead of blending into a wall
+    // of equally-bold color. Only kicks in for Match any — active is
+    // meaningful there without narrowing anything else out (Match any
+    // just adds matches), whereas in Match all every active Type is
+    // already the sole determinant of which Types even have results, so
+    // there's no "which one did I pick" ambiguity to resolve. Never
+    // applies to the active pill(s) themselves, and never touches
+    // clickability — still a plain opacity/saturation style on an
+    // otherwise fully interactive button.
+    var typeMuted =
+      kind === "type" &&
+      !active &&
+      state.matchMode === "any" &&
+      state.types.length > 0;
     var hue = kind === "type" ? typeHue[value] : null;
     var style = hue != null ? ' style="--type-h:' + hue + '"' : "";
     return (
       '<button class="pill' +
         (isEmpty ? " is-empty" : "") +
         (mayHide ? " pill-may-hide" : "") +
+        (typeMuted ? " pill-type-muted" : "") +
         '"' +
       ' type="button"' +
       ' aria-pressed="' + (active ? "true" : "false") + '"' +

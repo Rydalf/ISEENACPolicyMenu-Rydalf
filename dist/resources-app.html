@@ -701,7 +701,8 @@ kbd {
   align-items: center;
   gap: 6px;
   transition: background 0.15s ease, border-color 0.15s ease,
-    color 0.15s ease, transform 0.12s ease, opacity 0.15s ease;
+    color 0.15s ease, transform 0.12s ease, opacity 0.15s ease,
+    filter 0.15s ease;
 }
 
 .pill .dot {
@@ -808,6 +809,20 @@ kbd {
    is even on a pill that's already showing the selected-state ring. */
 .pill[data-filter="type"][aria-pressed="true"]:focus-visible {
   box-shadow: var(--ring), inset 0 0 0 1.5px rgba(255, 255, 255, 0.9);
+}
+
+/* Match-any-only emphasis (see pillHTML in app.js for exactly when this
+   class gets added): once a Type is active, mute the *other* Type pills'
+   color/opacity so the active selection reads clearly against the rest,
+   rather than sitting in a wall of equally-bold fills. Purely visual —
+   no change to layout, hit target, or the count/hide logic above; the
+   pill stays exactly as clickable as ever. filter (not just opacity)
+   pulls the saturation down too, since these pills are a solid hue fill
+   rather than plain text — opacity alone would just look translucent,
+   not "muted." */
+.pill[data-filter="type"].pill-type-muted {
+  opacity: 0.45;
+  filter: saturate(0.35);
 }
 
 .pill.is-empty { opacity: 0.34; }
@@ -2226,12 +2241,30 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     // broader move, so its own 0-count case isn't given the same
     // "always visible" treatment as the finer-grained facets).
     var mayHide = isEmpty && (kind === "type" || state.matchMode === "any");
+    // Purely a visual emphasis, not a hide/count change (see mayHide
+    // above for that): in Match any, once at least one Type is active,
+    // the *un*selected Type pills get muted so the active one(s) read as
+    // the current selection at a glance instead of blending into a wall
+    // of equally-bold color. Only kicks in for Match any — active is
+    // meaningful there without narrowing anything else out (Match any
+    // just adds matches), whereas in Match all every active Type is
+    // already the sole determinant of which Types even have results, so
+    // there's no "which one did I pick" ambiguity to resolve. Never
+    // applies to the active pill(s) themselves, and never touches
+    // clickability — still a plain opacity/saturation style on an
+    // otherwise fully interactive button.
+    var typeMuted =
+      kind === "type" &&
+      !active &&
+      state.matchMode === "any" &&
+      state.types.length > 0;
     var hue = kind === "type" ? typeHue[value] : null;
     var style = hue != null ? ' style="--type-h:' + hue + '"' : "";
     return (
       '<button class="pill' +
         (isEmpty ? " is-empty" : "") +
         (mayHide ? " pill-may-hide" : "") +
+        (typeMuted ? " pill-type-muted" : "") +
         '"' +
       ' type="button"' +
       ' aria-pressed="' + (active ? "true" : "false") + '"' +
