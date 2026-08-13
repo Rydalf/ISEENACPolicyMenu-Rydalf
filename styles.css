@@ -34,6 +34,14 @@
   --type-s: 62%;
   --type-l: 42%;
   --type-tint-l: 96%;
+  /* Deliberately darker than --type-l: this one's specifically for white
+     text sitting directly on a solid hue fill (see .pill[data-filter=
+     "type"] below), which needs more headroom than a dot or a stripe
+     does. --type-l's 42% clears WCAG AA (4.5:1) for white text on most
+     of app.js's HUES but falls short on the lighter/warmer ones (e.g.
+     hue 70, a yellow-green, lands around 3.7:1) — 28% clears all of them
+     with room to spare. */
+  --type-fill-l: 28%;
 
   /* Dedicated accent for "Another random resource" (see .btn-random) —
      the same pink/magenta hue used on some Type tags (hue 340 in app.js's
@@ -723,15 +731,17 @@ kbd {
 
 .pill[aria-pressed="true"] .dot { background: rgba(255, 255, 255, 0.85); }
 
-/* Subtype pills stay neutral/gray even when selected — no colored dot (it
-   was never added for this kind — see pillHTML in app.js), no hue-tinted
-   fill — so Type (colored dot + a fill/border matching the same hue used
-   for its card stripe and .tag.type) reads as the primary category and
-   Subtype reads as a quieter secondary refinement. More specific than
+/* Subtype pills stay a lighter, thinner gray outline at regular weight —
+   no colored dot (it was never added for this kind — see pillHTML in
+   app.js), no hue-tinted fill, selected or not — so next to Type's
+   always-on solid fill below, Subtype reads as the quieter secondary
+   refinement rather than a second primary category. More specific than
    the generic .pill[aria-pressed="true"] above, so it wins the cascade
-   for just this one property set; font-weight's bump still comes from
-   that generic rule. Organization pills are left as they were. Same
-   selectors at every width, so this holds on mobile too. */
+   for just this one property set; font-weight stays at the base .pill's
+   regular (unbolded) weight, since this rule doesn't touch it and Type's
+   bold-weight rule below is scoped to data-filter="type" only.
+   Organization pills are left as they were. Same selectors at every
+   width, so this holds on mobile too. */
 .pill[data-filter="sub"][aria-pressed="true"] {
   color: var(--text);
   background: var(--surface-2);
@@ -741,6 +751,55 @@ kbd {
 .pill[data-filter="sub"][aria-pressed="true"] .n {
   background: var(--surface);
   color: var(--text-2);
+}
+
+/* Type pills read as the primary category at a glance, before any
+   interaction — solid, per-value hue fill (same hue as the card stripe/
+   .tag.type) with bold white text, always on rather than only once
+   selected. Equal specificity to the generic .pill[aria-pressed="true"]
+   above, so source order (this comes after) is what makes this rule win
+   for pressed Type pills too, rather than the generic accent-colored
+   fill; unpressed Type pills need no such tie-break since the generic
+   rule doesn't apply to them at all. */
+.pill[data-filter="type"] {
+  color: #fff;
+  background: hsl(var(--type-h) var(--type-s) var(--type-fill-l));
+  border-color: hsl(var(--type-h) var(--type-s) var(--type-fill-l));
+  font-weight: 600;
+}
+
+.pill[data-filter="type"] .dot { background: rgba(255, 255, 255, 0.85); }
+
+.pill[data-filter="type"] .n {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* Hover's generic border-color (var(--border-strong), a neutral gray)
+   would otherwise sit oddly against a saturated fill — keep it on-hue,
+   just a touch darker. */
+.pill[data-filter="type"]:hover {
+  border-color: hsl(var(--type-h) var(--type-s) calc(var(--type-fill-l) - 6%));
+}
+
+/* The fill above is now Type's permanent look, so it can no longer by
+   itself signal "this is the active filter" the way it used to when
+   pressed was the only thing that turned a pill solid. An inner ring —
+   same box-shadow: inset technique .tag[aria-pressed="true"] already
+   uses for card tags — layers "currently selected" on top without
+   touching the fill color, keeping the two signals (Type vs. Subtype,
+   and selected vs. not) independent of each other. */
+.pill[data-filter="type"][aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.9);
+}
+
+/* box-shadow doesn't stack across separate rules — without this, tabbing
+   to an already-selected Type pill would win on specificity alone (0-3-0
+   beats .pill:focus-visible's 0-2-0) and silently swallow the focus
+   ring. Layer both explicitly so a keyboard user still sees where focus
+   is even on a pill that's already showing the selected-state ring. */
+.pill[data-filter="type"][aria-pressed="true"]:focus-visible {
+  box-shadow: var(--ring), inset 0 0 0 1.5px rgba(255, 255, 255, 0.9);
 }
 
 .pill.is-empty { opacity: 0.34; }
