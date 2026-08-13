@@ -825,6 +825,41 @@ kbd {
   filter: saturate(0.35);
 }
 
+/* Organization gets its own soft, muted light-blue identity — distinct
+   from Type's per-value hue coding and Subtype's neutral gray — built on
+   --accent/--accent-2 (the same navy/slate pair .seg-btn[aria-pressed=
+   "true"] already uses for a deliberately muted selected tone, rather
+   than a solid fill) so it reads as "on brand" instead of an arbitrary
+   new color. Text stays --accent (navy) in both states rather than the
+   lighter --accent-2 — against a background this pale, --accent-2 comes
+   in under 4:1 contrast, short of WCAG AA's 4.5:1 for this size text;
+   --accent clears it with comfortable room in both states. Selected just
+   deepens the tint and switches the border to --accent-2, rather than
+   any bold/saturated fill — a modest escalation to stay legible as
+   "this one's picked," not a different color language. */
+.pill[data-filter="org"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent-2) 32%, transparent);
+}
+
+.pill[data-filter="org"] .n {
+  background: color-mix(in srgb, var(--accent-2) 16%, var(--surface));
+  color: var(--accent);
+}
+
+.pill[data-filter="org"][aria-pressed="true"] {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, white);
+  border-color: var(--accent-2);
+  font-weight: 560;
+}
+
+.pill[data-filter="org"][aria-pressed="true"] .n {
+  background: color-mix(in srgb, var(--accent) 14%, white);
+  color: var(--accent);
+}
+
 .pill.is-empty { opacity: 0.34; }
 .pill.is-empty:hover { transform: none; }
 
