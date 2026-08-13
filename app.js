@@ -774,6 +774,16 @@
       }
     });
 
+    // Start Here disclosure: collapsed on every load, for every visitor —
+    // no persistence, so this line is the only way back in once dismissed.
+    // hidden is the source of truth; aria-expanded just mirrors it for
+    // assistive tech, and the CSS chevron rotation reads that same attribute.
+    el.startHereToggle.addEventListener("click", function () {
+      var willOpen = el.startHereSection.hidden;
+      el.startHereSection.hidden = !willOpen;
+      el.startHereToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    });
+
     // "Start Here" pathway cards: pre-apply Type/Subtype filters as a
     // guided shortcut into the same filter system the pills use, replacing
     // whatever filters/search were already active for a clean result.
@@ -1075,6 +1085,8 @@
       controls: $("controls"),
       filterBar: $("filter-bar"),
       startHere: $("start-here"),
+      startHereToggle: $("start-here-toggle"),
+      startHereSection: $("start-here-section"),
       search: $("search"),
       searchbox: $("searchbox"),
       clearSearch: $("clear-search"),

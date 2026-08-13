@@ -19,14 +19,18 @@
 
 <div class="wrap">
 
-  <p class="intro"><span class="intro-lead">A searchable library of guides, databases, legal resources, and advocacy tools for turning environmental health science into policy and action.</span><br><strong>New to environmental health advocacy?</strong> Use the shortcuts below to find a starting point — or search and filter the full library beneath them.</p>
+  <p class="intro"><span class="intro-lead">A searchable library of guides, databases, legal resources, and advocacy tools for turning environmental health science into policy and action.</span></p>
 
-  <section class="start-here" aria-labelledby="start-here-heading">
+  <button class="start-here-toggle" id="start-here-toggle" type="button" aria-expanded="false" aria-controls="start-here-section">
+    <span class="start-here-toggle-text"><strong>New to environmental health advocacy?</strong> Use the shortcuts below to find a starting point — or search and filter the full library beneath them.</span>
+    <svg class="chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  </button>
+
+  <section class="start-here" id="start-here-section" aria-labelledby="start-here-heading" hidden>
     <h2 id="start-here-heading" class="start-here-title">
       <span class="start-here-icon" id="start-here-icon" aria-hidden="true"></span>
       Start here
     </h2>
-    <p class="start-here-subtitle">New here? Pick the option that matches what you're trying to do.</p>
     <div class="start-here-grid" id="start-here">
       <button class="start-card" type="button" data-pathway="new-to-advocacy" aria-pressed="false">
         <span class="start-card-title">New to advocacy? Start here</span>

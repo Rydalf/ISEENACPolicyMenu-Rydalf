@@ -153,6 +153,50 @@ body {
 
 /* ---------- Start Here ---------- */
 
+/* Clickable line that reveals/hides the card grid below it. Collapsed by
+   default on every load (app.js sets no persisted state), so this is the
+   only way back into Start Here once dismissed — keeping first-paint
+   focus on search/filter rather than a wall of four cards. */
+.start-here-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--accent);
+  text-align: center;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.start-here-toggle strong { color: var(--accent); }
+
+.start-here-toggle:hover,
+.start-here-toggle:focus-visible {
+  background: color-mix(in srgb, var(--accent) 16%, var(--accent-soft));
+  border-color: var(--accent-2);
+  box-shadow: var(--shadow-sm);
+}
+.start-here-toggle:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.start-here-toggle .chevron {
+  flex: none;
+  transition: transform 0.2s ease;
+}
+
+/* Reads the button's own aria-expanded (set in app.js alongside the
+   section's hidden attribute) rather than a separate class. */
+.start-here-toggle[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
 .start-here {
   margin: 0 0 10px;
   background: var(--accent-soft);
@@ -162,7 +206,7 @@ body {
 }
 
 .start-here-title {
-  margin: 0 0 2px;
+  margin: 0 0 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,14 +219,6 @@ body {
 }
 
 .start-here-icon { display: inline-flex; flex: none; }
-
-.start-here-subtitle {
-  margin: 0 auto 6px;
-  max-width: 50ch;
-  font-size: 13.5px;
-  color: var(--text-2);
-  text-align: center;
-}
 
 .start-here-grid {
   display: grid;
@@ -272,15 +308,21 @@ body {
   pointer-events: none;
 }
 
+/* Deliberately the most visually prominent control on the page — a
+   thicker accent-toned border plus a standing shadow (not just on focus)
+   so it reads as the primary way in, ahead of Match/filter categories
+   below it (see .filter-group-box, .segmented). */
 #search {
   width: 100%;
   padding: 12px 84px 12px 40px;
   font: inherit;
+  font-size: 15.5px;
   color: var(--text);
   background: var(--surface);
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--accent-2);
   border-radius: 11px;
   outline: none;
+  box-shadow: var(--shadow-sm);
   transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -505,11 +547,24 @@ kbd {
 /* Type+Subtype and Organization each get their own bordered box so the
    three filter categories read as two distinct groups rather than one
    continuous wall of tags. */
+/* Muted by default — blends toward the page background rather than
+   standing out as a bordered card — so it reads as a supporting section
+   next to the search bar above. Interacting with anything inside it
+   (hover or focus, e.g. tabbing to a pill) restores the clearer card
+   treatment, since at that point the user's attention is already there. */
 .filter-group-box {
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   border-radius: var(--radius);
   padding: 6px 10px;
+  background: color-mix(in srgb, var(--surface) 55%, var(--bg));
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filter-group-box:hover,
+.filter-group-box:focus-within {
+  border-color: var(--border);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 /* A small always-visible preview of the top pills in a box (plus whatever's
@@ -644,10 +699,19 @@ kbd {
      gap next to the two buttons. */
   justify-self: start;
   display: inline-flex;
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   border-radius: 999px;
   padding: 2px;
   gap: 2px;
+  /* Muted by default, same reasoning as .filter-group-box — a supporting
+     control, not competing with the search bar for attention. */
+  background: color-mix(in srgb, var(--surface) 55%, var(--bg));
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.segmented:hover,
+.segmented:focus-within {
+  border-color: var(--border);
   background: var(--surface);
 }
 
@@ -1089,10 +1153,12 @@ mark {
      keeps scaling smoothly instead of jumping at this one breakpoint. */
   .wrap { padding-top: 10px; padding-bottom: 72px; }
 
-  /* Smaller, tighter-lined intro so the tagline sentence and the
-     "New to..." line take less room before Start Here. */
+  /* Smaller, tighter-lined intro so the tagline sentence takes less room
+     before the Start Here toggle. */
   .intro { margin: 0 0 6px; font-size: 13px; line-height: 1.35; }
   .intro-lead { font-size: 15px; }
+
+  .start-here-toggle { font-size: 12.5px; padding: 8px 12px; margin: 0 0 8px; }
 
   /* Start Here: tighter box padding/margins, and 2 cards per row instead
      of 1 so the section takes roughly half the vertical space it did
@@ -1100,8 +1166,7 @@ mark {
      organizations...") will run a couple of lines taller than their
      row-mate — an acceptable trade-off for halving the row count. */
   .start-here { margin: 0 0 8px; padding: 8px 10px 10px; }
-  .start-here-title { margin: 0 0 2px; font-size: 17px; }
-  .start-here-subtitle { margin: 0 auto 6px; font-size: 12.5px; }
+  .start-here-title { margin: 0 0 6px; font-size: 17px; }
   .start-here-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .start-card { padding: 9px 10px; }
 

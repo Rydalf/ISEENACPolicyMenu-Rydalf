@@ -117,7 +117,11 @@ the CSV (simplest) or the spreadsheet — and stick with it.
 ## What the app does
 
 **Start Here**
-- Four curated shortcut cards above the search bar for first-time visitors with
+- Collapsed by default on every page load, for every visitor. The intro's
+  second line — "New to environmental health advocacy?..." — is a toggle
+  button with a chevron that expands it; it's the only way in, and there's no
+  persistence, so it starts collapsed again on the next visit too
+- Once expanded: four curated shortcut cards for first-time visitors with
   no policy background: *New to advocacy? Start here*, *Want to contact a
   policymaker?*, *Looking for guides*, and *Explore organizations to get
   involved with*
