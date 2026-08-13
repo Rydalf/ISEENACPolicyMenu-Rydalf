@@ -723,6 +723,26 @@ kbd {
 
 .pill[aria-pressed="true"] .dot { background: rgba(255, 255, 255, 0.85); }
 
+/* Subtype pills stay neutral/gray even when selected — no colored dot (it
+   was never added for this kind — see pillHTML in app.js), no hue-tinted
+   fill — so Type (colored dot + a fill/border matching the same hue used
+   for its card stripe and .tag.type) reads as the primary category and
+   Subtype reads as a quieter secondary refinement. More specific than
+   the generic .pill[aria-pressed="true"] above, so it wins the cascade
+   for just this one property set; font-weight's bump still comes from
+   that generic rule. Organization pills are left as they were. Same
+   selectors at every width, so this holds on mobile too. */
+.pill[data-filter="sub"][aria-pressed="true"] {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+.pill[data-filter="sub"][aria-pressed="true"] .n {
+  background: var(--surface);
+  color: var(--text-2);
+}
+
 .pill.is-empty { opacity: 0.34; }
 .pill.is-empty:hover { transform: none; }
 
