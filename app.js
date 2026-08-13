@@ -1053,16 +1053,20 @@
     // page content down and scrolls normally.
     el.filterToggle.addEventListener("click", function () {
       var open = !el.filterBar.classList.contains("filters-open");
+      var label = open ? "Hide filters" : "Browse filters";
       el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
+      el.filterToggleLabel.textContent = label;
+      // Its mobile-only duplicate near the top of the expanded wall (see
+      // .filter-actions-top in styles.css) mirrors the same open/closed
+      // state and label rather than tracking it independently.
+      el.filterToggleTop.setAttribute("aria-expanded", open ? "true" : "false");
+      el.filterToggleTopLabel.textContent = label;
     });
 
-    // Top "Hide filters" (see .filter-actions-top in styles.css) is only
-    // ever shown while already expanded, so it has nothing of its own to
-    // decide — it just proxies to the real toggle button above, which
-    // owns the open/closed state, the aria-expanded attribute, and the
-    // Browse/Hide label swap.
+    // The top button itself has no state of its own to decide — it just
+    // proxies to the real toggle above, whose handler (just above) is
+    // what actually flips filters-open and keeps both labels in sync.
     el.filterToggleTop.addEventListener("click", function () {
       el.filterToggle.click();
     });
@@ -1285,6 +1289,7 @@
       clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
       filterToggleTop: $("filter-toggle-top"),
+      filterToggleTopLabel: $("filter-toggle-top-label"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),

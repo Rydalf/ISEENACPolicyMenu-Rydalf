@@ -86,14 +86,18 @@
 
       <!-- Mobile-only, and only while the full pill wall is expanded (see
            .filter-actions-top in styles.css) — reachable-without-scrolling
-           copies of the "Hide filters" / "Clear filters" pair below, for
-           when that wall runs long enough to push the originals
-           off-screen. Hide filters here just proxies a click to
-           #filter-toggle (see app.js) rather than duplicating its
-           expand/collapse + label logic — it's only ever shown in the
-           "expanded" state, so it never needs to say "Browse filters". -->
-      <div class="filter-actions-top">
-        <button class="btn" id="filter-toggle-top" type="button">Hide filters</button>
+           copies of the "Browse/Hide filters" toggle and "Clear filters"
+           button below, for when that wall runs long enough to push the
+           originals off-screen. Reuses the .filter-actions class itself
+           (not just a lookalike) so the row/button layout is guaranteed
+           identical to the one at the bottom, not just visually similar.
+           #filter-toggle-top's click just proxies to #filter-toggle (see
+           app.js), which owns the open/closed state and keeps both
+           buttons' labels in sync. -->
+      <div class="filter-actions filter-actions-top">
+        <button class="btn" id="filter-toggle-top" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
+          <span id="filter-toggle-top-label">Browse filters</span>
+        </button>
         <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
       </div>
 

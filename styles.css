@@ -548,9 +548,14 @@ kbd {
 
 /* Hidden by default everywhere — only shown (see the mobile media query
    below) on narrow screens while the full pill wall is expanded, as a
-   second, higher-up copy of the Hide filters / Clear filters pair for
-   when that wall runs long enough to push the originals below the fold. */
-.filter-actions-top { display: none; }
+   second, higher-up copy of the Browse/Hide filters + Clear filters pair
+   for when that wall runs long enough to push the originals below the
+   fold. Combined with .filter-actions (both classes are on the same
+   element — see index.html) precisely so its row/button styling comes
+   free from .filter-actions itself; the combined selector here is what
+   makes this override win the cascade over .filter-actions's own
+   unconditional `display: flex` below, regardless of source order. */
+.filter-actions.filter-actions-top { display: none; }
 
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
@@ -1349,22 +1354,12 @@ mark {
   /* Only earns its place once the wall it's meant to shortcut past is
      actually showing — collapsed, the originals right below "Browse
      filters" are already close enough that a duplicate row would just be
-     clutter. Same row/gap treatment as .filter-actions below. */
-  .filter-bar.filters-open .filter-actions-top {
+     clutter. Row direction, wrap, and button sizing all come from
+     .filter-actions below (this element carries both classes), so this
+     only needs to add display + spacing on top of that. */
+  .filter-bar.filters-open .filter-actions.filter-actions-top {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
     margin: 8px 0 2px;
-  }
-
-  .filter-actions-top .btn {
-    flex: 1 1 0;
-    min-width: 0;
-    justify-content: center;
-    white-space: nowrap;
-    padding: 11px 10px;
-    font-size: 13.5px;
   }
 
   .filter-actions {

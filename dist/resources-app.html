@@ -556,9 +556,14 @@ kbd {
 
 /* Hidden by default everywhere — only shown (see the mobile media query
    below) on narrow screens while the full pill wall is expanded, as a
-   second, higher-up copy of the Hide filters / Clear filters pair for
-   when that wall runs long enough to push the originals below the fold. */
-.filter-actions-top { display: none; }
+   second, higher-up copy of the Browse/Hide filters + Clear filters pair
+   for when that wall runs long enough to push the originals below the
+   fold. Combined with .filter-actions (both classes are on the same
+   element — see index.html) precisely so its row/button styling comes
+   free from .filter-actions itself; the combined selector here is what
+   makes this override win the cascade over .filter-actions's own
+   unconditional `display: flex` below, regardless of source order. */
+.filter-actions.filter-actions-top { display: none; }
 
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
@@ -1357,22 +1362,12 @@ mark {
   /* Only earns its place once the wall it's meant to shortcut past is
      actually showing — collapsed, the originals right below "Browse
      filters" are already close enough that a duplicate row would just be
-     clutter. Same row/gap treatment as .filter-actions below. */
-  .filter-bar.filters-open .filter-actions-top {
+     clutter. Row direction, wrap, and button sizing all come from
+     .filter-actions below (this element carries both classes), so this
+     only needs to add display + spacing on top of that. */
+  .filter-bar.filters-open .filter-actions.filter-actions-top {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
     margin: 8px 0 2px;
-  }
-
-  .filter-actions-top .btn {
-    flex: 1 1 0;
-    min-width: 0;
-    justify-content: center;
-    white-space: nowrap;
-    padding: 11px 10px;
-    font-size: 13.5px;
   }
 
   .filter-actions {
@@ -1583,14 +1578,18 @@ footer.foot {
 
       <!-- Mobile-only, and only while the full pill wall is expanded (see
            .filter-actions-top in styles.css) — reachable-without-scrolling
-           copies of the "Hide filters" / "Clear filters" pair below, for
-           when that wall runs long enough to push the originals
-           off-screen. Hide filters here just proxies a click to
-           #filter-toggle (see app.js) rather than duplicating its
-           expand/collapse + label logic — it's only ever shown in the
-           "expanded" state, so it never needs to say "Browse filters". -->
-      <div class="filter-actions-top">
-        <button class="btn" id="filter-toggle-top" type="button">Hide filters</button>
+           copies of the "Browse/Hide filters" toggle and "Clear filters"
+           button below, for when that wall runs long enough to push the
+           originals off-screen. Reuses the .filter-actions class itself
+           (not just a lookalike) so the row/button layout is guaranteed
+           identical to the one at the bottom, not just visually similar.
+           #filter-toggle-top's click just proxies to #filter-toggle (see
+           app.js), which owns the open/closed state and keeps both
+           buttons' labels in sync. -->
+      <div class="filter-actions filter-actions-top">
+        <button class="btn" id="filter-toggle-top" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
+          <span id="filter-toggle-top-label">Browse filters</span>
+        </button>
         <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
       </div>
 
@@ -2809,16 +2808,20 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     // page content down and scrolls normally.
     el.filterToggle.addEventListener("click", function () {
       var open = !el.filterBar.classList.contains("filters-open");
+      var label = open ? "Hide filters" : "Browse filters";
       el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
+      el.filterToggleLabel.textContent = label;
+      // Its mobile-only duplicate near the top of the expanded wall (see
+      // .filter-actions-top in styles.css) mirrors the same open/closed
+      // state and label rather than tracking it independently.
+      el.filterToggleTop.setAttribute("aria-expanded", open ? "true" : "false");
+      el.filterToggleTopLabel.textContent = label;
     });
 
-    // Top "Hide filters" (see .filter-actions-top in styles.css) is only
-    // ever shown while already expanded, so it has nothing of its own to
-    // decide — it just proxies to the real toggle button above, which
-    // owns the open/closed state, the aria-expanded attribute, and the
-    // Browse/Hide label swap.
+    // The top button itself has no state of its own to decide — it just
+    // proxies to the real toggle above, whose handler (just above) is
+    // what actually flips filters-open and keeps both labels in sync.
     el.filterToggleTop.addEventListener("click", function () {
       el.filterToggle.click();
     });
@@ -3041,6 +3044,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
       filterToggleTop: $("filter-toggle-top"),
+      filterToggleTopLabel: $("filter-toggle-top-label"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),
