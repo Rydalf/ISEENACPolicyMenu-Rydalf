@@ -548,9 +548,9 @@ kbd {
 
 /* Hidden by default everywhere — only shown (see the mobile media query
    below) on narrow screens while the full pill wall is expanded, as a
-   second, higher-up copy of #clear-filters for when that wall runs long
-   enough to push the original below the fold. */
-.clear-filters-top { display: none; }
+   second, higher-up copy of the Hide filters / Clear filters pair for
+   when that wall runs long enough to push the originals below the fold. */
+.filter-actions-top { display: none; }
 
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
@@ -1347,14 +1347,24 @@ mark {
   .filter-bar-lower { grid-template-columns: 1fr; }
 
   /* Only earns its place once the wall it's meant to shortcut past is
-     actually showing — collapsed, #clear-filters right below "Browse
-     filters" is already close enough that a duplicate would just be
-     clutter. */
-  .filter-bar.filters-open .clear-filters-top {
-    display: inline-flex;
-    width: 100%;
-    justify-content: center;
+     actually showing — collapsed, the originals right below "Browse
+     filters" are already close enough that a duplicate row would just be
+     clutter. Same row/gap treatment as .filter-actions below. */
+  .filter-bar.filters-open .filter-actions-top {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
     margin: 8px 0 2px;
+  }
+
+  .filter-actions-top .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 11px 10px;
+    font-size: 13.5px;
   }
 
   .filter-actions {

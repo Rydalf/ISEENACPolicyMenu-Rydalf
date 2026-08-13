@@ -1058,6 +1058,15 @@
       el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
+    // Top "Hide filters" (see .filter-actions-top in styles.css) is only
+    // ever shown while already expanded, so it has nothing of its own to
+    // decide — it just proxies to the real toggle button above, which
+    // owns the open/closed state, the aria-expanded attribute, and the
+    // Browse/Hide label swap.
+    el.filterToggleTop.addEventListener("click", function () {
+      el.filterToggle.click();
+    });
+
     // Random resource: narrows the grid to a single pick drawn from the
     // *currently filtered* results, not always all 65 — so it stays
     // relevant to whatever search/filters are already active rather than
@@ -1275,6 +1284,7 @@
       clearFilters: $("clear-filters"),
       clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
+      filterToggleTop: $("filter-toggle-top"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),

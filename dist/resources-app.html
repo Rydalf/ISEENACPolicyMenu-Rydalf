@@ -556,9 +556,9 @@ kbd {
 
 /* Hidden by default everywhere — only shown (see the mobile media query
    below) on narrow screens while the full pill wall is expanded, as a
-   second, higher-up copy of #clear-filters for when that wall runs long
-   enough to push the original below the fold. */
-.clear-filters-top { display: none; }
+   second, higher-up copy of the Hide filters / Clear filters pair for
+   when that wall runs long enough to push the originals below the fold. */
+.filter-actions-top { display: none; }
 
 /* Tags on the left, a fixed action column on the right — the column's
    height follows whichever side is taller (grid default), while its
@@ -1355,14 +1355,24 @@ mark {
   .filter-bar-lower { grid-template-columns: 1fr; }
 
   /* Only earns its place once the wall it's meant to shortcut past is
-     actually showing — collapsed, #clear-filters right below "Browse
-     filters" is already close enough that a duplicate would just be
-     clutter. */
-  .filter-bar.filters-open .clear-filters-top {
-    display: inline-flex;
-    width: 100%;
-    justify-content: center;
+     actually showing — collapsed, the originals right below "Browse
+     filters" are already close enough that a duplicate row would just be
+     clutter. Same row/gap treatment as .filter-actions below. */
+  .filter-bar.filters-open .filter-actions-top {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
     margin: 8px 0 2px;
+  }
+
+  .filter-actions-top .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 11px 10px;
+    font-size: 13.5px;
   }
 
   .filter-actions {
@@ -1572,10 +1582,17 @@ footer.foot {
       </div>
 
       <!-- Mobile-only, and only while the full pill wall is expanded (see
-           .clear-filters-top in styles.css) — a second, reachable-without-
-           scrolling copy of #clear-filters below, for when that wall runs
-           long enough to push the original one off-screen. -->
-      <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
+           .filter-actions-top in styles.css) — reachable-without-scrolling
+           copies of the "Hide filters" / "Clear filters" pair below, for
+           when that wall runs long enough to push the originals
+           off-screen. Hide filters here just proxies a click to
+           #filter-toggle (see app.js) rather than duplicating its
+           expand/collapse + label logic — it's only ever shown in the
+           "expanded" state, so it never needs to say "Browse filters". -->
+      <div class="filter-actions-top">
+        <button class="btn" id="filter-toggle-top" type="button">Hide filters</button>
+        <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
+      </div>
 
       <div class="filter-bar-lower">
       <div class="filter-bar-tags">
@@ -2797,6 +2814,15 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
+    // Top "Hide filters" (see .filter-actions-top in styles.css) is only
+    // ever shown while already expanded, so it has nothing of its own to
+    // decide — it just proxies to the real toggle button above, which
+    // owns the open/closed state, the aria-expanded attribute, and the
+    // Browse/Hide label swap.
+    el.filterToggleTop.addEventListener("click", function () {
+      el.filterToggle.click();
+    });
+
     // Random resource: narrows the grid to a single pick drawn from the
     // *currently filtered* results, not always all 65 — so it stays
     // relevant to whatever search/filters are already active rather than
@@ -3014,6 +3040,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       clearFilters: $("clear-filters"),
       clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
+      filterToggleTop: $("filter-toggle-top"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),
