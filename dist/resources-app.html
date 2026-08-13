@@ -466,13 +466,26 @@ kbd {
 
 /* ---------- Filter groups ---------- */
 
-/* Match toggle spans full width on its own row; the boxed tag groups and
-   the action column sit in a second row below it, so the buttons align
-   with the top of the boxes rather than the Match toggle above them. */
+/* .match-row, .filter-bar-tags, and .filter-actions are placed by name
+   (grid-area, declared with each of them below) rather than relying on
+   their order in index.html, so each can move independently per
+   breakpoint: desktop keeps Match spanning the top with tags and the
+   action column sharing the row below it (the action column's height
+   following whichever side is taller, per grid's default stretch, while
+   its buttons stay top-aligned rather than stretching to fill it);
+   mobile (see the media query) instead stacks Browse/Clear right under
+   Match, ahead of the tags — permanently reachable near the top instead
+   of trailing after a pill wall that can run much longer than one
+   screen. */
 .filter-bar {
   margin-top: 6px;
   display: grid;
-  gap: 6px;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "match match"
+    "tags actions";
+  align-items: start;
+  gap: 6px 16px;
 }
 
 /* Match all/any is a persistent control, not part of the collapse — it
@@ -483,6 +496,7 @@ kbd {
    that needs the room a stacked layout buys, and staying inline keeps
    this row's footprint minimal. */
 .match-row {
+  grid-area: match;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -554,35 +568,16 @@ kbd {
   pointer-events: auto;
 }
 
-/* Hidden by default everywhere — only shown (see the mobile media query
-   below) on narrow screens while the full pill wall is expanded, as a
-   second, higher-up copy of the Browse/Hide filters + Clear filters pair
-   for when that wall runs long enough to push the originals below the
-   fold. Combined with .filter-actions (both classes are on the same
-   element — see index.html) precisely so its row/button styling comes
-   free from .filter-actions itself; the combined selector here is what
-   makes this override win the cascade over .filter-actions's own
-   unconditional `display: flex` below, regardless of source order. */
-.filter-actions.filter-actions-top { display: none; }
-
-/* Tags on the left, a fixed action column on the right — the column's
-   height follows whichever side is taller (grid default), while its
-   buttons stay top-aligned rather than stretching to fill it. */
-.filter-bar-lower {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 16px;
-}
-
 /* The two boxed groups (Type+Subtype, Organization), stacked. */
 .filter-bar-tags {
+  grid-area: tags;
   min-width: 0;
   display: grid;
   gap: 6px;
 }
 
 .filter-actions {
+  grid-area: actions;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1354,20 +1349,35 @@ mark {
     pointer-events: none;
   }
 
-  /* Limited width: tags stack above the action buttons instead of sitting
-     beside them, and the buttons share a row evenly instead of forming a
-     tall column. */
-  .filter-bar-lower { grid-template-columns: 1fr; }
+  /* Single column, and Browse/Clear filters move up to sit right under
+     Match — permanently reachable near the top on every load, collapsed
+     or expanded, rather than trailing after a pill wall that can run
+     much longer than one screen (their .filter-actions styling itself,
+     row direction and button sizing, comes from the rule further down —
+     this only changes where the row sits). */
+  .filter-bar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "match"
+      "actions"
+      "tags";
+  }
 
-  /* Only earns its place once the wall it's meant to shortcut past is
-     actually showing — collapsed, the originals right below "Browse
-     filters" are already close enough that a duplicate row would just be
-     clutter. Row direction, wrap, and button sizing all come from
-     .filter-actions below (this element carries both classes), so this
-     only needs to add display + spacing on top of that. */
-  .filter-bar.filters-open .filter-actions.filter-actions-top {
-    display: flex;
-    margin: 8px 0 2px;
+  /* "MATCH" spelled out is redundant with the pill labels themselves
+     ("Match all" / "Match any") and just eats into a row that's already
+     tight next to the info icon — visually-hidden rather than removed so
+     .segmented's aria-labelledby (see index.html) still has real text to
+     announce. Matches .visually-hidden's technique (see that rule). */
+  .match-row .flabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .filter-actions {
@@ -1559,6 +1569,13 @@ footer.foot {
     </div>
   </div>
 
+  <!-- .match-row, .filter-actions, and .filter-bar-tags are all direct
+       children of this single grid (see .filter-bar in styles.css) so
+       they can be freely repositioned per breakpoint via grid-area,
+       independent of their source order below. Source order itself is
+       chosen for tab order: actions right after Match, ahead of the
+       (often much longer) tags, so keyboard users reach Browse/Clear
+       filters early on every screen size, not just visually on mobile. -->
   <div class="filter-bar" id="filter-bar">
       <div class="match-row">
         <span class="flabel" id="lbl-match">Match</span>
@@ -1576,24 +1593,13 @@ footer.foot {
         </button>
       </div>
 
-      <!-- Mobile-only, and only while the full pill wall is expanded (see
-           .filter-actions-top in styles.css) — reachable-without-scrolling
-           copies of the "Browse/Hide filters" toggle and "Clear filters"
-           button below, for when that wall runs long enough to push the
-           originals off-screen. Reuses the .filter-actions class itself
-           (not just a lookalike) so the row/button layout is guaranteed
-           identical to the one at the bottom, not just visually similar.
-           #filter-toggle-top's click just proxies to #filter-toggle (see
-           app.js), which owns the open/closed state and keeps both
-           buttons' labels in sync. -->
-      <div class="filter-actions filter-actions-top">
-        <button class="btn" id="filter-toggle-top" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
-          <span id="filter-toggle-top-label">Browse filters</span>
+      <div class="filter-actions">
+        <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
+          <span id="filter-toggle-label">Browse filters</span><span class="badge" id="filter-badge"></span>
         </button>
-        <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
+        <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       </div>
 
-      <div class="filter-bar-lower">
       <div class="filter-bar-tags">
         <div class="filter-group-box">
           <div class="filters-preview" id="filters-preview-typesub">
@@ -1634,14 +1640,6 @@ footer.foot {
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="filter-actions">
-        <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
-          <span id="filter-toggle-label">Browse filters</span><span class="badge" id="filter-badge"></span>
-        </button>
-        <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
-      </div>
       </div>
   </div>
 
@@ -2493,7 +2491,6 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     // must stay enabled in that case too, not just when a real filter is
     // active.
     el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
-    el.clearFiltersTop.disabled = el.clearFilters.disabled;
 
     // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
@@ -2674,13 +2671,11 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar), plus its mobile-only
-    // duplicate near the top of the expanded filter wall (see
-    // .clear-filters-top in styles.css) — same handler for both. While
-    // viewing a random pick, this exits that view only — same as "Back to
-    // all resources" — rather than also clearing search/filters the pick
+    // Clear-filters button (next to the search bar). While viewing a
+    // random pick, this exits that view only — same as "Back to all
+    // resources" — rather than also clearing search/filters the pick
     // itself doesn't touch; otherwise it's the normal full clear.
-    function handleClearFilters() {
+    el.clearFilters.addEventListener("click", function () {
       if (randomPick) {
         exitRandomPick();
       } else {
@@ -2688,9 +2683,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       }
       render();
       el.search.focus();
-    }
-    el.clearFilters.addEventListener("click", handleClearFilters);
-    el.clearFiltersTop.addEventListener("click", handleClearFilters);
+    });
 
     // Filter pills (delegated on the filter bar — the pills' actual
     // container since it moved out of #controls to be a plain, never-
@@ -2808,22 +2801,9 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
     // page content down and scrolls normally.
     el.filterToggle.addEventListener("click", function () {
       var open = !el.filterBar.classList.contains("filters-open");
-      var label = open ? "Hide filters" : "Browse filters";
       el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      el.filterToggleLabel.textContent = label;
-      // Its mobile-only duplicate near the top of the expanded wall (see
-      // .filter-actions-top in styles.css) mirrors the same open/closed
-      // state and label rather than tracking it independently.
-      el.filterToggleTop.setAttribute("aria-expanded", open ? "true" : "false");
-      el.filterToggleTopLabel.textContent = label;
-    });
-
-    // The top button itself has no state of its own to decide — it just
-    // proxies to the real toggle above, whose handler (just above) is
-    // what actually flips filters-open and keeps both labels in sync.
-    el.filterToggleTop.addEventListener("click", function () {
-      el.filterToggle.click();
+      el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
     // Random resource: narrows the grid to a single pick drawn from the
@@ -3041,10 +3021,7 @@ The ATS Research News Quarterly, written by the ATS Research Advocacy Committe
       subPillsPreview: $("sub-pills-preview"),
       orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
-      clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
-      filterToggleTop: $("filter-toggle-top"),
-      filterToggleTopLabel: $("filter-toggle-top-label"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),

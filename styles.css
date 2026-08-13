@@ -458,13 +458,26 @@ kbd {
 
 /* ---------- Filter groups ---------- */
 
-/* Match toggle spans full width on its own row; the boxed tag groups and
-   the action column sit in a second row below it, so the buttons align
-   with the top of the boxes rather than the Match toggle above them. */
+/* .match-row, .filter-bar-tags, and .filter-actions are placed by name
+   (grid-area, declared with each of them below) rather than relying on
+   their order in index.html, so each can move independently per
+   breakpoint: desktop keeps Match spanning the top with tags and the
+   action column sharing the row below it (the action column's height
+   following whichever side is taller, per grid's default stretch, while
+   its buttons stay top-aligned rather than stretching to fill it);
+   mobile (see the media query) instead stacks Browse/Clear right under
+   Match, ahead of the tags — permanently reachable near the top instead
+   of trailing after a pill wall that can run much longer than one
+   screen. */
 .filter-bar {
   margin-top: 6px;
   display: grid;
-  gap: 6px;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "match match"
+    "tags actions";
+  align-items: start;
+  gap: 6px 16px;
 }
 
 /* Match all/any is a persistent control, not part of the collapse — it
@@ -475,6 +488,7 @@ kbd {
    that needs the room a stacked layout buys, and staying inline keeps
    this row's footprint minimal. */
 .match-row {
+  grid-area: match;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -546,35 +560,16 @@ kbd {
   pointer-events: auto;
 }
 
-/* Hidden by default everywhere — only shown (see the mobile media query
-   below) on narrow screens while the full pill wall is expanded, as a
-   second, higher-up copy of the Browse/Hide filters + Clear filters pair
-   for when that wall runs long enough to push the originals below the
-   fold. Combined with .filter-actions (both classes are on the same
-   element — see index.html) precisely so its row/button styling comes
-   free from .filter-actions itself; the combined selector here is what
-   makes this override win the cascade over .filter-actions's own
-   unconditional `display: flex` below, regardless of source order. */
-.filter-actions.filter-actions-top { display: none; }
-
-/* Tags on the left, a fixed action column on the right — the column's
-   height follows whichever side is taller (grid default), while its
-   buttons stay top-aligned rather than stretching to fill it. */
-.filter-bar-lower {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 16px;
-}
-
 /* The two boxed groups (Type+Subtype, Organization), stacked. */
 .filter-bar-tags {
+  grid-area: tags;
   min-width: 0;
   display: grid;
   gap: 6px;
 }
 
 .filter-actions {
+  grid-area: actions;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1346,20 +1341,35 @@ mark {
     pointer-events: none;
   }
 
-  /* Limited width: tags stack above the action buttons instead of sitting
-     beside them, and the buttons share a row evenly instead of forming a
-     tall column. */
-  .filter-bar-lower { grid-template-columns: 1fr; }
+  /* Single column, and Browse/Clear filters move up to sit right under
+     Match — permanently reachable near the top on every load, collapsed
+     or expanded, rather than trailing after a pill wall that can run
+     much longer than one screen (their .filter-actions styling itself,
+     row direction and button sizing, comes from the rule further down —
+     this only changes where the row sits). */
+  .filter-bar {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "match"
+      "actions"
+      "tags";
+  }
 
-  /* Only earns its place once the wall it's meant to shortcut past is
-     actually showing — collapsed, the originals right below "Browse
-     filters" are already close enough that a duplicate row would just be
-     clutter. Row direction, wrap, and button sizing all come from
-     .filter-actions below (this element carries both classes), so this
-     only needs to add display + spacing on top of that. */
-  .filter-bar.filters-open .filter-actions.filter-actions-top {
-    display: flex;
-    margin: 8px 0 2px;
+  /* "MATCH" spelled out is redundant with the pill labels themselves
+     ("Match all" / "Match any") and just eats into a row that's already
+     tight next to the info icon — visually-hidden rather than removed so
+     .segmented's aria-labelledby (see index.html) still has real text to
+     announce. Matches .visually-hidden's technique (see that rule). */
+  .match-row .flabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .filter-actions {

@@ -67,6 +67,13 @@
     </div>
   </div>
 
+  <!-- .match-row, .filter-actions, and .filter-bar-tags are all direct
+       children of this single grid (see .filter-bar in styles.css) so
+       they can be freely repositioned per breakpoint via grid-area,
+       independent of their source order below. Source order itself is
+       chosen for tab order: actions right after Match, ahead of the
+       (often much longer) tags, so keyboard users reach Browse/Clear
+       filters early on every screen size, not just visually on mobile. -->
   <div class="filter-bar" id="filter-bar">
       <div class="match-row">
         <span class="flabel" id="lbl-match">Match</span>
@@ -84,24 +91,13 @@
         </button>
       </div>
 
-      <!-- Mobile-only, and only while the full pill wall is expanded (see
-           .filter-actions-top in styles.css) — reachable-without-scrolling
-           copies of the "Browse/Hide filters" toggle and "Clear filters"
-           button below, for when that wall runs long enough to push the
-           originals off-screen. Reuses the .filter-actions class itself
-           (not just a lookalike) so the row/button layout is guaranteed
-           identical to the one at the bottom, not just visually similar.
-           #filter-toggle-top's click just proxies to #filter-toggle (see
-           app.js), which owns the open/closed state and keeps both
-           buttons' labels in sync. -->
-      <div class="filter-actions filter-actions-top">
-        <button class="btn" id="filter-toggle-top" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
-          <span id="filter-toggle-top-label">Browse filters</span>
+      <div class="filter-actions">
+        <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
+          <span id="filter-toggle-label">Browse filters</span><span class="badge" id="filter-badge"></span>
         </button>
-        <button class="btn clear-filters-top" id="clear-filters-top" type="button" disabled>Clear filters</button>
+        <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
       </div>
 
-      <div class="filter-bar-lower">
       <div class="filter-bar-tags">
         <div class="filter-group-box">
           <div class="filters-preview" id="filters-preview-typesub">
@@ -142,14 +138,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="filter-actions">
-        <button class="btn" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filters-typesub filters-org">
-          <span id="filter-toggle-label">Browse filters</span><span class="badge" id="filter-badge"></span>
-        </button>
-        <button class="btn" id="clear-filters" type="button" disabled>Clear filters</button>
-      </div>
       </div>
   </div>
 

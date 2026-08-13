@@ -738,7 +738,6 @@
     // must stay enabled in that case too, not just when a real filter is
     // active.
     el.clearFilters.disabled = !hasActiveFilters() && !randomPick;
-    el.clearFiltersTop.disabled = el.clearFilters.disabled;
 
     // Show how many pill filters are active, since they're collapsed on mobile
     var activePills = state.types.length + state.subs.length + state.orgs.length;
@@ -919,13 +918,11 @@
       el.grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    // Clear-filters button (next to the search bar), plus its mobile-only
-    // duplicate near the top of the expanded filter wall (see
-    // .clear-filters-top in styles.css) — same handler for both. While
-    // viewing a random pick, this exits that view only — same as "Back to
-    // all resources" — rather than also clearing search/filters the pick
+    // Clear-filters button (next to the search bar). While viewing a
+    // random pick, this exits that view only — same as "Back to all
+    // resources" — rather than also clearing search/filters the pick
     // itself doesn't touch; otherwise it's the normal full clear.
-    function handleClearFilters() {
+    el.clearFilters.addEventListener("click", function () {
       if (randomPick) {
         exitRandomPick();
       } else {
@@ -933,9 +930,7 @@
       }
       render();
       el.search.focus();
-    }
-    el.clearFilters.addEventListener("click", handleClearFilters);
-    el.clearFiltersTop.addEventListener("click", handleClearFilters);
+    });
 
     // Filter pills (delegated on the filter bar — the pills' actual
     // container since it moved out of #controls to be a plain, never-
@@ -1053,22 +1048,9 @@
     // page content down and scrolls normally.
     el.filterToggle.addEventListener("click", function () {
       var open = !el.filterBar.classList.contains("filters-open");
-      var label = open ? "Hide filters" : "Browse filters";
       el.filterBar.classList.toggle("filters-open", open);
       el.filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      el.filterToggleLabel.textContent = label;
-      // Its mobile-only duplicate near the top of the expanded wall (see
-      // .filter-actions-top in styles.css) mirrors the same open/closed
-      // state and label rather than tracking it independently.
-      el.filterToggleTop.setAttribute("aria-expanded", open ? "true" : "false");
-      el.filterToggleTopLabel.textContent = label;
-    });
-
-    // The top button itself has no state of its own to decide — it just
-    // proxies to the real toggle above, whose handler (just above) is
-    // what actually flips filters-open and keeps both labels in sync.
-    el.filterToggleTop.addEventListener("click", function () {
-      el.filterToggle.click();
+      el.filterToggleLabel.textContent = open ? "Hide filters" : "Browse filters";
     });
 
     // Random resource: narrows the grid to a single pick drawn from the
@@ -1286,10 +1268,7 @@
       subPillsPreview: $("sub-pills-preview"),
       orgPillsPreview: $("org-pills-preview"),
       clearFilters: $("clear-filters"),
-      clearFiltersTop: $("clear-filters-top"),
       filterToggle: $("filter-toggle"),
-      filterToggleTop: $("filter-toggle-top"),
-      filterToggleTopLabel: $("filter-toggle-top-label"),
       filterToggleLabel: $("filter-toggle-label"),
       filterBadge: $("filter-badge"),
       matchMode: $("match-mode"),
